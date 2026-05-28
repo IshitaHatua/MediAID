@@ -1,0 +1,87 @@
+
+    <div class="page-header">
+      <h2 class="page-title">Compliance Management</h2>
+      <p class="page-sub">Monitor compliance records, violations, and trigger evaluations</p>
+    </div>
+
+    <mat-tab-group>
+      <mat-tab label="All Records">
+        <div class="tab-content"><ng-container *ngTemplateOutlet="table; context:{data: all}"></ng-container></div>
+      </mat-tab>
+      <mat-tab label="Violations">
+        <div class="tab-content"><ng-container *ngTemplateOutlet="table; context:{data: violations}"></ng-container></div>
+      </mat-tab>
+      <mat-tab label="Flagged">
+        <div class="tab-content"><ng-container *ngTemplateOutlet="table; context:{data: flagged}"></ng-container></div>
+      </mat-tab>
+      <mat-tab label="Full Evaluation">
+        <div class="tab-content">
+          <div class="section-card">
+            <h3 class="section-title">Full Compliance Evaluation</h3>
+            <form [formGroup]="evalForm" (ngSubmit)="evaluateFull()" class="eval-form">
+              <mat-form-field appearance="outline"><mat-label>Entity ID</mat-label><input matInput formControlName="entityId" type="number"><mat-error>Required</mat-error></mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Entity Type</mat-label>
+                <mat-select formControlName="entityType">
+                  <mat-option value="CLAIM">Claim</mat-option>
+                  <mat-option value="ENROLLMENT">Enrollment</mat-option>
+                  <mat-option value="DISBURSEMENT">Disbursement</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button class="btn-evaluate" type="submit"><mat-icon>rule</mat-icon> Evaluate</button>
+            </form>
+            <div *ngIf="evalResult" class="eval-result">
+              <h4>Evaluation Result</h4>
+              <pre>{{ evalResult | json }}</pre>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Create Record">
+        <div class="tab-content">
+          <div class="section-card">
+            <h3 class="section-title">Create Compliance Record</h3>
+            <form [formGroup]="recordForm" (ngSubmit)="createRecord()" class="eval-form">
+              <mat-form-field appearance="outline"><mat-label>Entity ID</mat-label><input matInput formControlName="entityId" type="number"><mat-error>Required</mat-error></mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Entity Type</mat-label>
+                <mat-select formControlName="entityType">
+                  <mat-option value="CLAIM">Claim</mat-option>
+                  <mat-option value="ENROLLMENT">Enrollment</mat-option>
+                  <mat-option value="DISBURSEMENT">Disbursement</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Result</mat-label>
+                <mat-select formControlName="result">
+                  <mat-option value="PASS">Pass</mat-option>
+                  <mat-option value="FAIL">Fail</mat-option>
+                  <mat-option value="FLAGGED">Flagged</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" style="width:300px"><mat-label>Notes</mat-label><textarea matInput formControlName="notes" rows="2"></textarea></mat-form-field>
+              <button class="btn-evaluate" type="submit"><mat-icon>save</mat-icon> Save Record</button>
+            </form>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <ng-template #table let-data="data">
+      <div class="section-card">
+        <div class="center" *ngIf="loading"><mat-spinner diameter="40" color="accent"></mat-spinner></div>
+        <table mat-table [dataSource]="data" class="data-table" *ngIf="!loading && data.length">
+          <ng-container matColumnDef="complianceId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let r" class="id-cell">#{{ r.complianceId }}</td></ng-container>
+          <ng-container matColumnDef="entityId"><th mat-header-cell *matHeaderCellDef>Entity</th><td mat-cell *matCellDef="let r">{{ r.entityId }}</td></ng-container>
+          <ng-container matColumnDef="entityType"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let r">{{ r.entityType }}</td></ng-container>
+          <ng-container matColumnDef="result"><th mat-header-cell *matHeaderCellDef>Result</th><td mat-cell *matCellDef="let r"><app-status-badge [status]="r.result"></app-status-badge></td></ng-container>
+          <ng-container matColumnDef="notes"><th mat-header-cell *matHeaderCellDef>Notes</th><td mat-cell *matCellDef="let r">{{ r.notes }}</td></ng-container>
+          <ng-container matColumnDef="evaluatedAt"><th mat-header-cell *matHeaderCellDef>Evaluated</th><td mat-cell *matCellDef="let r" class="date-cell">{{ r.evaluatedAt | date:'dd MMM y' }}</td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="cols"></tr>
+          <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+        </table>
+        <div class="empty-state" *ngIf="!loading && !data.length">
+          <mat-icon>rule</mat-icon><p>No records found</p>
+        </div>
+      </div>
+    </ng-template>

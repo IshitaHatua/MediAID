@@ -1,0 +1,253 @@
+<h2 class="page-title">Compliance Records</h2>
+
+<mat-tab-group>
+
+  <!-- ═══════════════ All Records ═══════════════ -->
+  <mat-tab label="All Records">
+    <div class="tab-content">
+      <div class="section-card">
+        <div class="toolbar">
+          <h3 class="section-title">All Compliance Records</h3>
+          <span class="count-badge">{{ all.length }} record(s)</span>
+        </div>
+        <div class="center" *ngIf="loading"><mat-spinner diameter="40"></mat-spinner></div>
+        <table mat-table [dataSource]="all" class="data-table" *ngIf="!loading && all.length">
+          <ng-container matColumnDef="complianceId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let r" class="id-cell">#{{ r.complianceId }}</td></ng-container>
+          <ng-container matColumnDef="entityId"><th mat-header-cell *matHeaderCellDef>Entity</th><td mat-cell *matCellDef="let r">{{ r.entityType }} #{{ r.entityId }}</td></ng-container>
+          <ng-container matColumnDef="entityType"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let r">{{ r.entityType }}</td></ng-container>
+          <ng-container matColumnDef="result"><th mat-header-cell *matHeaderCellDef>Result</th><td mat-cell *matCellDef="let r"><app-status-badge [status]="r.result"></app-status-badge></td></ng-container>
+          <ng-container matColumnDef="notes"><th mat-header-cell *matHeaderCellDef>Notes</th><td mat-cell *matCellDef="let r">{{ r.notes }}</td></ng-container>
+          <ng-container matColumnDef="evaluatedAt"><th mat-header-cell *matHeaderCellDef>Evaluated</th><td mat-cell *matCellDef="let r">{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="cols"></tr>
+          <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+        </table>
+        <p *ngIf="!loading && !all.length" class="empty">No compliance records yet.</p>
+      </div>
+    </div>
+  </mat-tab>
+
+  <!-- ═══════════════ Violations ═══════════════ -->
+  <mat-tab label="Violations">
+    <div class="tab-content">
+      <div class="section-card">
+        <div class="toolbar">
+          <h3 class="section-title">Compliance Violations</h3>
+          <span class="count-badge violations">{{ violations.length }} violation(s)</span>
+        </div>
+        <table mat-table [dataSource]="violations" class="data-table" *ngIf="violations.length">
+          <ng-container matColumnDef="complianceId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let r" class="id-cell">#{{ r.complianceId }}</td></ng-container>
+          <ng-container matColumnDef="entityId"><th mat-header-cell *matHeaderCellDef>Entity</th><td mat-cell *matCellDef="let r">{{ r.entityType }} #{{ r.entityId }}</td></ng-container>
+          <ng-container matColumnDef="entityType"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let r">{{ r.entityType }}</td></ng-container>
+          <ng-container matColumnDef="result"><th mat-header-cell *matHeaderCellDef>Result</th><td mat-cell *matCellDef="let r"><app-status-badge [status]="r.result"></app-status-badge></td></ng-container>
+          <ng-container matColumnDef="notes"><th mat-header-cell *matHeaderCellDef>Notes</th><td mat-cell *matCellDef="let r">{{ r.notes }}</td></ng-container>
+          <ng-container matColumnDef="evaluatedAt"><th mat-header-cell *matHeaderCellDef>Evaluated</th><td mat-cell *matCellDef="let r">{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="cols"></tr>
+          <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+        </table>
+        <p *ngIf="!violations.length" class="empty">No violations.</p>
+      </div>
+    </div>
+  </mat-tab>
+
+  <!-- ═══════════════ Flagged ═══════════════ -->
+  <mat-tab label="Flagged">
+    <div class="tab-content">
+      <div class="section-card">
+        <div class="toolbar">
+          <h3 class="section-title">Flagged Items</h3>
+          <span class="count-badge flagged">{{ flagged.length }} flagged</span>
+        </div>
+        <table mat-table [dataSource]="flagged" class="data-table" *ngIf="flagged.length">
+          <ng-container matColumnDef="complianceId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let r" class="id-cell">#{{ r.complianceId }}</td></ng-container>
+          <ng-container matColumnDef="entityId"><th mat-header-cell *matHeaderCellDef>Entity</th><td mat-cell *matCellDef="let r">{{ r.entityType }} #{{ r.entityId }}</td></ng-container>
+          <ng-container matColumnDef="entityType"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let r">{{ r.entityType }}</td></ng-container>
+          <ng-container matColumnDef="result"><th mat-header-cell *matHeaderCellDef>Result</th><td mat-cell *matCellDef="let r"><app-status-badge [status]="r.result"></app-status-badge></td></ng-container>
+          <ng-container matColumnDef="notes"><th mat-header-cell *matHeaderCellDef>Notes</th><td mat-cell *matCellDef="let r">{{ r.notes }}</td></ng-container>
+          <ng-container matColumnDef="evaluatedAt"><th mat-header-cell *matHeaderCellDef>Evaluated</th><td mat-cell *matCellDef="let r">{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="cols"></tr>
+          <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+        </table>
+        <p *ngIf="!flagged.length" class="empty">No flagged items.</p>
+      </div>
+    </div>
+  </mat-tab>
+
+  <!-- ═══════════════ Full Evaluation ═══════════════ -->
+  <mat-tab label="Full Evaluation">
+    <div class="tab-content">
+      <div class="section-card">
+        <h3 class="section-title">Run Compliance Evaluation</h3>
+        <p class="section-sub">Select an entity type, pick a record from the live list, then run the compliance check.</p>
+
+        <!-- Step 1 -->
+        <div class="step-label"><span class="step-num">1</span> Select entity type</div>
+        <div class="type-btns">
+          <button class="type-btn" [class.active]="evalEntityType === 'CLAIM'" (click)="selectEvalType('CLAIM')">
+            <mat-icon>receipt_long</mat-icon> Claim
+          </button>
+          <button class="type-btn" [class.active]="evalEntityType === 'POLICY'" (click)="selectEvalType('POLICY')">
+            <mat-icon>assignment</mat-icon> Enrollment / Policy
+          </button>
+          <button class="type-btn" [class.active]="evalEntityType === 'DISBURSEMENT'" (click)="selectEvalType('DISBURSEMENT')">
+            <mat-icon>account_balance_wallet</mat-icon> Disbursement
+          </button>
+        </div>
+
+        <!-- Step 2 -->
+        <ng-container *ngIf="evalEntityType">
+          <div class="step-label"><span class="step-num">2</span> Select a record</div>
+          <div class="center" *ngIf="evalLoadingEntities"><mat-spinner diameter="36"></mat-spinner></div>
+          <div class="entity-list" *ngIf="!evalLoadingEntities && evalEntities.length">
+            <div class="entity-row"
+                 *ngFor="let e of evalEntities"
+                 [class.selected]="evalSelected?.id === e.id"
+                 (click)="evalSelected = e; evalResult = null">
+              <mat-icon class="radio-icon">{{ evalSelected?.id === e.id ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+              <span class="entity-label">{{ e.label }}</span>
+              <app-status-badge [status]="e.status"></app-status-badge>
+            </div>
+          </div>
+          <p class="empty" *ngIf="!evalLoadingEntities && !evalEntities.length && !evalLoadError">No records found for this type.</p>
+
+          <!-- load error -->
+          <div class="entity-load-error" *ngIf="evalLoadError && !evalLoadingEntities">
+            <mat-icon>error_outline</mat-icon>
+            <span>Could not load records. Check your connection and try again.</span>
+            <button class="btn-retry" (click)="retryFetch('eval')">
+              <mat-icon>refresh</mat-icon> Retry
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- Step 3 -->
+        <ng-container *ngIf="evalSelected">
+          <div class="step-label"><span class="step-num">3</span> Run the check</div>
+          <div class="eval-summary">
+            <mat-icon>info_outline</mat-icon>
+            <span>Evaluating: <strong>{{ evalSelected.label }}</strong></span>
+          </div>
+          <button class="btn-submit eval-btn" (click)="runEvaluation()" [disabled]="evalRunning">
+            <mat-spinner *ngIf="evalRunning" diameter="18" class="btn-spinner"></mat-spinner>
+            <mat-icon *ngIf="!evalRunning">rule</mat-icon>
+            {{ evalRunning ? 'Evaluating…' : 'Run Compliance Check' }}
+          </button>
+        </ng-container>
+
+        <!-- Result box -->
+        <div class="eval-result-box"
+             *ngIf="evalResult"
+             [class.box-pass]="evalResult.result?.toUpperCase() === 'PASS'"
+             [class.box-fail]="evalResult.result?.toUpperCase() === 'FAIL'"
+             [class.box-flagged]="evalResult.result?.toUpperCase() === 'FLAGGED'">
+          <mat-icon class="result-icon">
+            {{ evalResult.result?.toUpperCase() === 'PASS' ? 'check_circle' :
+               evalResult.result?.toUpperCase() === 'FAIL' ? 'cancel' : 'flag' }}
+          </mat-icon>
+          <div class="result-text">
+            <div class="result-heading">{{ evalResult.result }}</div>
+            <div class="result-notes" *ngIf="evalResult.notes">{{ evalResult.notes }}</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </mat-tab>
+
+  <!-- ═══════════════ Create Record ═══════════════ -->
+  <mat-tab label="Create Record">
+    <div class="tab-content">
+      <div class="section-card">
+        <h3 class="section-title">Create Compliance Record</h3>
+        <p class="section-sub">Pick a live record from the system, set the compliance result, and save.</p>
+
+        <!-- Step 1 -->
+        <div class="step-label"><span class="step-num">1</span> Select entity type</div>
+        <div class="type-btns">
+          <button class="type-btn" [class.active]="createEntityType === 'CLAIM'" (click)="selectCreateType('CLAIM')">
+            <mat-icon>receipt_long</mat-icon> Claim
+          </button>
+          <button class="type-btn" [class.active]="createEntityType === 'POLICY'" (click)="selectCreateType('POLICY')">
+            <mat-icon>assignment</mat-icon> Enrollment / Policy
+          </button>
+          <button class="type-btn" [class.active]="createEntityType === 'DISBURSEMENT'" (click)="selectCreateType('DISBURSEMENT')">
+            <mat-icon>account_balance_wallet</mat-icon> Disbursement
+          </button>
+        </div>
+
+        <!-- Step 2 -->
+        <ng-container *ngIf="createEntityType">
+          <div class="step-label"><span class="step-num">2</span> Select a record</div>
+          <div class="center" *ngIf="createLoadingEntities"><mat-spinner diameter="36"></mat-spinner></div>
+          <div class="entity-list" *ngIf="!createLoadingEntities && createEntities.length">
+            <div class="entity-row"
+                 *ngFor="let e of createEntities"
+                 [class.selected]="createSelected?.id === e.id"
+                 (click)="createSelected = e">
+              <mat-icon class="radio-icon">{{ createSelected?.id === e.id ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+              <span class="entity-label">{{ e.label }}</span>
+              <app-status-badge [status]="e.status"></app-status-badge>
+            </div>
+          </div>
+          <p class="empty" *ngIf="!createLoadingEntities && !createEntities.length && !createLoadError">No records found for this type.</p>
+
+          <!-- load error -->
+          <div class="entity-load-error" *ngIf="createLoadError && !createLoadingEntities">
+            <mat-icon>error_outline</mat-icon>
+            <span>Could not load records. Check your connection and try again.</span>
+            <button class="btn-retry" (click)="retryFetch('create')">
+              <mat-icon>refresh</mat-icon> Retry
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- Step 3 -->
+        <ng-container *ngIf="createSelected">
+          <div class="step-label"><span class="step-num">3</span> Record the finding</div>
+          <div class="eval-summary">
+            <mat-icon>info_outline</mat-icon>
+            <span>Recording finding for: <strong>{{ createSelected.label }}</strong></span>
+          </div>
+
+          <div class="create-form">
+            <!-- Result picker buttons -->
+            <div class="create-form-label">Compliance Result</div>
+            <div class="result-picker">
+              <button class="result-btn"
+                      [class.active-pass]="createResult === 'PASS'"
+                      (click)="createResult = 'PASS'">
+                <mat-icon>check_circle</mat-icon> Pass
+              </button>
+              <button class="result-btn"
+                      [class.active-fail]="createResult === 'FAIL'"
+                      (click)="createResult = 'FAIL'">
+                <mat-icon>cancel</mat-icon> Fail / Violation
+              </button>
+              <button class="result-btn"
+                      [class.active-flagged]="createResult === 'FLAGGED'"
+                      (click)="createResult = 'FLAGGED'">
+                <mat-icon>flag</mat-icon> Flagged for Review
+              </button>
+            </div>
+
+            <!-- Notes -->
+            <div class="create-form-label">Notes <span class="optional">(optional)</span></div>
+            <textarea class="notes-input"
+                      [(ngModel)]="createNotes"
+                      placeholder="Describe the compliance finding…"
+                      rows="3"
+                      maxlength="500"></textarea>
+            <div class="notes-count">{{ createNotes.length }}/500</div>
+
+            <button class="btn-submit" (click)="saveRecord()" [disabled]="createSaving">
+              <mat-spinner *ngIf="createSaving" diameter="18" class="btn-spinner"></mat-spinner>
+              <mat-icon *ngIf="!createSaving">save</mat-icon>
+              {{ createSaving ? 'Saving…' : 'Save Record' }}
+            </button>
+          </div>
+        </ng-container>
+
+      </div>
+    </div>
+  </mat-tab>
+
+</mat-tab-group>

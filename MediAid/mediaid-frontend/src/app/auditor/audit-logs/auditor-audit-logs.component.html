@@ -1,0 +1,141 @@
+<div class="page-header">
+  <h2 class="page-title">Audit Logs</h2>
+  <p class="page-sub">Audit management logs across the platform</p>
+</div>
+
+<div class="section-card">
+  <mat-tab-group animationDuration="200ms">
+
+    <!-- ═══════════ TAB 1 — Business Activity Logs ═══════════ -->
+    <mat-tab label="Business Activity Logs">
+      <div class="tab-content">
+
+        <div class="toolbar">
+          <mat-form-field appearance="outline">
+            <mat-label>Filter by Action</mat-label>
+            <input matInput [(ngModel)]="businessActionFilter" placeholder="e.g. CREATE, UPDATE">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Filter by Resource</mat-label>
+            <input matInput [(ngModel)]="businessResourceFilter" placeholder="e.g. CLAIM:42">
+          </mat-form-field>
+          <button mat-flat-button color="primary" (click)="applyBusinessFilter()">Filter</button>
+          <button mat-button (click)="clearBusinessFilter()">Clear</button>
+          <button mat-stroked-button (click)="exportBusinessCSV()">
+            <mat-icon>download</mat-icon> Export CSV
+          </button>
+        </div>
+
+        <!-- Access denied banner -->
+        <div class="access-denied-banner" *ngIf="accessDenied && !businessLoading">
+          <mat-icon>lock_outline</mat-icon>
+          <div>
+            <strong>Access Restricted</strong>
+            <p>Your role does not have permission to view audit logs. Contact your administrator if you believe this is an error.</p>
+          </div>
+        </div>
+
+        <div class="center" *ngIf="businessLoading">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="businessLogs" class="data-table"
+               *ngIf="!businessLoading && !accessDenied && businessLogs.length">
+          <ng-container matColumnDef="logId">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let l" class="id-cell">#{{ l.logId }}</td>
+          </ng-container>
+          <ng-container matColumnDef="userId">
+            <th mat-header-cell *matHeaderCellDef>User ID</th>
+            <td mat-cell *matCellDef="let l">{{ l.userId }}</td>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let l">{{ l.action }}</td>
+          </ng-container>
+          <ng-container matColumnDef="resource">
+            <th mat-header-cell *matHeaderCellDef>Resource</th>
+            <td mat-cell *matCellDef="let l">{{ l.resource }}</td>
+          </ng-container>
+          <ng-container matColumnDef="details">
+            <th mat-header-cell *matHeaderCellDef>Details</th>
+            <td mat-cell *matCellDef="let l">{{ l.details }}</td>
+          </ng-container>
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+            <td mat-cell *matCellDef="let l" class="date-cell">{{ l.timestamp | date:'medium' }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="businessCols"></tr>
+          <tr mat-row *matRowDef="let row; columns: businessCols;"></tr>
+        </table>
+
+        <div class="empty-state" *ngIf="!businessLoading && !accessDenied && !businessLogs.length">
+          <mat-icon>history</mat-icon><p>No business audit logs found</p>
+        </div>
+
+      </div>
+    </mat-tab>
+
+    <!-- ═══════════ TAB 2 — Identity & Access Logs ═══════════ -->
+    <mat-tab label="Identity & Access Logs">
+      <div class="tab-content">
+
+        <div class="toolbar">
+          <mat-form-field appearance="outline">
+            <mat-label>Filter by Action</mat-label>
+            <input matInput [(ngModel)]="identityActionFilter" placeholder="e.g. LOGIN, REGISTER">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Filter by Resource</mat-label>
+            <input matInput [(ngModel)]="identityResourceFilter" placeholder="e.g. USER:42">
+          </mat-form-field>
+          <button mat-flat-button color="primary" (click)="applyIdentityFilter()">Filter</button>
+          <button mat-button (click)="clearIdentityFilter()">Clear</button>
+          <button mat-stroked-button (click)="exportIdentityCSV()">
+            <mat-icon>download</mat-icon> Export CSV
+          </button>
+        </div>
+
+        <div class="center" *ngIf="identityLoading">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="identityLogs" class="data-table"
+               *ngIf="!identityLoading && identityLogs.length">
+          <ng-container matColumnDef="auditId">
+            <th mat-header-cell *matHeaderCellDef>ID</th>
+            <td mat-cell *matCellDef="let l" class="id-cell">#{{ l.auditId }}</td>
+          </ng-container>
+          <ng-container matColumnDef="userId">
+            <th mat-header-cell *matHeaderCellDef>User ID</th>
+            <td mat-cell *matCellDef="let l">{{ l.userId }}</td>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let l">{{ l.action }}</td>
+          </ng-container>
+          <ng-container matColumnDef="resource">
+            <th mat-header-cell *matHeaderCellDef>Resource</th>
+            <td mat-cell *matCellDef="let l">{{ l.resource }}</td>
+          </ng-container>
+          <ng-container matColumnDef="details">
+            <th mat-header-cell *matHeaderCellDef>Details</th>
+            <td mat-cell *matCellDef="let l">{{ l.details }}</td>
+          </ng-container>
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+            <td mat-cell *matCellDef="let l" class="date-cell">{{ l.timestamp | date:'medium' }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="identityCols"></tr>
+          <tr mat-row *matRowDef="let row; columns: identityCols;"></tr>
+        </table>
+
+        <div class="empty-state" *ngIf="!identityLoading && !identityLogs.length">
+          <mat-icon>person_outline</mat-icon><p>No identity logs available</p>
+        </div>
+
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

@@ -1,0 +1,35 @@
+.page-header { margin-bottom: 20px; }
+.page-title { margin: 0 0 4px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
+.page-sub { margin: 0; font-size: 13px; color: rgba(255,255,255,0.4); }
+
+.section-card { background: linear-gradient(145deg,#111827,#1a2235); border: 1px solid rgba(99,102,241,0.15); border-radius: 14px; padding: 24px; }
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.filters { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.filter-field { width: 180px; }
+.count-badge { background: rgba(99,102,241,0.15); color: #818cf8; padding: 4px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+
+.btn-clear { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; font-size: 12px; cursor: pointer; }
+.btn-clear mat-icon { font-size: 15px; height: 15px; width: 15px; }
+
+.center { display: flex; justify-content: center; padding: 40px; }
+
+.audit-accordion { display: flex; flex-direction: column; gap: 8px; }
+.audit-panel { background: rgba(255,255,255,0.02) !important; border: 1px solid rgba(99,102,241,0.12) !important; border-radius: 10px !important; box-shadow: none !important; color: #f1f5f9 !important; }
+.audit-panel:hover { border-color: rgba(99,102,241,0.25) !important; }
+.panel-title { display: flex; align-items: center; gap: 10px; }
+.audit-id { color: #818cf8; font-weight: 700; font-family: monospace; }
+.scope-tag { background: rgba(99,102,241,0.15); color: #a5b4fc; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+
+.audit-detail { padding: 8px 0; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.info-item { display: flex; flex-direction: column; gap: 4px; }
+.info-item.full { grid-column: span 2; }
+.label { font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.value { font-size: 14px; color: rgba(255,255,255,0.8); }
+.value.date { color: rgba(255,255,255,0.4); font-size: 12px; }
+.findings-text { font-style: italic; color: rgba(255,255,255,0.6); }
+
+.empty-state { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 40px; color: rgba(255,255,255,0.25); }
+.empty-state mat-icon { font-size: 24px; }
+.empty-state p { margin: 0; font-size: 14px; }

@@ -1,0 +1,40 @@
+<div class="dashboard">
+  <div class="dash-header">
+    <div>
+      <div class="dash-eyebrow"></div>
+      <h1 class="dash-title">Compliance Dashboard</h1>
+      <p class="dash-subtitle">Evaluate claims and enrollments against compliance rules</p>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card" *ngFor="let card of summaryCards">
+      <div class="card-glow" [style.background]="card.glow"></div>
+      <div class="card-icon-wrap" [style.background]="card.grad">
+        <mat-icon>{{ card.icon }}</mat-icon>
+      </div>
+      <div class="card-content">
+        <div class="card-value">{{ card.value }}</div>
+        <div class="card-label">{{ card.label }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-actions-card">
+    <h3 class="qa-title">Quick Actions</h3>
+    <div class="qa-grid qa-grid-3">
+      <a routerLink="/compliance/records" class="qa-item">
+        <div class="qa-icon blue"><mat-icon>verified_user</mat-icon></div>
+        <span>Compliance Records</span>
+      </a>
+      <a routerLink="/compliance/audits" class="qa-item">
+        <div class="qa-icon green"><mat-icon>fact_check</mat-icon></div>
+        <span>Formal Audits</span>
+      </a>
+      <a routerLink="/compliance/audit-logs" class="qa-item">
+        <div class="qa-icon sky"><mat-icon>manage_search</mat-icon></div>
+        <span>Audit Logs</span>
+      </a>
+    </div>
+  </div>
+</div>

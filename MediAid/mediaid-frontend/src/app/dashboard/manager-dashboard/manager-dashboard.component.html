@@ -1,0 +1,41 @@
+
+    <div class="dashboard">
+      <div class="dash-header">
+        <div>
+          <div class="dash-eyebrow"></div>
+          <h1 class="dash-title">Manager Dashboard</h1>
+          <p class="dash-subtitle">Monitor schemes, compliance, and formal audits</p>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card" *ngFor="let card of summaryCards">
+          <div class="card-glow" [style.background]="card.glow"></div>
+          <div class="card-icon-wrap" [style.background]="card.grad">
+            <mat-icon>{{ card.icon }}</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ card.value }}</div>
+            <div class="card-label">{{ card.label }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-actions-card">
+        <h3 class="qa-title">Quick Actions</h3>
+        <div class="qa-grid">
+          <a routerLink="/manager/schemes" class="qa-item">
+            <div class="qa-icon blue"><mat-icon>local_offer</mat-icon></div>
+            <span>Manage Schemes</span>
+          </a>
+          <a routerLink="/manager/compliance" class="qa-item">
+            <div class="qa-icon red"><mat-icon>rule</mat-icon></div>
+            <span>Compliance Review</span>
+          </a>
+          <a routerLink="/manager/audits" class="qa-item">
+            <div class="qa-icon amber"><mat-icon>fact_check</mat-icon></div>
+            <span>Formal Audits</span>
+          </a>
+        </div>
+      </div>
+    </div>

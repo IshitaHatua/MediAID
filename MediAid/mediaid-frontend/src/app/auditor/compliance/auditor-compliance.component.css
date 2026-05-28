@@ -1,0 +1,18 @@
+.page-header { margin-bottom: 20px; }
+.page-title { margin: 0 0 4px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
+.page-sub { margin: 0; font-size: 13px; color: rgba(255,255,255,0.4); }
+
+.tab-content { padding: 18px 0; }
+.section-card { background: linear-gradient(145deg,#111827,#1a2235); border: 1px solid rgba(99,102,241,0.15); border-radius: 14px; padding: 22px; }
+.section-title { margin: 0 0 6px; color: #f1f5f9; font-size: 1.1rem; font-weight: 700; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.count-badge { background: rgba(99,102,241,0.15); color: #818cf8; padding: 4px 12px; border-radius: 20px; font-size: 12.5px; font-weight: 600; }
+.count-badge.violations { background: rgba(239,68,68,0.15); color: #f87171; }
+.count-badge.flagged { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.center { display: flex; justify-content: center; padding: 32px; }
+.data-table { width: 100%; background: transparent !important; }
+.id-cell { color: #818cf8; font-family: monospace; font-weight: 600; }
+.date-cell { color: rgba(255,255,255,0.4); font-size: 12px; }
+.empty-state { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 40px; color: rgba(255,255,255,0.25); }
+.empty-state mat-icon { font-size: 24px; }
+.empty-state p { margin: 0; font-size: 14px; }

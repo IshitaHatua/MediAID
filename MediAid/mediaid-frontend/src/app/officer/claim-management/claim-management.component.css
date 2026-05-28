@@ -1,0 +1,91 @@
+
+    .page-header { margin-bottom: 20px; }
+    .page-title { margin: 0 0 4px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
+    .page-sub { margin: 0; font-size: 13px; color: rgba(255,255,255,0.4); }
+
+    .toolbar-card {
+      background: linear-gradient(145deg, #111827, #1a2235);
+      border: 1px solid rgba(99,102,241,0.15); border-radius: 14px;
+      padding: 16px 20px; margin-bottom: 20px;
+    }
+    .toolbar { display: flex; align-items: center; gap: 16px; }
+    .filter-field { width: 200px; }
+    .count-badge {
+      background: rgba(99,102,241,0.15); color: #818cf8;
+      padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    }
+
+    .center { display: flex; justify-content: center; padding: 48px; }
+
+    .claims-accordion { display: flex; flex-direction: column; gap: 8px; }
+    .claim-panel {
+      background: linear-gradient(145deg, #111827, #1a2235) !important;
+      border: 1px solid rgba(99,102,241,0.15) !important;
+      border-radius: 12px !important;
+      box-shadow: none !important;
+      color: #f1f5f9 !important;
+    }
+    .claim-panel:hover { border-color: rgba(99,102,241,0.3) !important; }
+    .panel-title { display: flex; align-items: center; gap: 12px; }
+    .claim-id { color: #818cf8; font-weight: 700; font-family: monospace; font-size: 14px; }
+    .claim-amount { font-weight: 700; color: #4ade80; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 8px 0 16px; }
+    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .info-item.full { grid-column: span 2; }
+    .label { font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .value { font-size: 14px; color: rgba(255,255,255,0.8); }
+    .value.amount { color: #4ade80; font-weight: 700; }
+
+    .docs-section { padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.06); }
+    .docs-title {
+      display: flex; align-items: center; gap: 6px;
+      margin: 0 0 10px; font-size: 13px; font-weight: 700;
+      color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .docs-title mat-icon { font-size: 16px; height: 16px; width: 16px; color: #818cf8; }
+    .docs-loading { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.5); font-size: 13px; }
+    .docs-list { display: flex; flex-direction: column; gap: 6px; }
+    .doc-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;
+    }
+    .doc-type { font-size: 12px; font-weight: 700; color: #c7d2fe; min-width: 110px; }
+    .doc-name { flex: 1; font-size: 13px; color: rgba(255,255,255,0.7); word-break: break-all; }
+    .btn-doc {
+      background: rgba(99,102,241,0.15); color: #818cf8;
+      border: 1px solid rgba(99,102,241,0.3); border-radius: 6px;
+      width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.18s;
+    }
+    .btn-doc:hover { background: rgba(99,102,241,0.28); }
+    .btn-doc mat-icon { font-size: 16px; height: 16px; width: 16px; }
+    .docs-empty { color: rgba(255,255,255,0.35); font-size: 13px; font-style: italic; padding: 6px 0; }
+
+    .action-bar { display: flex; gap: 10px; padding-top: 12px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .btn-approve {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(52,211,153,0.15); color: #34d399;
+      border: 1px solid rgba(52,211,153,0.3); border-radius: 8px;
+      padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.18s;
+    }
+    .btn-approve:hover { background: rgba(52,211,153,0.25); }
+    .btn-approve mat-icon { font-size: 16px; height: 16px; width: 16px; }
+    .btn-reject {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(248,113,113,0.15); color: #f87171;
+      border: 1px solid rgba(248,113,113,0.3); border-radius: 8px;
+      padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.18s;
+    }
+    .btn-reject:hover { background: rgba(248,113,113,0.25); }
+    .btn-reject mat-icon { font-size: 16px; height: 16px; width: 16px; }
+
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-icon {
+      width: 56px; height: 56px; background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.2); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+    }
+    .empty-icon mat-icon { font-size: 28px; color: rgba(255,255,255,0.2); }
+    .empty-state p { color: rgba(255,255,255,0.35); font-size: 15px; margin: 0; }

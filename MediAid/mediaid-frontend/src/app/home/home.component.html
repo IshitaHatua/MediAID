@@ -1,0 +1,179 @@
+
+<!-- ═══════════ NAVBAR ═══════════ -->
+<nav class="home-nav">
+  <div class="nav-inner">
+    <a routerLink="/" class="nav-brand">
+      <div class="brand-logo">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 1v16M1 9h16" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span>MediAid</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="#about" class="nav-link">About</a>
+    </div>
+    <div class="nav-actions">
+      <a routerLink="/auth/login" class="btn-outline">Sign In</a>
+      <a routerLink="/auth/register" class="btn-solid">Get Started &rarr;</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Government Healthcare Initiative
+      </div>
+      <h1 class="hero-title">
+        Your Health,<br>
+        <span class="gradient-text">Our Priority</span>
+      </h1>
+      <p class="hero-subtitle">
+        MediAid bridges citizens with government healthcare schemes.
+        Register once, enroll in programs, file claims and track every benefit
+        &mdash; securely, transparently, instantly.
+      </p>
+      <div class="hero-cta">
+        <a routerLink="/auth/register" class="cta-primary">
+          Register Free
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </a>
+        <a routerLink="/auth/login" class="cta-ghost">Sign In to Portal</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FEATURES ═══════════ -->
+<section class="features-section" id="features">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <span class="material-icons">star</span> Core Features
+      </div>
+      <h2>Everything You Need, <span class="hl">In One Place</span></h2>
+      <p>From registration to disbursement, MediAid manages the complete healthcare aid lifecycle.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card" *ngFor="let f of features;">
+        <div class="fc-top">
+          <div class="fc-icon" [style.background]="f.bg">
+            <span class="material-icons" [style.color]="f.color">{{ f.icon }}</span>
+          </div>
+          
+        </div>
+        <h3>{{ f.title }}</h3>
+        <p>{{ f.desc }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ HOW IT WORKS ═══════════ -->
+<section class="how-section" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <span class="material-icons">route</span> Simple Process
+      </div>
+      <h2>Four Steps to <span class="hl">Healthcare Aid</span></h2>
+      <p>Get enrolled and start receiving benefits through a streamlined digital process.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card" *ngFor="let step of steps; let i = index">
+        <div class="step-num" [style.background]="stepColors[i] + '22'" [style.color]="stepColors[i]">
+          {{ i+1 }}
+        </div>
+        <div class="step-icon-wrap" [style.background]="stepColors[i] + '22'">
+          <span class="material-icons" [style.color]="stepColors[i]">{{ step.icon }}</span>
+        </div>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.desc }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ABOUT / MISSION ═══════════ -->
+<section class="about-section" id="about">
+  <div class="container">
+    <div class="about-text">
+      <div class="section-eyebrow">
+        <span class="material-icons">info</span> Our Mission
+      </div>
+      <h2>Bridging Citizens with <span class="hl">Healthcare Benefits</span></h2>
+      <p class="about-lead">MediAid is a digital platform that eliminates complexity around healthcare scheme enrollment, claim processing, and disbursement.</p>
+      <p class="about-body">We believe every citizen deserves transparent, efficient access to healthcare support. Our system cuts paperwork, removes middlemen, and puts control in your hands.</p>
+      <div class="about-pillars">
+        <div class="pillar" *ngFor="let p of pillars">
+          <div class="pillar-icon" [style.background]="p.bg">
+            <span class="material-icons" [style.color]="p.color">{{ p.icon }}</span>
+          </div>
+          <div>
+            <div class="pillar-title">{{ p.title }}</div>
+            <div class="pillar-desc">{{ p.desc }}</div>
+          </div>
+        </div>
+      </div>
+      <a routerLink="/auth/register" class="about-cta">
+        Get Started Today
+        <span class="material-icons">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CTA ═══════════ -->
+<section class="cta-section">
+  <div class="container cta-inner">
+    <div class="cta-icon-ring">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M14 2v24M2 14h24" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h2>Ready to Access Your Benefits?</h2>
+    <p>Create an account and start managing your healthcare aid online.</p>
+    <div class="cta-buttons">
+      <a routerLink="/auth/register" class="cta-btn-primary">
+        Create Free Account &rarr;
+      </a>
+      <a routerLink="/auth/login" class="cta-btn-outline">Sign In</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="container footer-grid">
+      <div class="footer-brand-col">
+        <div class="footer-brand">
+          <div class="f-logo">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1v14M1 8h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          MediAid
+        </div>
+        <p class="footer-tagline">Government healthcare aid &mdash; securely, transparently, instantly.</p>
+      </div>
+      <div class="footer-links-col" *ngFor="let col of footerLinks">
+        <div class="footer-col-title">{{ col.title }}</div>
+        <a class="footer-link" *ngFor="let l of col.links" [routerLink]="l['route'] || null" [href]="l['href'] || null">{{ l.label }}</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <span>&copy; 2025 MediAid. Government Healthcare Aid Portal. All rights reserved.</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,35 @@
+
+    <nav class="sidebar">
+      <div class="sidebar-inner">
+        <div class="nav-section">
+          <a
+            *ngFor="let item of navItems"
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            class="nav-item"
+            [matTooltip]="item.label"
+            matTooltipPosition="right"
+          >
+            <div class="nav-icon-wrap">
+              <mat-icon>{{ item.icon }}</mat-icon>
+            </div>
+            <span class="nav-label">{{ item.label }}</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-footer-info">
+          <div class="user-footer-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="user-footer-text">
+            <div class="user-footer-name">{{ auth.getUserName() }}</div>
+            <div class="user-footer-role">{{ auth.getRole() }}</div>
+          </div>
+        </div>
+        <button class="logout-btn" (click)="auth.logout()" matTooltip="Sign Out" matTooltipPosition="right">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+    </nav>

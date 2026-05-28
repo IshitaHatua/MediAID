@@ -1,0 +1,53 @@
+<h2 class="page-title">Audit Logs</h2>
+<p class="page-sub">Identity and access logs — login, register, password events</p>
+
+<mat-card>
+  <div class="toolbar">
+    <mat-form-field appearance="outline">
+      <mat-label>Filter by User ID</mat-label>
+      <input matInput [(ngModel)]="userIdFilter" placeholder="Enter user ID">
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Filter by Action</mat-label>
+      <input matInput [(ngModel)]="actionFilter" placeholder="e.g. LOGIN, REGISTER">
+    </mat-form-field>
+    <button mat-flat-button color="primary" (click)="applyFilter()">Filter</button>
+    <button mat-button (click)="clear()">Clear</button>
+    <button mat-stroked-button (click)="exportCSV(basicLogs, 'identity-audit-logs.csv')">
+      <mat-icon>download</mat-icon> Export CSV
+    </button>
+  </div>
+
+  <div class="center" *ngIf="basicLoading"><mat-spinner diameter="40"></mat-spinner></div>
+
+  <table mat-table [dataSource]="basicLogs" class="full-width" *ngIf="!basicLoading && basicLogs.length">
+    <ng-container matColumnDef="auditId">
+      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <td mat-cell *matCellDef="let l">{{ l.auditId }}</td>
+    </ng-container>
+    <ng-container matColumnDef="userId">
+      <th mat-header-cell *matHeaderCellDef>User ID</th>
+      <td mat-cell *matCellDef="let l">{{ l.userId }}</td>
+    </ng-container>
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef>Action</th>
+      <td mat-cell *matCellDef="let l">{{ l.action }}</td>
+    </ng-container>
+    <ng-container matColumnDef="resource">
+      <th mat-header-cell *matHeaderCellDef>Resource</th>
+      <td mat-cell *matCellDef="let l">{{ l.resource }}</td>
+    </ng-container>
+    <ng-container matColumnDef="details">
+      <th mat-header-cell *matHeaderCellDef>Details</th>
+      <td mat-cell *matCellDef="let l">{{ l.details }}</td>
+    </ng-container>
+    <ng-container matColumnDef="timestamp">
+      <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+      <td mat-cell *matCellDef="let l">{{ l.timestamp | date:'medium' }}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="basicCols"></tr>
+    <tr mat-row *matRowDef="let row; columns: basicCols;"></tr>
+  </table>
+
+  <p *ngIf="!basicLoading && !basicLogs.length" class="empty">No audit logs found.</p>
+</mat-card>

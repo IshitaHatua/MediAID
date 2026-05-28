@@ -1,0 +1,132 @@
+<h2 class="page-title">My Claims</h2>
+
+<!-- No Profile Banner -->
+<div class="no-profile-banner" *ngIf="!profileLoading && !hasProfile">
+  <mat-icon>account_circle</mat-icon>
+  <div>
+    <strong>Profile Required</strong>
+    <p>You need to create your citizen profile before you can submit claims.</p>
+  </div>
+  <a mat-flat-button color="primary" routerLink="/citizen/profile">Create Profile</a>
+</div>
+
+<!-- Pending Approval Banner -->
+<div class="pending-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'PENDING'">
+  <mat-icon>hourglass_top</mat-icon>
+  <div>
+    <strong>Profile Pending Approval</strong>
+    <p>Your citizen profile is awaiting officer verification. You can submit claims once your profile is approved.</p>
+  </div>
+</div>
+
+<!-- Rejected Banner -->
+<div class="rejected-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'REJECTED'">
+  <mat-icon>cancel</mat-icon>
+  <div>
+    <strong>Profile Rejected</strong>
+    <p>Your citizen profile was rejected. Please update your profile and contact support.</p>
+  </div>
+  <a mat-flat-button color="warn" routerLink="/citizen/profile">Update Profile</a>
+</div>
+
+<!-- Suspended Banner -->
+<div class="rejected-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'SUSPENDED'">
+  <mat-icon>block</mat-icon>
+  <div>
+    <strong>Profile Suspended</strong>
+    <p>Your citizen profile has been suspended. Please contact support for assistance.</p>
+  </div>
+</div>
+
+<mat-card class="page-card" style="background:#1a2235;color:#f1f5f9" *ngIf="!profileLoading && hasProfile && citizenStatus === 'VERIFIED'">
+  <div class="toolbar">
+    <span>{{ claims.length }} claim(s)</span>
+    <button mat-flat-button color="primary" (click)="openDialog()">
+      <mat-icon>add</mat-icon> Submit Claim
+    </button>
+  </div>
+  <div class="center" *ngIf="loading"><mat-spinner diameter="40"></mat-spinner></div>
+  <mat-accordion *ngIf="!loading && claims.length">
+    <mat-expansion-panel *ngFor="let c of claims" class="claim-panel" style="background:#1f2a42">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Claim #{{ c.claimId }} — ₹{{ c.claimAmount | number:'1.0-0' }}</mat-panel-title>
+        <mat-panel-description>
+          <app-status-badge [status]="c.status"></app-status-badge>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div class="claim-detail">
+        <div class="detail-row"><span class="label">Scheme</span><span>{{ schemeName(c.schemeId) }}</span></div>
+        <div class="detail-row"><span class="label">Date</span><span>{{ c.claimDate | date:'mediumDate' }}</span></div>
+        <div class="detail-row"><span class="label">Description</span><span>{{ c.description || '—' }}</span></div>
+      </div>
+      <div class="upload-section">
+        <div class="docs-header">
+          <b>Documents</b>
+          <span class="docs-inline" *ngIf="claimDocs[c.claimId]?.length">
+            <span class="doc-chip" *ngFor="let d of claimDocs[c.claimId]">
+              <mat-icon>description</mat-icon>{{ originalFileName(d.fileName) }}
+            </span>
+          </span>
+          <span class="docs-empty-inline" *ngIf="claimDocs[c.claimId] && !claimDocs[c.claimId].length">
+            No documents attached yet.
+          </span>
+        </div>
+        <label class="upload-btn">
+          <mat-icon>attach_file</mat-icon> Attach Document
+          <input type="file" (change)="uploadDoc($event, c.claimId)" accept=".pdf,.jpg,.jpeg,.png" hidden>
+        </label>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+  <p *ngIf="!loading && !claims.length" class="empty">No claims submitted yet.</p>
+</mat-card>
+<div class="center" *ngIf="profileLoading"><mat-spinner diameter="40"></mat-spinner></div>
+
+<div class="dialog-overlay" *ngIf="showDialog">
+  <mat-card class="dialog-card" style="background:#1f2a42;color:#f1f5f9">
+    <button mat-icon-button class="dialog-close-btn" type="button" aria-label="Close" (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+    <h3>Submit a Claim</h3>
+    <form [formGroup]="claimForm" (ngSubmit)="submitClaim()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Scheme</mat-label>
+        <mat-select formControlName="schemeId">
+          <mat-option *ngIf="schemes.length === 0" disabled>No approved enrollments &mdash; enroll in a scheme first</mat-option>
+          <mat-option *ngFor="let s of schemes" [value]="s.schemeId">{{ s.name }}</mat-option>
+        </mat-select>
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Claim Amount (₹)</mat-label>
+        <input matInput formControlName="claimAmount" type="number" min="1">
+        <mat-error>Required</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description (optional)</mat-label>
+        <textarea matInput formControlName="description" rows="3" maxlength="500"></textarea>
+      </mat-form-field>
+
+      <div class="dialog-attach">
+        <label class="dialog-attach-btn">
+          <mat-icon>attach_file</mat-icon>
+          <span>{{ pendingFile ? 'Change Document' : 'Attach Document' }}</span>
+          <input type="file" (change)="onFileSelected($event)" accept=".pdf,.jpg,.jpeg,.png" hidden>
+        </label>
+        <span class="dialog-attach-file" *ngIf="pendingFile">
+          <mat-icon>description</mat-icon>{{ pendingFile.name }}
+          <button mat-icon-button type="button" (click)="pendingFile=null" aria-label="Remove">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+        <span class="dialog-attach-hint" *ngIf="!pendingFile">PDF, JPG, or PNG (max 10MB) &mdash; optional</span>
+      </div>
+
+      <div class="dialog-actions">
+        <button mat-button type="button" (click)="closeDialog()">Cancel</button>
+        <button mat-flat-button color="primary" type="submit">Submit</button>
+      </div>
+    </form>
+  </mat-card>
+</div>
+

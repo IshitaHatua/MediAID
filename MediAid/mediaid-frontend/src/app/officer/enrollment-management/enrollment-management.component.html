@@ -1,0 +1,52 @@
+
+    <h2 class="page-title">Enrollment Management</h2>
+    <mat-card class="page-card">
+      <div class="toolbar">
+        <mat-form-field appearance="outline">
+          <mat-label>Filter by Status</mat-label>
+          <mat-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()">
+            <mat-option value="">All</mat-option>
+            <mat-option value="PENDING">Pending</mat-option>
+            <mat-option value="APPROVED">Approved</mat-option>
+            <mat-option value="REJECTED">Rejected</mat-option>
+            <mat-option value="ACTIVE">Active</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <span>{{ filtered.length }} record(s)</span>
+      </div>
+      <div class="center" *ngIf="loading"><mat-spinner diameter="40"></mat-spinner></div>
+      <table mat-table [dataSource]="filtered" class="full-width" *ngIf="!loading && filtered.length">
+        <ng-container matColumnDef="citizenId">
+          <th mat-header-cell *matHeaderCellDef>Citizen ID</th>
+          <td mat-cell *matCellDef="let e">{{ e.citizenId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="citizenAge">
+          <th mat-header-cell *matHeaderCellDef>Citizen Age</th>
+          <td mat-cell *matCellDef="let e">{{ citizenAge(e.citizenId) }}</td>
+        </ng-container>
+        <ng-container matColumnDef="schemeName">
+          <th mat-header-cell *matHeaderCellDef>Scheme</th>
+          <td mat-cell *matCellDef="let e">{{ schemeName(e.schemeId) }}</td>
+        </ng-container>
+        <ng-container matColumnDef="eligibility">
+          <th mat-header-cell *matHeaderCellDef>Eligibility</th>
+          <td mat-cell *matCellDef="let e" class="eligibility-cell">{{ schemeEligibility(e.schemeId) }}</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let e"><app-status-badge [status]="e.status"></app-status-badge></td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let e">
+            <ng-container *ngIf="e.status === 'PENDING'">
+              <button mat-button color="primary" (click)="updateStatus(e, 'APPROVED')">Approve</button>
+              <button mat-button color="warn" (click)="updateStatus(e, 'REJECTED')">Reject</button>
+            </ng-container>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="cols"></tr>
+        <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+      </table>
+      <p *ngIf="!loading && !filtered.length" class="empty">No enrollments found.</p>
+    </mat-card>

@@ -1,0 +1,48 @@
+
+    <mat-toolbar class="navbar">
+      <div class="nav-left">
+        <button mat-icon-button class="hamburger-btn" (click)="toggleSidebar.emit()" aria-label="Open navigation menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2v16M2 10h16" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="brand-name">MediAid</span>
+        </div>
+      </div>
+
+      <span class="spacer"></span>
+
+      <div class="nav-right">
+        <div class="user-chip">
+          <div class="user-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ auth.getUserName() }}</span>
+            <span class="role-chip" [ngClass]="(auth.getRole() || '') | lowercase">{{ auth.getRole() }}</span>
+          </div>
+          <button mat-icon-button [matMenuTriggerFor]="menu" class="menu-btn">
+            <mat-icon>expand_more</mat-icon>
+          </button>
+        </div>
+
+        <mat-menu #menu="matMenu" class="user-menu" xPosition="before">
+          <div class="menu-header">
+            <div class="menu-avatar"><mat-icon>account_circle</mat-icon></div>
+            <div>
+              <div class="menu-name">{{ auth.getUserName() }}</div>
+              <div class="menu-role">{{ auth.getRole() }}</div>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="auth.logout()">
+            <mat-icon class="logout-icon">logout</mat-icon>
+            <span>Sign Out</span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-toolbar>

@@ -1,0 +1,102 @@
+
+    .page-header { margin-bottom: 20px; }
+    .page-title { margin: 0 0 4px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
+    .page-sub { margin: 0; font-size: 13px; color: rgba(255,255,255,0.4); }
+
+    .pending-section { padding-top: 8px; }
+
+    .pending-toolbar {
+      display: flex; align-items: center; margin-bottom: 16px;
+    }
+    .pending-count { color: rgba(255,255,255,0.45); font-size: 13px; }
+    .pending-count.loading-placeholder { opacity: 0.5; }
+
+    .btn-refresh {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(99,102,241,0.15); color: #818cf8;
+      border: 1px solid rgba(99,102,241,0.3); border-radius: 8px;
+      padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+      margin-left: auto;
+    }
+    .btn-refresh:hover { background: rgba(99,102,241,0.25); }
+    .btn-refresh mat-icon { font-size: 15px; height: 15px; width: 15px; }
+
+    .center { display: flex; justify-content: center; padding: 48px; }
+
+    .empty-state { display: flex; align-items: center; gap: 8px; padding: 20px 0; color: rgba(255,255,255,0.3); }
+    .empty-state mat-icon { font-size: 20px; }
+    .empty-state p { margin: 0; font-size: 14px; }
+
+    .pending-list { display: flex; flex-direction: column; gap: 12px; }
+    .pending-card {
+      background: linear-gradient(145deg, #111827, #1a2235);
+      border: 1px solid rgba(245,158,11,0.25); border-radius: 12px; padding: 18px 20px;
+    }
+    .pending-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .citizen-name { font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+    .citizen-meta { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 2px; }
+    .citizen-addr { font-size: 12px; color: rgba(255,255,255,0.35); }
+    .pending-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+    .btn-docs {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(56,189,248,0.12); color: #38bdf8;
+      border: 1px solid rgba(56,189,248,0.3); border-radius: 8px;
+      padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.18s;
+    }
+    .btn-docs:hover { background: rgba(56,189,248,0.2); }
+    .btn-docs mat-icon { font-size: 16px; height: 16px; width: 16px; }
+
+    .btn-approve {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(52,211,153,0.15); color: #34d399;
+      border: 1px solid rgba(52,211,153,0.3); border-radius: 8px;
+      padding: 8px 18px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.18s;
+    }
+    .btn-approve:hover { background: rgba(52,211,153,0.25); }
+    .btn-approve mat-icon { font-size: 16px; height: 16px; width: 16px; }
+
+    .btn-reject {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(248,113,113,0.15); color: #f87171;
+      border: 1px solid rgba(248,113,113,0.3); border-radius: 8px;
+      padding: 8px 18px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.18s;
+    }
+    .btn-reject:hover { background: rgba(248,113,113,0.25); }
+    .btn-reject mat-icon { font-size: 16px; height: 16px; width: 16px; }
+
+    .docs-panel {
+      margin-top: 16px; padding-top: 16px;
+      border-top: 1px dashed rgba(255,255,255,0.08);
+    }
+    .docs-table { width: 100%; }
+    .btn-view-doc, .btn-download-doc {
+      background: rgba(99,102,241,0.1); color: #818cf8;
+      border: 1px solid rgba(99,102,241,0.25); border-radius: 6px;
+      padding: 4px 8px; cursor: pointer; margin-right: 6px;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all 0.15s; vertical-align: middle;
+    }
+    .btn-view-doc:hover, .btn-download-doc:hover { background: rgba(99,102,241,0.2); }
+    .btn-view-doc mat-icon, .btn-download-doc mat-icon { font-size: 16px; height: 16px; width: 16px; }
+    .btn-verify-doc {
+      background: rgba(52,211,153,0.1); color: #34d399;
+      border: 1px solid rgba(52,211,153,0.25); border-radius: 6px;
+      padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;
+      margin-right: 6px; transition: all 0.15s;
+    }
+    .btn-verify-doc:hover { background: rgba(52,211,153,0.2); }
+    .btn-reject-doc {
+      background: rgba(248,113,113,0.1); color: #f87171;
+      border: 1px solid rgba(248,113,113,0.25); border-radius: 6px;
+      padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-reject-doc:hover { background: rgba(248,113,113,0.2); }
+
+    .docs-empty {
+      display: flex; align-items: center; gap: 8px; padding: 12px 0;
+      color: rgba(255,255,255,0.35); font-size: 13px;
+    }
+    .docs-empty mat-icon { font-size: 18px; height: 18px; width: 18px; }

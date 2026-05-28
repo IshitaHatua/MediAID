@@ -1,0 +1,32 @@
+<div class="dashboard">
+  <div class="dash-header">
+    <div>
+      <div class="dash-eyebrow"></div>
+      <h1 class="dash-title">Auditor Dashboard</h1>
+      <p class="dash-subtitle">Review system audit logs and platform activity</p>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card" *ngFor="let card of summaryCards">
+      <div class="card-glow" [style.background]="card.glow"></div>
+      <div class="card-icon-wrap" [style.background]="card.grad">
+        <mat-icon>{{ card.icon }}</mat-icon>
+      </div>
+      <div class="card-content">
+        <div class="card-value">{{ card.value }}</div>
+        <div class="card-label">{{ card.label }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-actions-card">
+    <h3 class="qa-title">Quick Actions</h3>
+    <div class="qa-grid">
+      <a routerLink="/auditor/audit-logs" class="qa-item">
+        <div class="qa-icon blue"><mat-icon>manage_search</mat-icon></div>
+        <span>View Audit Logs</span>
+      </a>
+    </div>
+  </div>
+</div>

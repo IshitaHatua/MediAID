@@ -1,0 +1,16 @@
+
+    .page-title { margin: 0 0 20px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
+    .page-card { padding: 24px; }
+    .toolbar { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .toolbar mat-form-field { width: 200px; }
+    .toolbar span { color: rgba(255,255,255,0.5); font-size: 13px; margin-left: auto; }
+    .center { display: flex; justify-content: center; padding: 32px; }
+    .full-width { width: 100%; }
+    .empty { color: rgba(255,255,255,0.3); padding: 20px 0; font-size: 14px; }
+    .eligibility-cell {
+      max-width: 320px;
+      white-space: normal;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.55) !important;
+      font-size: 12px !important;
+    }

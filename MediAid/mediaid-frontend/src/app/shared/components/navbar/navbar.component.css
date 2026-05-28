@@ -1,0 +1,84 @@
+
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 64px;
+      background: rgba(13,21,38,0.95) !important;
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(99,102,241,0.15) !important;
+      box-shadow: 0 1px 0 rgba(99,102,241,0.08), 0 4px 24px rgba(0,0,0,0.4) !important;
+      padding: 0 24px;
+      display: flex; align-items: center;
+    }
+    .nav-left { display: flex; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 10px; cursor: default; }
+    .brand-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+    }
+    .brand-name { font-size: 1.2rem; font-weight: 800; color: white; letter-spacing: -0.3px; }
+    .spacer { flex: 1; }
+    .nav-right { display: flex; align-items: center; }
+    .user-chip {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 40px; padding: 4px 10px 4px 4px;
+      transition: all 0.2s;
+    }
+    .user-chip:hover { background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.3); }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .user-avatar mat-icon { color: white; font-size: 18px; height: 18px; width: 18px; }
+    .user-details { display: flex; flex-direction: column; gap: 1px; }
+    .user-name { color: #f1f5f9; font-size: 13px; font-weight: 600; line-height: 1; }
+    .role-chip {
+      font-size: 9px; font-weight: 700; padding: 2px 6px;
+      border-radius: 10px; line-height: 1.4; text-transform: uppercase; letter-spacing: 0.6px;
+      width: fit-content;
+    }
+    .role-chip.citizen  { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+    .role-chip.officer  { background: rgba(52,211,153,0.15); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.25); }
+    .role-chip.manager  { background: rgba(251,191,36,0.15); color: #fde68a; border: 1px solid rgba(251,191,36,0.25); }
+    .role-chip.admin    { background: rgba(248,113,113,0.15); color: #fca5a5; border: 1px solid rgba(248,113,113,0.25); }
+    .menu-btn { color: rgba(255,255,255,0.5) !important; width: 24px !important; height: 24px !important; line-height: 24px !important; }
+
+    /* Dropdown menu */
+    .menu-header {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px 12px;
+    }
+    .menu-avatar mat-icon { font-size: 36px; height: 36px; width: 36px; color: #6366f1; }
+    .menu-name { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+    .menu-role { font-size: 12px; color: #666; margin-top: 2px; }
+    .logout-icon { color: #ef4444 !important; }
+
+    /* ── Hamburger (mobile only) ── */
+    .hamburger-btn {
+      display: none;
+      margin-right: 8px;
+      color: rgba(255,255,255,0.85) !important;
+    }
+    .hamburger-btn mat-icon { color: rgba(255,255,255,0.85) !important; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .navbar { padding: 0 16px; }
+    }
+
+    @media (max-width: 768px) {
+      .hamburger-btn { display: inline-flex !important; }
+      .navbar { padding: 0 10px; }
+      .brand-name { font-size: 1.05rem; }
+      .user-details { display: none; }
+      .user-chip { padding: 4px; gap: 4px; }
+      .menu-btn { width: 20px !important; height: 20px !important; }
+    }
+
+    @media (max-width: 480px) {
+      .brand-name { display: none; }
+      .navbar { padding: 0 6px; }
+    }

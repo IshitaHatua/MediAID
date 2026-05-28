@@ -1,0 +1,84 @@
+<div class="page-header">
+  <h2 class="page-title">Compliance Records</h2>
+  <p class="page-sub">View compliance evaluations, violations and flagged items</p>
+</div>
+
+<mat-tab-group>
+
+  <!-- All Records -->
+  <mat-tab label="All Records">
+    <div class="tab-content">
+      <div class="section-card">
+        <div class="toolbar">
+          <h3 class="section-title">All Compliance Records</h3>
+          <span class="count-badge">{{ all.length }} record(s)</span>
+        </div>
+        <div class="center" *ngIf="loading"><mat-spinner diameter="40"></mat-spinner></div>
+        <table mat-table [dataSource]="all" class="data-table" *ngIf="!loading && all.length">
+          <ng-container matColumnDef="complianceId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let r" class="id-cell">#{{ r.complianceId }}</td></ng-container>
+          <ng-container matColumnDef="entityId"><th mat-header-cell *matHeaderCellDef>Entity</th><td mat-cell *matCellDef="let r">{{ r.entityType }} #{{ r.entityId }}</td></ng-container>
+          <ng-container matColumnDef="entityType"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let r">{{ r.entityType }}</td></ng-container>
+          <ng-container matColumnDef="result"><th mat-header-cell *matHeaderCellDef>Result</th><td mat-cell *matCellDef="let r"><app-status-badge [status]="r.result"></app-status-badge></td></ng-container>
+          <ng-container matColumnDef="notes"><th mat-header-cell *matHeaderCellDef>Notes</th><td mat-cell *matCellDef="let r">{{ r.notes || '—' }}</td></ng-container>
+          <ng-container matColumnDef="evaluatedAt"><th mat-header-cell *matHeaderCellDef>Evaluated</th><td mat-cell *matCellDef="let r" class="date-cell">{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="cols"></tr>
+          <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+        </table>
+        <div class="empty-state" *ngIf="!loading && !all.length">
+          <mat-icon>verified_user</mat-icon><p>No compliance records found</p>
+        </div>
+      </div>
+    </div>
+  </mat-tab>
+
+  <!-- Violations -->
+  <mat-tab label="Violations">
+    <div class="tab-content">
+      <div class="section-card">
+        <div class="toolbar">
+          <h3 class="section-title">Compliance Violations</h3>
+          <span class="count-badge violations">{{ violations.length }} violation(s)</span>
+        </div>
+        <table mat-table [dataSource]="violations" class="data-table" *ngIf="violations.length">
+          <ng-container matColumnDef="complianceId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let r" class="id-cell">#{{ r.complianceId }}</td></ng-container>
+          <ng-container matColumnDef="entityId"><th mat-header-cell *matHeaderCellDef>Entity</th><td mat-cell *matCellDef="let r">{{ r.entityType }} #{{ r.entityId }}</td></ng-container>
+          <ng-container matColumnDef="entityType"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let r">{{ r.entityType }}</td></ng-container>
+          <ng-container matColumnDef="result"><th mat-header-cell *matHeaderCellDef>Result</th><td mat-cell *matCellDef="let r"><app-status-badge [status]="r.result"></app-status-badge></td></ng-container>
+          <ng-container matColumnDef="notes"><th mat-header-cell *matHeaderCellDef>Notes</th><td mat-cell *matCellDef="let r">{{ r.notes || '—' }}</td></ng-container>
+          <ng-container matColumnDef="evaluatedAt"><th mat-header-cell *matHeaderCellDef>Evaluated</th><td mat-cell *matCellDef="let r" class="date-cell">{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="cols"></tr>
+          <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+        </table>
+        <div class="empty-state" *ngIf="!violations.length">
+          <mat-icon>check_circle</mat-icon><p>No violations found</p>
+        </div>
+      </div>
+    </div>
+  </mat-tab>
+
+  <!-- Flagged -->
+  <mat-tab label="Flagged">
+    <div class="tab-content">
+      <div class="section-card">
+        <div class="toolbar">
+          <h3 class="section-title">Flagged Items</h3>
+          <span class="count-badge flagged">{{ flagged.length }} flagged</span>
+        </div>
+        <table mat-table [dataSource]="flagged" class="data-table" *ngIf="flagged.length">
+          <ng-container matColumnDef="complianceId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let r" class="id-cell">#{{ r.complianceId }}</td></ng-container>
+          <ng-container matColumnDef="entityId"><th mat-header-cell *matHeaderCellDef>Entity</th><td mat-cell *matCellDef="let r">{{ r.entityType }} #{{ r.entityId }}</td></ng-container>
+          <ng-container matColumnDef="entityType"><th mat-header-cell *matHeaderCellDef>Type</th><td mat-cell *matCellDef="let r">{{ r.entityType }}</td></ng-container>
+          <ng-container matColumnDef="result"><th mat-header-cell *matHeaderCellDef>Result</th><td mat-cell *matCellDef="let r"><app-status-badge [status]="r.result"></app-status-badge></td></ng-container>
+          <ng-container matColumnDef="notes"><th mat-header-cell *matHeaderCellDef>Notes</th><td mat-cell *matCellDef="let r">{{ r.notes || '—' }}</td></ng-container>
+          <ng-container matColumnDef="evaluatedAt"><th mat-header-cell *matHeaderCellDef>Evaluated</th><td mat-cell *matCellDef="let r" class="date-cell">{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td></ng-container>
+          <tr mat-header-row *matHeaderRowDef="cols"></tr>
+          <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+        </table>
+        <div class="empty-state" *ngIf="!flagged.length">
+          <mat-icon>flag</mat-icon><p>No flagged items found</p>
+        </div>
+      </div>
+    </div>
+  </mat-tab>
+
+</mat-tab-group>

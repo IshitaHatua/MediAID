@@ -1,0 +1,117 @@
+
+    <div class="dashboard">
+      <!-- Header -->
+      <div class="dash-header">
+        <div>
+          <div class="dash-eyebrow">
+            
+          </div>
+          <h1 class="dash-title">My Dashboard</h1>
+          <p class="dash-subtitle">Track your healthcare aid, claims, and disbursements</p>
+        </div>
+        <a routerLink="/citizen/enrollments" class="enroll-btn">
+          <mat-icon>add</mat-icon>
+          New Enrollment
+        </a>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-grid">
+        <div class="summary-card" *ngFor="let card of summaryCards">
+          <div class="card-glow" [style.background]="card.glow"></div>
+          <div class="card-icon-wrap" [style.background]="card.grad">
+            <mat-icon>{{ card.icon }}</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ card.value }}</div>
+            <div class="card-label">{{ card.label }}</div>
+          </div>
+          <div class="card-trend">
+            <span class="material-icons trend-arrow">trending_up</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tables Row -->
+      <div class="tables-row">
+        <!-- Enrollments -->
+        <div class="table-card">
+          <div class="table-card-header">
+            <div class="tch-left">
+              <div class="tch-icon blue"><span class="material-icons">assignment</span></div>
+              <h3>Recent Enrollments</h3>
+            </div>
+            <a routerLink="/citizen/enrollments" class="view-all-btn">
+              View all <span class="material-icons">arrow_forward</span>
+            </a>
+          </div>
+          <div class="table-wrap" *ngIf="enrollments.length; else noEnroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Enrollment ID</th>
+                  <th>Scheme</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of enrollments.slice(0,5)">
+                  <td class="id-cell">{{ e.enrollmentId }}</td>
+                  <td class="scheme-cell">{{ schemeName(e.schemeId) }}</td>
+                  <td class="date-cell">{{ e.enrollmentDate | date:'dd MMM y' }}</td>
+                  <td><app-status-badge [status]="e.status"></app-status-badge></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noEnroll>
+            <div class="empty-state">
+              <div class="empty-icon"><span class="material-icons">assignment</span></div>
+              <p>No enrollments yet</p>
+              <a routerLink="/citizen/enrollments">Browse schemes &rarr;</a>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Claims -->
+        <div class="table-card">
+          <div class="table-card-header">
+            <div class="tch-left">
+              <div class="tch-icon purple"><span class="material-icons">receipt_long</span></div>
+              <h3>Recent Claims</h3>
+            </div>
+            <a routerLink="/citizen/claims" class="view-all-btn">
+              View all <span class="material-icons">arrow_forward</span>
+            </a>
+          </div>
+          <div class="table-wrap" *ngIf="claims.length; else noClaim">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Claim ID</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let c of claims.slice(0,5)">
+                  <td class="id-cell">{{ c.claimId }}</td>
+                  <td class="amount-cell">₹{{ c.claimAmount | number:'1.0-0' }}</td>
+                  <td class="date-cell">{{ c.claimDate | date:'dd MMM y' }}</td>
+                  <td><app-status-badge [status]="c.status"></app-status-badge></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noClaim>
+            <div class="empty-state">
+              <div class="empty-icon"><span class="material-icons">receipt_long</span></div>
+              <p>No claims submitted</p>
+              <a routerLink="/citizen/claims">Submit a claim &rarr;</a>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>

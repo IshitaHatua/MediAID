@@ -1,0 +1,92 @@
+<div class="auth-page" style="background:#0d1526;min-height:100vh">
+  <!-- Left Branding Panel -->
+  <div class="auth-left">
+    <a routerLink="/" class="auth-brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2v18M2 11h18" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span>MediAid</span>
+    </a>
+    <div class="auth-left-content">
+      <div class="left-illustration">
+        <svg width="200" height="180" viewBox="0 0 200 180" fill="none">
+          <!-- Shield -->
+          <path d="M100 10 L170 38 L170 95 C170 135 100 170 100 170 C100 170 30 135 30 95 L30 38 Z"
+            fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+          <!-- Plus in shield -->
+          <rect x="88" y="60" width="24" height="8" rx="4" fill="rgba(255,255,255,0.7)"/>
+          <rect x="96" y="52" width="8" height="24" rx="4" fill="rgba(255,255,255,0.7)"/>
+          <!-- Orbiting dots -->
+          <circle cx="100" cy="10" r="5" fill="#00e5ff" fill-opacity="0.6"/>
+          <circle cx="170" cy="95" r="4" fill="#40c4ff" fill-opacity="0.5"/>
+          <circle cx="30" cy="95" r="4" fill="#4fc3f7" fill-opacity="0.5"/>
+          <circle cx="100" cy="170" r="5" fill="#00e5ff" fill-opacity="0.6"/>
+        </svg>
+      </div>
+      <h2 class="left-title">Welcome Back</h2>
+      <p class="left-subtitle">Sign in to access your healthcare benefits, track claims, and manage your enrollments.</p>
+      <div class="left-features">
+        <div class="left-feature" *ngFor="let f of features">
+          <div class="left-feature-icon">
+            <span class="material-icons">{{ f.icon }}</span>
+          </div>
+          <span>{{ f.text }}</span>
+        </div>
+      </div>
+    </div>
+    <p class="left-footer">MediAid · Healthcare Insurance Portal</p>
+  </div>
+
+  <div class="auth-right" style="background:#1a2235">
+    <div class="form-container">
+      <div class="form-header">
+        <h1>Sign In</h1>
+        <p>Enter your credentials to access the portal</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+        <div class="field-group">
+          <label class="field-label">Email Address</label>
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput formControlName="email" type="email" placeholder="your@email.com">
+            <mat-icon matSuffix class="field-icon">email</mat-icon>
+            <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
+            <mat-error *ngIf="form.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="field-group">
+          <div class="label-row">
+            <label class="field-label">Password</label>
+            <a routerLink="/auth/forgot-password" class="forgot-link">Forgot password?</a>
+          </div>
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput formControlName="password" [type]="showPw ? 'text' : 'password'" placeholder="Enter your password">
+            <button mat-icon-button matSuffix type="button" (click)="showPw=!showPw" class="eye-btn">
+              <mat-icon>{{ showPw ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="form.get('password')?.hasError('required')">Password is required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <button type="submit" class="submit-btn" [class.loading]="loading" [disabled]="loading">
+          <mat-spinner *ngIf="loading" diameter="20" class="inline-spinner"></mat-spinner>
+          <span *ngIf="!loading">
+            Sign In
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="display:inline;vertical-align:middle;margin-left:4px">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+      </form>
+
+      <p class="switch-link">
+        Don't have an account?
+        <a routerLink="/auth/register">Create one free</a>
+      </p>
+    </div>
+  </div>
+</div>
+

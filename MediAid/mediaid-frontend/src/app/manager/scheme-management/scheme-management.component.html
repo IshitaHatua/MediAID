@@ -1,0 +1,60 @@
+
+    <h2 class="page-title">Scheme Management</h2>
+    <mat-card class="page-card">
+      <div class="toolbar">
+        <input class="search-input" placeholder="Search schemes..." [(ngModel)]="search" (input)="applyFilter()">
+        <button mat-flat-button color="primary" (click)="showForm=!showForm; resetForm()">
+          <mat-icon>add</mat-icon> Create Scheme
+        </button>
+      </div>
+
+      <div *ngIf="showForm" class="scheme-form-panel">
+        <h3>{{ editMode ? 'Edit' : 'New' }} Scheme</h3>
+        <form [formGroup]="schemeForm" (ngSubmit)="submit()" class="scheme-form">
+          <div class="two-col">
+            <mat-form-field appearance="outline"><mat-label>Name</mat-label><input matInput formControlName="name"><mat-error>Required</mat-error></mat-form-field>
+            <mat-form-field appearance="outline"><mat-label>Max Coverage (₹)</mat-label><input matInput formControlName="maxCoverageAmount" type="number"><mat-error>Required</mat-error></mat-form-field>
+          </div>
+          <mat-form-field appearance="outline" class="full-width"><mat-label>Description</mat-label><textarea matInput formControlName="description" rows="2" maxlength="1000"></textarea><mat-error>Required</mat-error></mat-form-field>
+          <mat-form-field appearance="outline" class="full-width"><mat-label>Eligibility Criteria</mat-label><textarea matInput formControlName="eligibilityCriteria" rows="2" maxlength="500"></textarea><mat-error>Required</mat-error></mat-form-field>
+          <mat-form-field appearance="outline" class="full-width"><mat-label>Benefits</mat-label><textarea matInput formControlName="benefits" rows="2" maxlength="500"></textarea><mat-error>Required</mat-error></mat-form-field>
+          <div class="two-col">
+            <mat-form-field appearance="outline"><mat-label>Validity (Years)</mat-label><input matInput formControlName="validityYears" type="number" min="1"><mat-error>Must be 1 or more</mat-error></mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                <mat-option value="ACTIVE">Active</mat-option>
+                <mat-option value="INACTIVE">Inactive</mat-option>
+              </mat-select>
+              <mat-error>Required</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-actions">
+            <button mat-button type="button" (click)="showForm=false">Cancel</button>
+            <button mat-flat-button color="primary" type="submit">{{ editMode ? 'Update' : 'Create' }}</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="center" *ngIf="loading"><mat-spinner diameter="40"></mat-spinner></div>
+      <table mat-table [dataSource]="filtered" class="full-width" *ngIf="!loading && filtered.length">
+        <ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let s">{{ s.name }}</td></ng-container>
+        <ng-container matColumnDef="maxCoverageAmount"><th mat-header-cell *matHeaderCellDef>Max Coverage</th><td mat-cell *matCellDef="let s">₹{{ s.maxCoverageAmount | number:'1.0-0' }}</td></ng-container>
+        <ng-container matColumnDef="validityYears"><th mat-header-cell *matHeaderCellDef>Validity</th><td mat-cell *matCellDef="let s">{{ s.validityYears }} yr(s)</td></ng-container>
+        <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let s"><app-status-badge [status]="s.status"></app-status-badge></td></ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let s">
+            <button mat-icon-button (click)="toggleStatus(s)" [title]="s.status === 'ACTIVE' ? 'Deactivate' : 'Activate'">
+              <mat-icon>{{ s.status === 'ACTIVE' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteScheme(s)" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="cols"></tr>
+        <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+      </table>
+      <p *ngIf="!loading && !filtered.length" class="empty">No schemes found.</p>
+    </mat-card>

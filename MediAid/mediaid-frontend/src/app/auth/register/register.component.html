@@ -1,0 +1,96 @@
+
+    <div class="auth-page" style="background:#0d1526;min-height:100vh">
+      <!-- Left Branding Panel -->
+      <div class="auth-left">
+        <a routerLink="/" class="auth-brand">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 2v18M2 11h18" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span>MediAid</span>
+        </a>
+        <div class="auth-left-content">
+          <div class="left-illustration">
+            <svg width="200" height="180" viewBox="0 0 200 180" fill="none">
+              <!-- Circle rings -->
+              <circle cx="100" cy="90" r="75" stroke="rgba(255,255,255,0.08)" stroke-width="2" stroke-dasharray="8 6"/>
+              <circle cx="100" cy="90" r="50" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+              <!-- Person icon -->
+              <circle cx="100" cy="68" r="22" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+              <circle cx="100" cy="65" r="11" fill="rgba(255,255,255,0.5)"/>
+              <path d="M75 112 Q100 95 125 112" stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <!-- Checkmark badge -->
+              <circle cx="130" cy="58" r="14" fill="#00e5ff" fill-opacity="0.25" stroke="#00e5ff" stroke-width="1.5"/>
+              <path d="M123 58 L128 63 L138 53" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2 class="left-title">Start Your Journey</h2>
+          <p class="left-subtitle">Create your MediAid account and gain access to government healthcare schemes, subsidies, and direct benefit transfers.</p>
+          <div class="left-steps">
+            <div class="left-step" *ngFor="let s of steps; let i = index">
+              <div class="step-num">{{ i + 1 }}</div>
+              <span>{{ s }}</span>
+            </div>
+          </div>
+        </div>
+        <p class="left-footer">MediAid · Healthcare Insurance Portal</p>
+      </div>
+
+      <div class="auth-right" style="background:#1a2235">
+        <div class="form-container">
+          <div class="form-header">
+            <h1>Create Account</h1>
+            <p>Fill in your details to register as a citizen</p>
+          </div>
+
+          <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+            <div class="field-group">
+              <label class="field-label">Full Name</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <input matInput formControlName="name" placeholder="e.g. Rajesh Kumar">
+                <mat-icon matSuffix class="field-icon">person</mat-icon>
+                <mat-error>Full name is required</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Email Address</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <input matInput formControlName="email" type="email" placeholder="your@email.com">
+                <mat-icon matSuffix class="field-icon">email</mat-icon>
+                <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
+                <mat-error *ngIf="form.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Password</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <input matInput formControlName="password" [type]="showPw ? 'text' : 'password'" placeholder="Min. 8 characters">
+                <button mat-icon-button matSuffix type="button" (click)="showPw=!showPw" class="eye-btn">
+                  <mat-icon>{{ showPw ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                <mat-error *ngIf="form.get('password')?.hasError('required')">Password is required</mat-error>
+                <mat-error *ngIf="form.get('password')?.hasError('minlength')">Password must be at least 8 characters</mat-error>
+              </mat-form-field>
+            </div>
+            
+            <button type="submit" class="submit-btn" [class.loading]="loading" [disabled]="loading">
+              <mat-spinner *ngIf="loading" diameter="20" class="inline-spinner"></mat-spinner>
+              <span *ngIf="!loading">
+                Create Account
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="display:inline;vertical-align:middle;margin-left:4px">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </button>
+          </form>
+
+          <p class="switch-link">
+            Already have an account?
+            <a routerLink="/auth/login">Sign in</a>
+          </p>
+        </div>
+      </div>
+    </div>

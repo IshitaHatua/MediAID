@@ -1,0 +1,7 @@
+.page-title { margin: 0 0 20px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
+.tab-content { padding: 18px 0; }
+.toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.center { display: flex; justify-content: center; padding: 32px; }
+.full-width { width: 100%; }
+.empty { color: rgba(255,255,255,0.4); padding: 24px 0; text-align: center; }
+mat-card { background: linear-gradient(145deg,#111827,#1a2235) !important; border: 1px solid rgba(99,102,241,0.15) !important; padding: 18px; }

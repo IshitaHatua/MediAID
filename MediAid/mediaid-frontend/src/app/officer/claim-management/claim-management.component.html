@@ -1,0 +1,93 @@
+
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Claim Management</h2>
+        <p class="page-sub">Review and process citizen claim submissions</p>
+      </div>
+    </div>
+
+    <div class="toolbar-card">
+      <div class="toolbar">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter by Status</mat-label>
+          <mat-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()">
+            <mat-option value="">All</mat-option>
+            <mat-option value="PENDING">Pending</mat-option>
+            <mat-option value="APPROVED">Approved</mat-option>
+            <mat-option value="REJECTED">Rejected</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <span class="count-badge">{{ filtered.length }} claim(s)</span>
+      </div>
+    </div>
+
+    <div class="center" *ngIf="loading">
+      <mat-spinner diameter="40" color="accent"></mat-spinner>
+    </div>
+
+    <mat-accordion *ngIf="!loading && filtered.length" class="claims-accordion">
+      <mat-expansion-panel *ngFor="let c of filtered" class="claim-panel" (opened)="loadClaimDocs(c.claimId)">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="panel-title">
+            <span class="claim-id">#{{ c.claimId }}</span>
+            <span class="claim-amount">₹{{ c.claimAmount | number:'1.0-0' }}</span>
+          </mat-panel-title>
+          <mat-panel-description>
+            <app-status-badge [status]="c.status"></app-status-badge>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Citizen ID</span>
+            <span class="value">{{ c.citizenId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Scheme ID</span>
+            <span class="value">{{ c.schemeId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Date Filed</span>
+            <span class="value">{{ c.claimDate | date:'dd MMM y' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Amount</span>
+            <span class="value amount">₹{{ c.claimAmount | number:'1.0-2' }}</span>
+          </div>
+          <div class="info-item full">
+            <span class="label">Description</span>
+            <span class="value">{{ c.description || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="docs-section">
+          <h4 class="docs-title"><mat-icon>folder</mat-icon> Claim Documents</h4>
+          <div *ngIf="docsLoading[c.claimId]" class="docs-loading">
+            <mat-spinner diameter="20"></mat-spinner> Loading...
+          </div>
+          <div *ngIf="!docsLoading[c.claimId] && claimDocs[c.claimId]?.length" class="docs-list">
+            <div *ngFor="let d of claimDocs[c.claimId]" class="doc-item">
+              <span class="doc-name">{{ originalFileName(d.fileName) }}</span>
+              <button class="btn-doc" (click)="viewDoc(d.fileName)" title="View"><mat-icon>visibility</mat-icon></button>
+              <button class="btn-doc" (click)="downloadDoc(d.fileName)" title="Download"><mat-icon>download</mat-icon></button>
+            </div>
+          </div>
+          <div *ngIf="!docsLoading[c.claimId] && claimDocs[c.claimId] && !claimDocs[c.claimId].length" class="docs-empty">
+            No documents attached to this claim.
+          </div>
+        </div>
+
+        <div class="action-bar" *ngIf="c.status === 'PENDING'">
+          <button class="btn-approve" (click)="updateStatus(c, 'APPROVED')">
+            <mat-icon>check_circle</mat-icon> Approve
+          </button>
+          <button class="btn-reject" (click)="updateStatus(c, 'REJECTED')">
+            <mat-icon>cancel</mat-icon> Reject
+          </button>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <div class="empty-state" *ngIf="!loading && !filtered.length">
+      <div class="empty-icon"><mat-icon>receipt_long</mat-icon></div>
+      <p>No claims found</p>
+    </div>

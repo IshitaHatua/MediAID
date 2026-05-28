@@ -1,0 +1,95 @@
+
+    <div class="page-header">
+      <h2 class="page-title">Disbursement & Payment Management</h2>
+      <p class="page-sub">Process disbursements and manage payment records</p>
+    </div>
+
+    <mat-tab-group>
+      <!-- Disbursements Tab -->
+      <mat-tab label="Disbursements">
+        <div class="tab-content">
+          <div class="section-card">
+            <div class="toolbar">
+              <h3 class="section-title">All Disbursements</h3>
+              <button class="btn-new" (click)="showDisbForm=!showDisbForm">
+                <mat-icon>add</mat-icon> New Disbursement
+              </button>
+            </div>
+            <form *ngIf="showDisbForm" [formGroup]="disbForm" (ngSubmit)="createDisbursement()" class="inline-form">
+              <mat-form-field appearance="outline"><mat-label>Claim ID</mat-label><input matInput formControlName="claimId" type="number"><mat-error>Required</mat-error></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Citizen ID</mat-label><input matInput formControlName="citizenId" type="number"><mat-error>Required</mat-error></mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Scheme</mat-label>
+                <mat-select formControlName="schemeId">
+                  <mat-option *ngFor="let s of schemes" [value]="s.schemeId">{{ s.name }}</mat-option>
+                </mat-select>
+                <mat-error>Required</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Amount (₹)</mat-label><input matInput formControlName="amount" type="number"><mat-error>Required</mat-error></mat-form-field>
+              <div class="form-btns">
+                <button class="btn-submit" type="submit">Create</button>
+                <button class="btn-cancel" type="button" (click)="showDisbForm=false">Cancel</button>
+              </div>
+            </form>
+            <div class="center" *ngIf="disbLoading"><mat-spinner diameter="40" color="accent"></mat-spinner></div>
+            <table mat-table [dataSource]="disbursements" class="data-table" *ngIf="!disbLoading && disbursements.length">
+              <ng-container matColumnDef="disbursementId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let d" class="id-cell">#{{ d.disbursementId }}</td></ng-container>
+              <ng-container matColumnDef="claimId"><th mat-header-cell *matHeaderCellDef>Claim</th><td mat-cell *matCellDef="let d">#{{ d.claimId }}</td></ng-container>
+              <ng-container matColumnDef="citizenId"><th mat-header-cell *matHeaderCellDef>Citizen</th><td mat-cell *matCellDef="let d">{{ d.citizenId }}</td></ng-container>
+              <ng-container matColumnDef="amount"><th mat-header-cell *matHeaderCellDef>Amount</th><td mat-cell *matCellDef="let d" class="amount-cell">₹{{ d.amount | number:'1.0-2' }}</td></ng-container>
+              <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let d"><app-status-badge [status]="d.status"></app-status-badge></td></ng-container>
+              <tr mat-header-row *matHeaderRowDef="disbCols"></tr>
+              <tr mat-row *matRowDef="let row; columns: disbCols;"></tr>
+            </table>
+            <div class="empty-state" *ngIf="!disbLoading && !disbursements.length">
+              <mat-icon>account_balance_wallet</mat-icon>
+              <p>No disbursements found</p>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Payments Tab -->
+      <mat-tab label="Payments">
+        <div class="tab-content">
+          <div class="section-card">
+            <div class="toolbar">
+              <h3 class="section-title">All Payments</h3>
+              <button class="btn-new" (click)="showPayForm=!showPayForm">
+                <mat-icon>add</mat-icon> Process Payment
+              </button>
+            </div>
+            <form *ngIf="showPayForm" [formGroup]="payForm" (ngSubmit)="createPayment()" class="inline-form">
+              <mat-form-field appearance="outline"><mat-label>Disbursement ID</mat-label><input matInput formControlName="disbursementId" type="number"><mat-error>Required</mat-error></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Amount (₹)</mat-label><input matInput formControlName="amount" type="number"><mat-error>Required</mat-error></mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Method</mat-label>
+                <mat-select formControlName="method">
+                  <mat-option value="Bank Transfer">Bank Transfer</mat-option>
+                  <mat-option value="Credit Card">Credit Card</mat-option>
+                  <mat-option value="PayPal">PayPal</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="form-btns">
+                <button class="btn-submit" type="submit">Process</button>
+                <button class="btn-cancel" type="button" (click)="showPayForm=false">Cancel</button>
+              </div>
+            </form>
+            <div class="center" *ngIf="payLoading"><mat-spinner diameter="40" color="accent"></mat-spinner></div>
+            <table mat-table [dataSource]="payments" class="data-table" *ngIf="!payLoading && payments.length">
+              <ng-container matColumnDef="paymentId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let p" class="id-cell">#{{ p.paymentId }}</td></ng-container>
+              <ng-container matColumnDef="disbursementId"><th mat-header-cell *matHeaderCellDef>Disbursement</th><td mat-cell *matCellDef="let p">#{{ p.disbursementId }}</td></ng-container>
+              <ng-container matColumnDef="method"><th mat-header-cell *matHeaderCellDef>Method</th><td mat-cell *matCellDef="let p">{{ p.method }}</td></ng-container>
+              <ng-container matColumnDef="amount"><th mat-header-cell *matHeaderCellDef>Amount</th><td mat-cell *matCellDef="let p" class="amount-cell">₹{{ p.amount | number:'1.0-2' }}</td></ng-container>
+              <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let p"><app-status-badge [status]="p.status"></app-status-badge></td></ng-container>
+              <tr mat-header-row *matHeaderRowDef="payCols"></tr>
+              <tr mat-row *matRowDef="let row; columns: payCols;"></tr>
+            </table>
+            <div class="empty-state" *ngIf="!payLoading && !payments.length">
+              <mat-icon>payments</mat-icon>
+              <p>No payments found</p>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>

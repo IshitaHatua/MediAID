@@ -1,0 +1,124 @@
+
+    .page-title { margin: 0 0 20px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
+    .profile-card { padding: 28px; max-width: 700px; }
+    .center { display: flex; justify-content: center; padding: 32px; }
+    .profile-header { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .avatar { font-size: 64px; height: 64px; width: 64px; color: #818cf8; }
+    .profile-header h3 { margin: 0 0 8px; font-size: 1.3rem; color: #f1f5f9; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .info-item.full { grid-column: span 2; }
+    .label { font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .profile-form { display: flex; flex-direction: column; gap: 8px; }
+    .full-width { width: 100%; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .two-col mat-form-field { width: 100%; }
+    h3 { color: #f1f5f9 !important; margin: 0 0 16px; }
+    p { color: rgba(255,255,255,0.45) !important; }
+    textarea { color: #f1f5f9 !important; }
+
+    /* ── Native date input: force visibility on dark theme ──
+       Browsers render <input type="date"> via internal pseudo-elements that
+       ignore the regular `color` rule. Without these overrides the selected
+       date stays near-black on the dark background and looks blank. */
+    input[type="date"] {
+      color: #f1f5f9 !important;
+      color-scheme: dark;
+      background: transparent;
+      font-family: 'Inter', 'Roboto', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.3px;
+    }
+    input[type="date"]::-webkit-datetime-edit,
+    input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+    input[type="date"]::-webkit-datetime-edit-text,
+    input[type="date"]::-webkit-datetime-edit-day-field,
+    input[type="date"]::-webkit-datetime-edit-month-field,
+    input[type="date"]::-webkit-datetime-edit-year-field {
+      color: #f1f5f9 !important;
+      opacity: 1 !important;
+    }
+    input[type="date"]:not(:focus):invalid::-webkit-datetime-edit-day-field,
+    input[type="date"]:not(:focus):invalid::-webkit-datetime-edit-month-field,
+    input[type="date"]:not(:focus):invalid::-webkit-datetime-edit-year-field {
+      color: rgba(255,255,255,0.45) !important;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1) opacity(0.7);
+      cursor: pointer;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      filter: invert(1) opacity(1);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .page-title { font-size: 1.3rem; }
+      .profile-card, .docs-card { padding: 18px; max-width: 100%; }
+      .info-grid { grid-template-columns: 1fr; gap: 14px; }
+      .info-item.full { grid-column: span 1; }
+      .two-col { grid-template-columns: 1fr; gap: 8px; }
+      .docs-header { flex-direction: column; align-items: stretch; }
+      .upload-row { flex-direction: column; align-items: stretch; }
+      .doc-type-field { width: 100%; }
+      .upload-btn { width: 100%; justify-content: center; }
+      .profile-header { gap: 12px; }
+      .avatar { font-size: 48px; height: 48px; width: 48px; }
+    }
+    @media (max-width: 480px) {
+      .profile-card, .docs-card { padding: 14px; border-radius: 12px !important; }
+      .docs-table { font-size: 12px; }
+      .docs-table td, .docs-table th { padding: 8px 6px !important; }
+    }
+
+    /* Documents section */
+    .docs-card { padding: 28px; max-width: 1000px; margin-top: 24px; }
+    .docs-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .docs-header h3 { margin: 0 0 6px; font-size: 1.2rem; color: #f1f5f9; }
+    .docs-hint { margin: 0; color: rgba(255,255,255,0.45); font-size: 13px; }
+    .btn-refresh-docs {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(99,102,241,0.15); color: #818cf8;
+      border: 1px solid rgba(99,102,241,0.3); border-radius: 8px;
+      padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all 0.18s; flex-shrink: 0;
+    }
+    .btn-refresh-docs:hover { background: rgba(99,102,241,0.25); }
+    .btn-refresh-docs mat-icon { font-size: 16px; height: 16px; width: 16px; }
+    .upload-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .doc-type-field { width: 240px; }
+    .upload-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white; border: none; border-radius: 10px;
+      padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 600;
+      transition: all 0.2s; box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+      height: 44px;
+    }
+    .upload-btn:hover:not(.disabled) {
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      transform: translateY(-1px); box-shadow: 0 6px 18px rgba(99,102,241,0.45);
+    }
+    .upload-btn.disabled { opacity: 0.6; cursor: not-allowed; }
+    .upload-btn mat-icon { font-size: 20px; height: 20px; width: 20px; }
+
+    .upload-progress {
+      width: 100%; height: 6px; background: rgba(255,255,255,0.08);
+      border-radius: 4px; overflow: hidden; margin: 0 0 16px;
+    }
+    .progress-bar {
+      height: 100%; background: linear-gradient(90deg,#6366f1,#10b981);
+      transition: width 0.2s ease-out;
+    }
+
+    .doc-limit-note {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 14px; margin-bottom: 16px;
+      background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 8px; color: #fbbf24; font-size: 13px;
+    }
+    .doc-limit-note mat-icon { font-size: 18px; height: 18px; width: 18px; color: #f59e0b; }
+    .docs-table { width: 100%; background: transparent; }
+    .docs-table th { color: rgba(255,255,255,0.5) !important; font-size: 12px; font-weight: 600; }
+    .docs-table td { color: #e2e8f0 !important; }
+    .empty { color: rgba(255,255,255,0.3); padding: 20px 0; font-size: 14px; text-align: center; }

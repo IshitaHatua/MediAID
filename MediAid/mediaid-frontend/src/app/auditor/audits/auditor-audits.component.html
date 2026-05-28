@@ -1,0 +1,84 @@
+<div class="page-header">
+  <h2 class="page-title">Formal Audits</h2>
+  <p class="page-sub">View all formal compliance audits across the platform</p>
+</div>
+
+<div class="section-card">
+
+  <!-- Filters -->
+  <div class="toolbar">
+    <div class="filters">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()">
+          <mat-option value="">All Statuses</mat-option>
+          <mat-option value="PLANNED">Planned</mat-option>
+          <mat-option value="IN_PROGRESS">In Progress</mat-option>
+          <mat-option value="COMPLETED">Completed</mat-option>
+          <mat-option value="ESCALATED">Escalated</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Scope</mat-label>
+        <mat-select [(ngModel)]="filterScope" (ngModelChange)="applyFilter()">
+          <mat-option value="">All Scopes</mat-option>
+          <mat-option value="CLAIM">Claim</mat-option>
+          <mat-option value="POLICY">Policy</mat-option>
+          <mat-option value="DISBURSEMENT">Disbursement</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button class="btn-clear" (click)="clearFilters()" *ngIf="filterStatus || filterScope">
+        <mat-icon>clear</mat-icon> Clear
+      </button>
+    </div>
+    <span class="count-badge">{{ filtered.length }} audit(s)</span>
+  </div>
+
+  <div class="center" *ngIf="loading"><mat-spinner diameter="40" color="accent"></mat-spinner></div>
+
+  <!-- Accordion: read-only detail panels -->
+  <mat-accordion *ngIf="!loading && filtered.length" class="audit-accordion">
+    <mat-expansion-panel *ngFor="let a of filtered" class="audit-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title class="panel-title">
+          <span class="audit-id">#{{ a.auditId }}</span>
+          <span class="scope-tag">{{ a.scope }}</span>
+        </mat-panel-title>
+        <mat-panel-description>
+          <app-status-badge [status]="a.status"></app-status-badge>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="audit-detail">
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Officer ID</span>
+            <span class="value">{{ a.officerId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Entity ID</span>
+            <span class="value">{{ a.scopeEntityId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Status</span>
+            <span class="value"><app-status-badge [status]="a.status"></app-status-badge></span>
+          </div>
+          <div class="info-item">
+            <span class="label">Created</span>
+            <span class="value date">{{ a.createdAt | date:'dd MMM y, h:mm a' }}</span>
+          </div>
+          <div class="info-item full">
+            <span class="label">Findings</span>
+            <span class="value findings-text">{{ a.findings || 'No findings recorded.' }}</span>
+          </div>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <div class="empty-state" *ngIf="!loading && !filtered.length">
+    <mat-icon>fact_check</mat-icon>
+    <p>No audits match the selected filters</p>
+  </div>
+
+</div>

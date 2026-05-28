@@ -1,0 +1,23 @@
+
+    .page-title { margin: 0 0 20px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
+    .page-card { padding: 24px; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 16px; }
+    .search-input {
+      flex: 1; max-width: 300px; padding: 10px 14px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 8px; font-size: 14px; color: #f1f5f9; outline: none;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.3); }
+    .search-input:focus { border-color: rgba(99,102,241,0.5); }
+    .scheme-form-panel {
+      background: rgba(99,102,241,0.07); border: 1px solid rgba(99,102,241,0.15);
+      padding: 20px; border-radius: 12px; margin-bottom: 20px;
+    }
+    .scheme-form-panel h3 { margin: 0 0 16px; color: #f1f5f9; }
+    .scheme-form { display: flex; flex-direction: column; gap: 8px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .two-col mat-form-field, .full-width { width: 100%; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .center { display: flex; justify-content: center; padding: 32px; }
+    .full-width { width: 100%; }
+    .empty { color: rgba(255,255,255,0.3); padding: 20px 0; font-size: 14px; }
