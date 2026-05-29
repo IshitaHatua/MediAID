@@ -1,33 +1,16 @@
 package com.cts.audit.service;
 
 import com.cts.audit.model.AuditLog;
-import com.cts.audit.repository.AuditLogRepository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-public class AuditLogService {
+public interface AuditLogService {
 
-    private final AuditLogRepository auditLogRepository;
+    AuditLog createLog(AuditLog log);
 
-    public AuditLogService(AuditLogRepository auditLogRepository) {
-        this.auditLogRepository = auditLogRepository;
-    }
+    List<AuditLog> getAllLogs();
 
-    public AuditLog createLog(AuditLog log) {
-        return auditLogRepository.save(log);
-    }
+    List<AuditLog> getLatest100Logs();
 
-    public List<AuditLog> getAllLogs() {
-        return auditLogRepository.findAll();
-    }
-
-    public List<AuditLog> getLatest100Logs() {
-        return auditLogRepository.findTop100ByOrderByTimestampDesc();
-    }
-
-    public List<AuditLog> getLogsByUser(Long userId) {
-        return auditLogRepository.findByUserId(userId);
-    }
+    List<AuditLog> getLogsByUser(Long userId);
 }

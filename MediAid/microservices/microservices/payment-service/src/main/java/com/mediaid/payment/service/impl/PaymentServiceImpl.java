@@ -12,8 +12,7 @@ import com.mediaid.payment.mapper.PaymentMapper;
 import com.mediaid.payment.model.Payment;
 import com.mediaid.payment.repository.PaymentRepository;
 import com.mediaid.payment.service.PaymentService;
-import feign.FeignException;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final AuditManagementFeignClient auditManagementFeignClient;
 
     @Override
-    @CircuitBreaker(name = "disbursementService", fallbackMethod = "disbursementFallback")
     public PaymentResponseDTO createPayment(PaymentRequestDTO requestDTO) {
         Long disbursementId = requestDTO.getDisbursementId();
 
@@ -141,21 +139,4 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    public PaymentResponseDTO disbursementFallback(PaymentRequestDTO requestDTO, Throwable t) {
-        log.error("[PaymentService] disbursementFallback fired for disbursementId={} cause={} message={}",
-                requestDTO != null ? requestDTO.getDisbursementId() : "null",
-                t.getClass().getSimpleName(), t.getMessage());
-        if (t instanceof ResourceNotFoundException rne) throw rne;
-        if (t instanceof BadRequestException bre) throw bre;
-        if (t instanceof FeignException fe) {
-            if (fe.status() == 404) throw new ResourceNotFoundException(
-                    "Disbursement not found with id: " + requestDTO.getDisbursementId());
-            if (fe.status() == 400) throw new BadRequestException(
-                    "Bad request to Disbursement Service");
-            if (fe.status() == 401 || fe.status() == 403)
-                throw new RuntimeException("Payment service is not authorised to contact Disbursement Service. "
-                        + "Check that the API gateway is injecting X-User-Id / X-User-Role headers.");
-        }
-        throw new RuntimeException("Disbursement Service is currently unavailable. Please try again later.");
-    }
 }

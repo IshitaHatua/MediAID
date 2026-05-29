@@ -15,8 +15,7 @@ import com.cts.enrollment_service.mapper.EnrollmentMapper;
 import com.cts.enrollment_service.model.Enrollment;
 import com.cts.enrollment_service.repository.EnrollmentRepository;
 import com.cts.enrollment_service.service.EnrollmentService;
-import feign.FeignException;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +49,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private ComplianceFeignClient complianceFeignClient;
 
     @Override
-    @CircuitBreaker(name = "schemeService", fallbackMethod = "schemeFallback")
     public EnrollmentResponseDTO createEnrollment(Long citizenId, EnrollmentRequestDTO dto) {
         // Prevent duplicate enrollments. Without this guard a double-click or retry on
         // the Enroll button produces multiple rows for the same (citizenId, schemeId),
@@ -187,15 +185,4 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         }
     }
 
-    public EnrollmentResponseDTO schemeFallback(Long citizenId, EnrollmentRequestDTO dto, Throwable t) {
-        if (t instanceof ResourceNotFoundException rne) throw rne;
-        if (t instanceof BadRequestException bre) throw bre;
-        if (t instanceof FeignException fe) {
-            if (fe.status() == 404)
-                throw new ResourceNotFoundException("Scheme not found with id: " + dto.getSchemeId());
-            if (fe.status() == 400)
-                throw new BadRequestException("Bad request to Scheme Service: " + fe.getMessage());
-        }
-        throw new RuntimeException("Scheme Service is currently unavailable. Please try again later.");
-    }
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.math.BigDecimal;
 import java.util.List;
 
-@FeignClient(name = "DISBURSEMENT-SERVICE")
+@FeignClient(name = "DISBURSEMENT-SERVICE", fallback = DisbursementClientFallback.class)
 public interface DisbursementClient {
 
     // Returns sum of COMPLETED disbursement amounts for the given claim IDs.

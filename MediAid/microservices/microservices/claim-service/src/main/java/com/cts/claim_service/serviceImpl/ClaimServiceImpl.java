@@ -18,9 +18,7 @@ import com.cts.claim_service.repository.ClaimValidationRepository;
 import com.cts.claim_service.service.ClaimService;
 import com.cts.claim_service.exception.BadRequestException;
 import com.cts.claim_service.exception.ResourceNotFoundException;
-import feign.FeignException;
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +76,6 @@ public class ClaimServiceImpl implements ClaimService {
     private String uploadDirectory;
 
     @Override
-    @CircuitBreaker(name = "claimExternal", fallbackMethod = "claimFallback")
     public ClaimResponseDTO createClaim(Long citizenId, ClaimRequestDTO dto) {
         // Step 1: Validate scheme.
         // FeignErrorDecoder converts 404 → ResourceNotFoundException (bypasses circuit breaker via ignoreExceptions).
@@ -384,48 +381,4 @@ public class ClaimServiceImpl implements ClaimService {
         return dto;
     }
 
-    // Primary guard: ignoreExceptions config bypasses this fallback for ResourceNotFoundException
-    // and BadRequestException. This fallback handles genuine service outages AND acts as a safety
-    // net when FeignException reaches here instead of the converted exception.
-    public ClaimResponseDTO claimFallback(Long citizenId, ClaimRequestDTO dto, Throwable t) {
-        if (t instanceof ResourceNotFoundException rne) {
-            throw rne;
-        }
-        if (t instanceof BadRequestException bre) {
-            throw bre;
-        }
-        if (t instanceof FeignException fe) {
-            log.error("[ClaimService] Feign call failed in createClaim — status={}, message={}",
-                    fe.status(), fe.getMessage(), fe);
-            if (fe.status() == 404) {
-                throw new ResourceNotFoundException("Resource not found: " + fe.getMessage());
-            }
-            if (fe.status() == 400) {
-                throw new BadRequestException("Bad request: " + fe.getMessage());
-            }
-            throw new RuntimeException(
-                    "Downstream service returned HTTP " + fe.status() + ": " + fe.getMessage(), fe);
-        }
-        if (t instanceof CallNotPermittedException cnpe) {
-            log.error("[ClaimService] Circuit breaker OPEN — call not permitted: {}", cnpe.getMessage());
-            throw new RuntimeException(
-                    "Claim service is temporarily unavailable due to repeated downstream failures. " +
-                            "Please retry after a few seconds.", cnpe);
-        }
-        if (t instanceof NullPointerException npe) {
-            log.error("[ClaimService] NullPointerException in createClaim — likely a missing field " +
-                    "in a downstream response (scheme/enrollment). Citizen={}, SchemeId={}",
-                    citizenId, dto != null ? dto.getSchemeId() : null, npe);
-            throw new RuntimeException(
-                    "Unexpected empty data received from a downstream service. Please retry.", npe);
-        }
-        log.error("[ClaimService] Unhandled error in createClaim fallback — type={}, message={}",
-                t != null ? t.getClass().getName() : "null",
-                t != null ? t.getMessage() : "null",
-                t);
-        throw new RuntimeException(
-                "An external service is currently unavailable. Please try again later. (cause: " +
-                        (t != null ? t.getClass().getSimpleName() + ": " + t.getMessage() : "unknown") + ")",
-                t);
-    }
 }

@@ -10,8 +10,7 @@ import com.cts.auditmanagement.model.FormalAudit.FormalAuditStatus;
 import com.cts.auditmanagement.repository.FormalAuditRepository;
 import com.cts.auditmanagement.service.AuditManagementLogService;
 import com.cts.auditmanagement.service.FormalAuditService;
-import feign.FeignException;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -104,7 +103,6 @@ public class FormalAuditServiceImpl implements FormalAuditService {
 
     @Override
     @Transactional
-    @CircuitBreaker(name = "compliance-service", fallbackMethod = "triggerComplianceFallback")
     public FormalAuditResponseDTO triggerComplianceEvaluation(Long auditId) {
         FormalAudit audit = findById(auditId);
         audit.setStatus(FormalAuditStatus.IN_PROGRESS);
@@ -141,31 +139,6 @@ public class FormalAuditServiceImpl implements FormalAuditService {
                 .build());
 
         return mapper.toDto(saved);
-    }
-
-    // Fallback — safe, no external calls
-    public FormalAuditResponseDTO triggerComplianceFallback(Long auditId, Throwable t) {
-        if (t instanceof ResourceNotFoundException rne) throw rne;
-        if (t instanceof BadRequestException bre) throw bre;
-        if (t instanceof FeignException fe) {
-            if (fe.status() == 404) throw new ResourceNotFoundException("Entity not found: " + fe.getMessage());
-            if (fe.status() == 400) throw new BadRequestException("Bad request: " + fe.getMessage());
-        }
-
-        try {
-            FormalAudit audit = auditRepository.findById(auditId).orElse(null);
-            if (audit != null) {
-                audit.setFindings("Compliance service unavailable. Retry when service is restored.");
-                audit.setStatus(FormalAuditStatus.IN_PROGRESS);
-                return mapper.toDto(auditRepository.save(audit));
-            }
-        } catch (Exception ignored) {}
-
-        return FormalAuditResponseDTO.builder()
-                .auditId(auditId)
-                .status(FormalAuditStatus.IN_PROGRESS.name())
-                .findings("Compliance service unavailable. Retry when service is restored.")
-                .build();
     }
 
     private FormalAudit findById(Long auditId) {

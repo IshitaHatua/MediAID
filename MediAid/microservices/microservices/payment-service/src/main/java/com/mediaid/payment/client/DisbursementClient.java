@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "DISBURSEMENT-SERVICE")
+@FeignClient(name = "DISBURSEMENT-SERVICE", fallback = DisbursementClientFallback.class)
 public interface DisbursementClient {
 
     @GetMapping("/api/disbursement/{disbursementId}")

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "CLAIM-SERVICE")
+@FeignClient(name = "CLAIM-SERVICE", fallback = ClaimClientFallback.class)
 public interface ClaimClient {
 
     @GetMapping("/api/claims/{claimId}")

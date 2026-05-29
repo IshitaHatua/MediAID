@@ -14,8 +14,7 @@ import com.mediaid.disbursement.mapper.DisbursementMapper;
 import com.mediaid.disbursement.model.Disbursement;
 import com.mediaid.disbursement.repository.DisbursementRepository;
 import com.mediaid.disbursement.service.DisbursementService;
-import feign.FeignException;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,6 @@ public class DisbursementServiceImpl implements DisbursementService {
     private final ComplianceFeignClient complianceFeignClient;
 
     @Override
-    @CircuitBreaker(name = "claim-service", fallbackMethod = "claimFallback")
     public DisbursementResponseDTO createDisbursement(DisbursementRequestDTO requestDTO) {
         Long claimId = requestDTO.getClaimId();
         ClaimClientResponseDTO claimResponse = claimClient.getClaim(claimId);
@@ -178,21 +176,4 @@ public class DisbursementServiceImpl implements DisbursementService {
         }
     }
 
-    public DisbursementResponseDTO claimFallback(DisbursementRequestDTO requestDTO, Throwable t) {
-        log.error("[DisbursementService] claimFallback fired for claimId={} cause={} message={}",
-                requestDTO != null ? requestDTO.getClaimId() : "null",
-                t.getClass().getSimpleName(), t.getMessage());
-        if (t instanceof ResourceNotFoundException rne) throw rne;
-        if (t instanceof BadRequestException bre) throw bre;
-        if (t instanceof FeignException fe) {
-            if (fe.status() == 404)
-                throw new ResourceNotFoundException("Claim not found with id: " + requestDTO.getClaimId());
-            if (fe.status() == 400)
-                throw new BadRequestException("Bad request to Claim Service: " + fe.getMessage());
-            if (fe.status() == 401 || fe.status() == 403)
-                throw new RuntimeException("Disbursement service is not authorised to contact Claim Service. "
-                        + "Check that the API gateway is injecting X-User-Id / X-User-Role headers.");
-        }
-        throw new RuntimeException("Claim Service is currently unavailable. Please try again later.");
-    }
 }
