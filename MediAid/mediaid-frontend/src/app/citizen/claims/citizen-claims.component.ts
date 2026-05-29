@@ -43,7 +43,7 @@ export class CitizenClaimsComponent implements OnInit {
   claimForm = this.fb.group({
     schemeId: [null, Validators.required],
     claimAmount: [null, [Validators.required, Validators.min(1)]],
-    description: ['']
+    description: ['', [Validators.required, Validators.maxLength(500)]]
   });
 
   constructor(
@@ -142,26 +142,36 @@ export class CitizenClaimsComponent implements OnInit {
 
   submitClaim() {
     if (this.claimForm.invalid) { this.claimForm.markAllAsTouched(); return; }
+    if (!this.pendingFile) {
+      this.toastr.error('Please attach a supporting document before submitting.');
+      return;
+    }
+    const fileToUpload = this.pendingFile;
     this.claimSvc.create(this.claimForm.value as any).subscribe({
       next: r => {
         const newClaimId = r.data?.claimId;
-        if (this.pendingFile && newClaimId) {
-          this.claimSvc.uploadDocument(newClaimId, this.pendingFile).subscribe({
-            next: () => {
-              this.toastr.success('Claim submitted with document!');
-              this.finishSubmit();
-              this.cdr.markForCheck();
-            },
-            error: () => {
-              this.toastr.warning('Claim submitted, but document upload failed. You can attach it later.');
-              this.finishSubmit();
-              this.cdr.markForCheck();
-            }
-          });
-        } else {
-          this.toastr.success('Claim submitted!');
-          this.finishSubmit();
+        if (!newClaimId) {
+          this.toastr.error('Claim was not created. Please try again.');
+          return;
         }
+        this.claimSvc.uploadDocument(newClaimId, fileToUpload).subscribe({
+          next: () => {
+            this.toastr.success('Claim submitted with document!');
+            this.finishSubmit();
+            this.cdr.markForCheck();
+          },
+          error: () => {
+            // Claim row exists but the supporting document failed to attach.
+            // Surface it clearly so the citizen knows to retry attaching the doc
+            // from the claim's expansion panel.
+            this.toastr.error(
+              'Claim was created but the document failed to upload. ' +
+              'Open the claim and re-attach the document.'
+            );
+            this.finishSubmit();
+            this.cdr.markForCheck();
+          }
+        });
       }
       // Errors on the claim create itself are surfaced by the global JWT interceptor.
     });

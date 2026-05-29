@@ -21,7 +21,7 @@ public class DisbursementRequestDTO {
     private LocalDateTime date;
 
     @NotBlank(message = "Disbursement status is required")
-    @Pattern(regexp = "Pending|Processing|Completed|Failed",
+    @Pattern(regexp = "(?i)Pending|Processing|Completed|Failed",
              message = "Disbursement status must be Pending, Processing, Completed, or Failed")
     private String status;
 

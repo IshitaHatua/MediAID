@@ -84,6 +84,11 @@
             <mat-icon>cancel</mat-icon> Reject
           </button>
         </div>
+        <div class="action-bar" *ngIf="c.status === 'APPROVED'">
+          <button class="btn-generate" (click)="generateDisbursement(c)" title="If no disbursement was auto-created, click to generate one">
+            <mat-icon>account_balance_wallet</mat-icon> Generate Disbursement
+          </button>
+        </div>
       </mat-expansion-panel>
     </mat-accordion>
 

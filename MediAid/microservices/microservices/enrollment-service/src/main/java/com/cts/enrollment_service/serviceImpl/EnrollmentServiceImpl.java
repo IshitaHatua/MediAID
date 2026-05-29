@@ -52,6 +52,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @CircuitBreaker(name = "schemeService", fallbackMethod = "schemeFallback")
     public EnrollmentResponseDTO createEnrollment(Long citizenId, EnrollmentRequestDTO dto) {
+        // Prevent duplicate enrollments. Without this guard a double-click or retry on
+        // the Enroll button produces multiple rows for the same (citizenId, schemeId),
+        // which then breaks downstream lookups (findByCitizenIdAndSchemeId returns
+        // Optional<Enrollment>, throws IncorrectResultSizeDataAccessException → 503).
+        if (Boolean.TRUE.equals(enrollmentRepository.existsByCitizenIdAndSchemeId(citizenId, dto.getSchemeId()))) {
+            throw new BadRequestException("You have already enrolled in this scheme.");
+        }
+
         APIResponse<SchemeResponseDTO> response = schemeClient.getSchemeById(dto.getSchemeId());
         SchemeResponseDTO scheme = response.getData();
 

@@ -4,10 +4,13 @@ import com.cts.client.AuditServiceClient;
 import com.cts.dto.request.CitizenRequestDTO;
 import com.cts.dto.response.CitizenResponseDTO;
 import com.cts.enums.CitizenStatus;
+import com.cts.enums.DocumentVerificationStatus;
 import com.cts.exception.BadRequestException;
 import com.cts.exception.ResourceNotFoundException;
 import com.cts.mapper.CitizenMapper;
 import com.cts.model.Citizen;
+import com.cts.model.CitizenDocument;
+import com.cts.repository.CitizenDocumentRepository;
 import com.cts.repository.CitizenRepository;
 import com.cts.security.CurrentUserUtil;
 import com.cts.service.CitizenService;
@@ -22,15 +25,18 @@ import java.util.stream.Collectors;
 public class CitizenServiceImpl implements CitizenService {
 
     private final CitizenRepository citizenRepository;
+    private final CitizenDocumentRepository citizenDocumentRepository;
     private final CitizenMapper citizenMapper;
     private final AuditServiceClient auditServiceClient;
     private final CurrentUserUtil currentUserUtil;
 
     public CitizenServiceImpl(CitizenRepository citizenRepository,
+                               CitizenDocumentRepository citizenDocumentRepository,
                                CitizenMapper citizenMapper,
                                AuditServiceClient auditServiceClient,
                                CurrentUserUtil currentUserUtil) {
         this.citizenRepository = citizenRepository;
+        this.citizenDocumentRepository = citizenDocumentRepository;
         this.citizenMapper = citizenMapper;
         this.auditServiceClient = auditServiceClient;
         this.currentUserUtil = currentUserUtil;
@@ -83,6 +89,7 @@ public class CitizenServiceImpl implements CitizenService {
     }
 
     @Override
+    @Transactional
     public CitizenResponseDTO verifyCitizen(long citizenId, CitizenStatus status)
             throws ResourceNotFoundException {
 
@@ -103,6 +110,21 @@ public class CitizenServiceImpl implements CitizenService {
 
         citizen.setStatus(status);
         Citizen updated = citizenRepository.save(citizen);
+
+        // Cascade the same decision to every document the citizen has uploaded.
+        // The per-document Verify/Reject buttons were removed from the officer UI,
+        // so the citizen-level decision is the single source of truth for documents too.
+        DocumentVerificationStatus docStatus = (status == CitizenStatus.VERIFIED)
+                ? DocumentVerificationStatus.VERIFIED
+                : DocumentVerificationStatus.REJECTED;
+        List<CitizenDocument> docs = citizenDocumentRepository.findByCitizenCitizenId(citizenId);
+        for (CitizenDocument d : docs) {
+            d.setVerificationStatus(docStatus);
+        }
+        if (!docs.isEmpty()) {
+            citizenDocumentRepository.saveAll(docs);
+        }
+
         auditServiceClient.log(currentUserUtil.getUserId(), "VERIFY", "Citizen");
         return citizenMapper.toDto(updated);
     }

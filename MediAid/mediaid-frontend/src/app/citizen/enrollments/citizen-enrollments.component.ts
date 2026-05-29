@@ -87,6 +87,11 @@ export class CitizenEnrollmentsComponent implements OnInit {
 
   schemeName(id: number) { return this.schemes.find(s => s.schemeId === id)?.name || `Scheme #${id}`; }
 
+  get selectedScheme(): any | null {
+    const id = this.enrollForm.value.schemeId;
+    return id != null ? (this.schemes.find(s => s.schemeId === id) ?? null) : null;
+  }
+
   openEnrollDialog() { this.enrollForm.reset(); this.showDialog = true; }
 
   submitEnroll() {

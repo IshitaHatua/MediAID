@@ -30,7 +30,11 @@
         </ng-container>
         <ng-container matColumnDef="eligibility">
           <th mat-header-cell *matHeaderCellDef>Eligibility</th>
-          <td mat-cell *matCellDef="let e" class="eligibility-cell">{{ schemeEligibility(e.schemeId) }}</td>
+          <td mat-cell *matCellDef="let e" class="eligibility-cell"
+              [title]="schemeEligibility(e.schemeId) !== '—' ? 'Click to read full criteria' : ''"
+              (click)="openEligibility(e.schemeId)">
+            {{ schemeEligibility(e.schemeId) }}
+          </td>
         </ng-container>
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef>Status</th>
@@ -50,3 +54,13 @@
       </table>
       <p *ngIf="!loading && !filtered.length" class="empty">No enrollments found.</p>
     </mat-card>
+
+    <div class="dialog-overlay" *ngIf="eligibilityDialog.open" (click)="closeEligibility()">
+      <mat-card class="dialog-card" (click)="$event.stopPropagation()">
+        <button mat-icon-button class="dialog-close-btn" type="button" aria-label="Close" (click)="closeEligibility()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <h3>Eligibility Criteria — {{ eligibilityDialog.schemeName }}</h3>
+        <div class="dialog-body">{{ eligibilityDialog.text }}</div>
+      </mat-card>
+    </div>

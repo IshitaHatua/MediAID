@@ -38,6 +38,9 @@ export class EnrollmentManagementComponent implements OnInit {
 
   cols = ['citizenId', 'citizenAge', 'schemeName', 'eligibility', 'status', 'actions'];
 
+  eligibilityDialog: { open: boolean; schemeName: string; text: string } =
+    { open: false, schemeName: '', text: '' };
+
   constructor(
     private enrollSvc: EnrollmentService,
     private schemeSvc: SchemeService,
@@ -76,13 +79,26 @@ export class EnrollmentManagementComponent implements OnInit {
   citizenAge(citizenId: number): string {
     const c = this.citizensById[citizenId];
     if (!c?.dob) return '—';
-    const dob = new Date(c.dob);
-    if (isNaN(dob.getTime())) return '—';
+    // Backend stores DOB as a string in dd-MM-yyyy format (see citizen-service
+    // ValidDateValidator). new Date(dd-MM-yyyy) returns Invalid Date in JS,
+    // so parse the parts explicitly.
+    const dob = this.parseDob(c.dob);
+    if (!dob) return '—';
     const today = new Date();
     let age = today.getFullYear() - dob.getFullYear();
     const m = today.getMonth() - dob.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
     return age >= 0 ? String(age) : '—';
+  }
+
+  private parseDob(s: string): Date | null {
+    // Accept both dd-MM-yyyy (canonical) and yyyy-MM-dd (legacy/ISO) just in case.
+    const m1 = /^(\d{2})-(\d{2})-(\d{4})$/.exec(s);
+    if (m1) return new Date(+m1[3], +m1[2] - 1, +m1[1]);
+    const m2 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+    if (m2) return new Date(+m2[1], +m2[2] - 1, +m2[3]);
+    const fallback = new Date(s);
+    return isNaN(fallback.getTime()) ? null : fallback;
   }
 
   schemeName(schemeId: number): string {
@@ -91,6 +107,20 @@ export class EnrollmentManagementComponent implements OnInit {
 
   schemeEligibility(schemeId: number): string {
     return this.schemesById[schemeId]?.eligibilityCriteria || '—';
+  }
+
+  openEligibility(schemeId: number) {
+    const text = this.schemeEligibility(schemeId);
+    if (!text || text === '—') return;
+    this.eligibilityDialog = {
+      open: true,
+      schemeName: this.schemeName(schemeId),
+      text
+    };
+  }
+
+  closeEligibility() {
+    this.eligibilityDialog = { open: false, schemeName: '', text: '' };
   }
 
   updateStatus(e: any, status: string) {

@@ -67,6 +67,19 @@ export class CitizenManagementComponent implements OnInit {
     return idx >= 0 ? fileUri.substring(idx + 1) : fileUri;
   }
 
+  /**
+   * Returns a filesystem-friendly version of the original filename for use
+   * as a download target. Edge/Chromium PDF viewers reject file:// URLs whose
+   * paths contain unbalanced parens or sequences of `%20 (` — replacing
+   * spaces and parens with underscores avoids that without changing the bytes.
+   */
+  private safeDownloadName(fileUri: string): string {
+    return this.originalFileName(fileUri)
+      .replace(/[()\s]+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
+  }
+
   private mimeFor(fileUri: string): string {
     const ext = (fileUri.split('.').pop() || '').toLowerCase();
     switch (ext) {
@@ -98,7 +111,7 @@ export class CitizenManagementComponent implements OnInit {
         const typed = new Blob([blob], { type: this.mimeFor(fileUri) });
         const url = URL.createObjectURL(typed);
         const a = document.createElement('a');
-        a.href = url; a.download = this.originalFileName(fileUri); a.click();
+        a.href = url; a.download = this.safeDownloadName(fileUri); a.click();
         URL.revokeObjectURL(url);
       },
       error: () => this.toastr.error('Download failed. Please try again.')

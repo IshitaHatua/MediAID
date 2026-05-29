@@ -13,6 +13,7 @@ public class ClaimMapper {
         Claim claim = new Claim();
         claim.setSchemeId(dto.getSchemeId());
         claim.setClaimAmount(dto.getClaimAmount());
+        claim.setDescription(dto.getDescription());
         return claim;
     }
 

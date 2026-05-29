@@ -65,6 +65,19 @@ export class ClaimManagementComponent implements OnInit {
     return idx >= 0 ? name.substring(idx + 1) : name;
   }
 
+  /**
+   * Filesystem-friendly version of the original filename for use as a download
+   * target. Replaces characters that cause Edge / Chrome PDF viewers to reject
+   * the resulting file:// path (spaces, parens) with underscores. The bytes
+   * saved to disk are unchanged.
+   */
+  private safeDownloadName(name: string): string {
+    return this.originalFileName(name)
+      .replace(/[()\s]+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
+  }
+
   private mimeFor(name: string): string {
     const ext = (name.split('.').pop() || '').toLowerCase();
     switch (ext) {
@@ -97,7 +110,7 @@ export class ClaimManagementComponent implements OnInit {
         const typed = new Blob([blob], { type: this.mimeFor(fileName) });
         const url = URL.createObjectURL(typed);
         const a = document.createElement('a');
-        a.href = url; a.download = this.originalFileName(fileName); a.click();
+        a.href = url; a.download = this.safeDownloadName(fileName); a.click();
         URL.revokeObjectURL(url);
         this.cdr.markForCheck();
       },
@@ -121,6 +134,25 @@ export class ClaimManagementComponent implements OnInit {
         },
         error: () => { this.toastr.error(`Could not ${status.toLowerCase()} claim.`); this.cdr.markForCheck(); }
       });
+    });
+  }
+
+  /**
+   * Backfill for already-APPROVED claims with no disbursement (legacy approvals
+   * from before the auto-create event listener was wired in, or approvals that
+   * raced with disbursement-service being down).
+   */
+  generateDisbursement(c: any) {
+    this.claimSvc.generateDisbursement(c.claimId).subscribe({
+      next: () => {
+        this.refresh.notify('disbursements');
+        this.toastr.success(`Disbursement generated for claim #${c.claimId}.`);
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.toastr.error('Could not generate disbursement. Check the disbursement page — one may already exist.');
+        this.cdr.markForCheck();
+      }
     });
   }
 }

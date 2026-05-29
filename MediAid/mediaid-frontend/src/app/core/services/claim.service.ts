@@ -25,10 +25,20 @@ export class ClaimService {
     return this.http.get<ApiResponse<ClaimDocumentResponse[]>>(`${this.base}/${claimId}/documents`);
   }
   downloadDocument(fileName: string) {
+    // Stored claim-document filenames are `<UUID>_<original-name>` and may contain
+    // spaces, parentheses, plus signs, etc. Angular HttpClient does NOT auto-encode
+    // path segments in template literals, and Tomcat/Spring will reinterpret `+`
+    // as space inside an un-encoded path, so the backend looks up the wrong file
+    // and returns an error JSON body that gets saved as a corrupted .pdf.
     return this.http.get(
-      `${this.base}/documents/${fileName}/download`,
+      `${this.base}/documents/${encodeURIComponent(fileName)}/download`,
       { responseType: 'blob' }
     );
   }
   getValidations() { return this.http.get<ApiResponse<any[]>>(`${this.base}/validations`); }
+
+  /** Backfill: triggers backend creation of a disbursement for an already-APPROVED claim. */
+  generateDisbursement(claimId: number) {
+    return this.http.post<ApiResponse<void>>(`${this.base}/${claimId}/generate-disbursement`, {});
+  }
 }

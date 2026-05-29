@@ -21,4 +21,8 @@ public interface ClaimService {
     List<ClaimDocumentResponseDTO> getDocumentsByClaimId(Long claimId);
     Long getCitizenIdByClaimId(Long claimId);
     Double getClaimAmountByClaimId(Long claimId);
+
+    // Backfill: officer triggers disbursement creation for an already-APPROVED
+    // claim that has no disbursement (legacy approvals from before auto-create).
+    void generateDisbursement(Long claimId);
 }

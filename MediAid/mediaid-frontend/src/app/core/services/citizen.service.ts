@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpEvent, HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpEvent, HttpRequest } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/auth.models';
 import { CitizenDocumentResponse, CitizenRequest, CitizenResponse } from '../models/citizen.models';
+import { SKIP_ERROR_TOAST } from '../interceptors/jwt.interceptor';
 
 @Injectable({ providedIn: 'root' })
 export class CitizenService {
@@ -12,8 +13,15 @@ export class CitizenService {
   createCitizen(payload: CitizenRequest) {
     return this.http.post<ApiResponse<CitizenResponse>>(`${this.base}/citizens`, payload);
   }
+  /**
+   * Fetches the citizen profile. Returns 404 with "Citizen Not Found" when the
+   * citizen hasn't created their profile yet — this is a normal first-login state,
+   * not a real error. Suppress the global toast; callers display a "Profile Required"
+   * banner from their .error callback instead.
+   */
   getCitizen(citizenId: number) {
-    return this.http.get<ApiResponse<CitizenResponse>>(`${this.base}/citizens/${citizenId}`);
+    return this.http.get<ApiResponse<CitizenResponse>>(`${this.base}/citizens/${citizenId}`,
+      { context: new HttpContext().set(SKIP_ERROR_TOAST, true) });
   }
   getAll() {
     return this.http.get<ApiResponse<CitizenResponse[]>>(`${this.base}/citizens`);
@@ -62,6 +70,12 @@ export class CitizenService {
     return this.http.delete<ApiResponse<void>>(`${this.base}/documents/${documentId}`);
   }
   downloadDocument(fileName: string) {
-    return this.http.get(`${this.base}/documents/${fileName}/download`, { responseType: 'blob' });
+    // Encode the filename so spaces, parentheses and other URI-unsafe characters
+    // (the stored name is `<uuid>_<original>`, and originals like "email (1).pdf"
+    // contain spaces and parens) round-trip cleanly through the gateway and
+    // Spring's @PathVariable. Without this the backend resolves a different path
+    // and returns an error JSON which then gets saved as a corrupted .pdf.
+    return this.http.get(`${this.base}/documents/${encodeURIComponent(fileName)}/download`,
+      { responseType: 'blob' });
   }
 }

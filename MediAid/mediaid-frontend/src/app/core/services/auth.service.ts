@@ -40,8 +40,36 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.clear();
+    // Clear only auth-session keys. Keep app-level keys like `seenUsers` so first-vs-
+    // returning-login detection still works after the user logs out and back in.
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
     this.router.navigate(['/auth/login']);
+  }
+
+  /**
+   * Records the current user as having logged in on this device.
+   * Returns true if the user had logged in before (returning user),
+   * false if this is the first time we see them (first-time login).
+   */
+  markUserSeen(): boolean {
+    const userId = this.getUserId();
+    if (!userId) return false;
+    let seen: string[];
+    try {
+      seen = JSON.parse(localStorage.getItem('seenUsers') || '[]');
+      if (!Array.isArray(seen)) seen = [];
+    } catch {
+      seen = [];
+    }
+    const wasSeen = seen.includes(userId);
+    if (!wasSeen) {
+      seen.push(userId);
+      localStorage.setItem('seenUsers', JSON.stringify(seen));
+    }
+    return wasSeen;
   }
 
   getToken() { return localStorage.getItem('token'); }

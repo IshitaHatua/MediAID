@@ -7,6 +7,7 @@ import com.cts.claim_service.client.DisbursementClient;
 import com.cts.claim_service.client.EnrollmentClient;
 import com.cts.claim_service.client.SchemeClient;
 import com.cts.claim_service.dto.*;
+import com.cts.claim_service.event.ClaimApprovedEvent;
 import com.cts.claim_service.mapper.ClaimMapper;
 import com.cts.claim_service.model.Claim;
 import com.cts.claim_service.model.ClaimDocument;
@@ -18,13 +19,17 @@ import com.cts.claim_service.service.ClaimService;
 import com.cts.claim_service.exception.BadRequestException;
 import com.cts.claim_service.exception.ResourceNotFoundException;
 import feign.FeignException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -62,6 +67,12 @@ public class ClaimServiceImpl implements ClaimService {
     private AuditManagementFeignClient auditManagementFeignClient;
     @Autowired
     private ComplianceFeignClient complianceFeignClient;
+
+    // Used to defer the disbursement Feign call until after the @Transactional
+    // updateClaimStatus commit, so disbursement-service's reverse Feign read
+    // sees the APPROVED status instead of the still-uncommitted PENDING.
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Value("${app.upload.dir:uploads/claim-documents}")
     private String uploadDirectory;
@@ -191,13 +202,80 @@ public class ClaimServiceImpl implements ClaimService {
                 "CLAIM:" + claimId,
                 "Remarks=" + (dto.getRemarks() != null ? dto.getRemarks() : "none"));
 
-        // Auto-trigger compliance evaluation when a claim is APPROVED.
-        // Best-effort — claim stays APPROVED even if compliance-service is unavailable.
+        // Auto-trigger compliance evaluation AND auto-create a PENDING disbursement
+        // when a claim is APPROVED. Compliance runs in-tx (best-effort, swallowed
+        // on failure). Disbursement creation is deferred to after-commit via an
+        // event so disbursement-service's reverse Feign read sees the committed
+        // APPROVED state and doesn't reject with "Claim X has status: PENDING".
         if (dto.getStatus() == Claim.ClaimStatus.APPROVED) {
             triggerComplianceEvaluation(claimId, officerId);
+            eventPublisher.publishEvent(new ClaimApprovedEvent(updated.getClaimId()));
         }
 
         return claimMapper.toDto(updated);
+    }
+
+    /**
+     * Fires after the updateClaimStatus transaction commits. By this point the
+     * Claim row is durably APPROVED, so the disbursement-service callback (which
+     * Feigns back to GET /api/claims/{id}) will see the right status.
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onClaimApproved(ClaimApprovedEvent event) {
+        autoCreateDisbursementForClaim(event.getClaimId());
+    }
+
+    /**
+     * Backfill / retry entry point. Called by the {@code generateDisbursement}
+     * service method when the officer hits "Generate Disbursement" on an
+     * already-approved claim that had no disbursement (e.g. approved before this
+     * fix shipped, or approved while disbursement-service was down).
+     *
+     * Best-effort: failure logs but does not propagate, so an officer can retry.
+     */
+    private void autoCreateDisbursementForClaim(Long claimId) {
+        Claim claim = claimRepository.findById(claimId).orElse(null);
+        if (claim == null) {
+            log.warn("[ClaimService] Auto-create skipped — claim {} no longer exists", claimId);
+            return;
+        }
+        if (claim.getStatus() != Claim.ClaimStatus.APPROVED) {
+            log.warn("[ClaimService] Auto-create skipped — claim {} is not APPROVED (status={})",
+                    claimId, claim.getStatus());
+            return;
+        }
+        try {
+            DisbursementCreateRequest req = DisbursementCreateRequest.builder()
+                    .claimId(claim.getClaimId())
+                    .amount(claim.getClaimAmount() != null
+                            ? BigDecimal.valueOf(claim.getClaimAmount())
+                            : BigDecimal.ZERO)
+                    .date(LocalDateTime.now())
+                    .status("Pending")
+                    .build();
+            disbursementClient.createDisbursement(req);
+            log.info("[ClaimService] Auto-created PENDING disbursement for CLAIM:{}", claim.getClaimId());
+        } catch (Exception ex) {
+            log.error("[ClaimService] Failed to auto-create disbursement for CLAIM:{} — {}",
+                    claim.getClaimId(), ex.getMessage());
+        }
+    }
+
+    /**
+     * Manual backfill — used by POST /api/claims/{id}/generate-disbursement.
+     * Validates the claim is APPROVED, then runs the same auto-create logic.
+     * Throws if the claim isn't approved so the caller gets a 400, not a silent no-op.
+     */
+    @Override
+    public void generateDisbursement(Long claimId) {
+        Claim claim = claimRepository.findById(claimId)
+                .orElseThrow(() -> new ResourceNotFoundException("Claim not found with ID: " + claimId));
+        if (claim.getStatus() != Claim.ClaimStatus.APPROVED) {
+            throw new BadRequestException(
+                    "Disbursement can only be generated for APPROVED claims. Current status: "
+                            + claim.getStatus());
+        }
+        autoCreateDisbursementForClaim(claimId);
     }
 
     @Override
@@ -317,13 +395,37 @@ public class ClaimServiceImpl implements ClaimService {
             throw bre;
         }
         if (t instanceof FeignException fe) {
+            log.error("[ClaimService] Feign call failed in createClaim — status={}, message={}",
+                    fe.status(), fe.getMessage(), fe);
             if (fe.status() == 404) {
                 throw new ResourceNotFoundException("Resource not found: " + fe.getMessage());
             }
             if (fe.status() == 400) {
                 throw new BadRequestException("Bad request: " + fe.getMessage());
             }
+            throw new RuntimeException(
+                    "Downstream service returned HTTP " + fe.status() + ": " + fe.getMessage(), fe);
         }
-        throw new RuntimeException("An external service is currently unavailable. Please try again later.");
+        if (t instanceof CallNotPermittedException cnpe) {
+            log.error("[ClaimService] Circuit breaker OPEN — call not permitted: {}", cnpe.getMessage());
+            throw new RuntimeException(
+                    "Claim service is temporarily unavailable due to repeated downstream failures. " +
+                            "Please retry after a few seconds.", cnpe);
+        }
+        if (t instanceof NullPointerException npe) {
+            log.error("[ClaimService] NullPointerException in createClaim — likely a missing field " +
+                    "in a downstream response (scheme/enrollment). Citizen={}, SchemeId={}",
+                    citizenId, dto != null ? dto.getSchemeId() : null, npe);
+            throw new RuntimeException(
+                    "Unexpected empty data received from a downstream service. Please retry.", npe);
+        }
+        log.error("[ClaimService] Unhandled error in createClaim fallback — type={}, message={}",
+                t != null ? t.getClass().getName() : "null",
+                t != null ? t.getMessage() : "null",
+                t);
+        throw new RuntimeException(
+                "An external service is currently unavailable. Please try again later. (cause: " +
+                        (t != null ? t.getClass().getSimpleName() + ": " + t.getMessage() : "unknown") + ")",
+                t);
     }
 }

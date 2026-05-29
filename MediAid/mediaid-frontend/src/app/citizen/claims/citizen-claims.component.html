@@ -103,14 +103,16 @@
         <mat-error>Required</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Description (optional)</mat-label>
-        <textarea matInput formControlName="description" rows="3" maxlength="500"></textarea>
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3" maxlength="500"
+                  placeholder="Briefly describe the reason for this claim"></textarea>
+        <mat-error>Description is required</mat-error>
       </mat-form-field>
 
       <div class="dialog-attach">
         <label class="dialog-attach-btn">
           <mat-icon>attach_file</mat-icon>
-          <span>{{ pendingFile ? 'Change Document' : 'Attach Document' }}</span>
+          <span>{{ pendingFile ? 'Change Document' : 'Attach Document *' }}</span>
           <input type="file" (change)="onFileSelected($event)" accept=".pdf,.jpg,.jpeg,.png" hidden>
         </label>
         <span class="dialog-attach-file" *ngIf="pendingFile">
@@ -119,12 +121,13 @@
             <mat-icon>close</mat-icon>
           </button>
         </span>
-        <span class="dialog-attach-hint" *ngIf="!pendingFile">PDF, JPG, or PNG (max 10MB) &mdash; optional</span>
+        <span class="dialog-attach-hint" *ngIf="!pendingFile">PDF, JPG, or PNG (max 10MB) &mdash; required</span>
       </div>
 
       <div class="dialog-actions">
         <button mat-button type="button" (click)="closeDialog()">Cancel</button>
-        <button mat-flat-button color="primary" type="submit">Submit</button>
+        <button mat-flat-button color="primary" type="submit"
+                [disabled]="claimForm.invalid || !pendingFile">Submit</button>
       </div>
     </form>
   </mat-card>

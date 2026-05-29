@@ -42,7 +42,11 @@ export class LoginComponent {
       next: res => {
         this.loading = false;
         if (res.status === 'SUCCESS') {
-          this.toastr.success('Welcome back!', 'Login Successful');
+          if (this.auth.markUserSeen()) {
+            this.toastr.success('Welcome back!', 'Login Successful');
+          } else {
+            this.toastr.success('Welcome to MediAID!', 'Login Successful');
+          }
           this.router.navigate([this.auth.getDashboardRoute()]);
         } else {
           this.toastr.error(res.message || 'Login failed. Please check your credentials.');

@@ -91,6 +91,36 @@
             </mat-select>
             <mat-error>Please select a scheme</mat-error>
           </mat-form-field>
+
+          <div class="scheme-details" *ngIf="selectedScheme as s">
+            <div class="scheme-details-header">
+              <mat-icon>info</mat-icon>
+              <span>About this scheme</span>
+            </div>
+            <div class="scheme-pills">
+              <span class="pill pill-coverage">
+                <mat-icon>payments</mat-icon>
+                Max coverage: ₹{{ s.maxCoverageAmount | number:'1.0-0' }}
+              </span>
+              <span class="pill pill-validity">
+                <mat-icon>schedule</mat-icon>
+                Valid for {{ s.validityYears }} year{{ s.validityYears === 1 ? '' : 's' }}
+              </span>
+            </div>
+            <div class="scheme-section" *ngIf="s.description">
+              <div class="scheme-section-label">Description</div>
+              <p>{{ s.description }}</p>
+            </div>
+            <div class="scheme-section" *ngIf="s.benefits">
+              <div class="scheme-section-label">Benefits</div>
+              <p>{{ s.benefits }}</p>
+            </div>
+            <div class="scheme-section" *ngIf="s.eligibilityCriteria">
+              <div class="scheme-section-label">Eligibility</div>
+              <p>{{ s.eligibilityCriteria }}</p>
+            </div>
+          </div>
+
           <div class="dialog-actions">
             <button mat-button type="button" (click)="showDialog=false">Cancel</button>
             <button mat-flat-button color="primary" type="submit" [disabled]="schemes.length === 0">Enroll</button>

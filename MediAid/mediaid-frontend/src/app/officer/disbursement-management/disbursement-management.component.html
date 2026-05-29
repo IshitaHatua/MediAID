@@ -1,7 +1,7 @@
 
     <div class="page-header">
-      <h2 class="page-title">Disbursement & Payment Management</h2>
-      <p class="page-sub">Process disbursements and manage payment records</p>
+      <h2 class="page-title">Disbursement &amp; Payment Management</h2>
+      <p class="page-sub">Disbursements are created automatically when claims are approved. Process pending ones here and record payments against them.</p>
     </div>
 
     <mat-tab-group>
@@ -10,40 +10,52 @@
         <div class="tab-content">
           <div class="section-card">
             <div class="toolbar">
-              <h3 class="section-title">All Disbursements</h3>
-              <button class="btn-new" (click)="showDisbForm=!showDisbForm">
-                <mat-icon>add</mat-icon> New Disbursement
-              </button>
+              <h3 class="section-title">Active Disbursements</h3>
+              <span class="toolbar-meta" *ngIf="!disbLoading">{{ disbursements.length }} active</span>
             </div>
-            <form *ngIf="showDisbForm" [formGroup]="disbForm" (ngSubmit)="createDisbursement()" class="inline-form">
-              <mat-form-field appearance="outline"><mat-label>Claim ID</mat-label><input matInput formControlName="claimId" type="number"><mat-error>Required</mat-error></mat-form-field>
-              <mat-form-field appearance="outline"><mat-label>Citizen ID</mat-label><input matInput formControlName="citizenId" type="number"><mat-error>Required</mat-error></mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Scheme</mat-label>
-                <mat-select formControlName="schemeId">
-                  <mat-option *ngFor="let s of schemes" [value]="s.schemeId">{{ s.name }}</mat-option>
-                </mat-select>
-                <mat-error>Required</mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline"><mat-label>Amount (₹)</mat-label><input matInput formControlName="amount" type="number"><mat-error>Required</mat-error></mat-form-field>
-              <div class="form-btns">
-                <button class="btn-submit" type="submit">Create</button>
-                <button class="btn-cancel" type="button" (click)="showDisbForm=false">Cancel</button>
-              </div>
-            </form>
+            <p class="hint" *ngIf="!disbLoading">
+              Only <strong>PENDING</strong> and <strong>PROCESSING</strong> disbursements are listed.
+              Completed ones drop out once total payments reach the disbursement amount.
+            </p>
             <div class="center" *ngIf="disbLoading"><mat-spinner diameter="40" color="accent"></mat-spinner></div>
+
             <table mat-table [dataSource]="disbursements" class="data-table" *ngIf="!disbLoading && disbursements.length">
-              <ng-container matColumnDef="disbursementId"><th mat-header-cell *matHeaderCellDef>ID</th><td mat-cell *matCellDef="let d" class="id-cell">#{{ d.disbursementId }}</td></ng-container>
-              <ng-container matColumnDef="claimId"><th mat-header-cell *matHeaderCellDef>Claim</th><td mat-cell *matCellDef="let d">#{{ d.claimId }}</td></ng-container>
-              <ng-container matColumnDef="citizenId"><th mat-header-cell *matHeaderCellDef>Citizen</th><td mat-cell *matCellDef="let d">{{ d.citizenId }}</td></ng-container>
-              <ng-container matColumnDef="amount"><th mat-header-cell *matHeaderCellDef>Amount</th><td mat-cell *matCellDef="let d" class="amount-cell">₹{{ d.amount | number:'1.0-2' }}</td></ng-container>
-              <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let d"><app-status-badge [status]="d.status"></app-status-badge></td></ng-container>
+              <ng-container matColumnDef="details">
+                <th mat-header-cell *matHeaderCellDef>Details</th>
+                <td mat-cell *matCellDef="let d">
+                  <div class="disb-sentence">{{ describe(d) }}</div>
+                  <div class="disb-meta">Disbursement #{{ d.disbursementId }} &middot; Claim #{{ d.claimId }}</div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="amount">
+                <th mat-header-cell *matHeaderCellDef>Amount</th>
+                <td mat-cell *matCellDef="let d" class="amount-cell">₹{{ d.amount | number:'1.0-2' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let d"><app-status-badge [status]="d.status"></app-status-badge></td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let d">
+                  <button class="btn-process"
+                          *ngIf="(d.status || '').toUpperCase() === 'PENDING'"
+                          (click)="processDisbursement(d)">
+                    <mat-icon>play_arrow</mat-icon> Process
+                  </button>
+                </td>
+              </ng-container>
+
               <tr mat-header-row *matHeaderRowDef="disbCols"></tr>
               <tr mat-row *matRowDef="let row; columns: disbCols;"></tr>
             </table>
+
             <div class="empty-state" *ngIf="!disbLoading && !disbursements.length">
               <mat-icon>account_balance_wallet</mat-icon>
-              <p>No disbursements found</p>
+              <p>No active disbursements. New ones will appear here automatically when an officer approves a claim.</p>
             </div>
           </div>
         </div>
@@ -56,7 +68,7 @@
             <div class="toolbar">
               <h3 class="section-title">All Payments</h3>
               <button class="btn-new" (click)="showPayForm=!showPayForm">
-                <mat-icon>add</mat-icon> Process Payment
+                <mat-icon>add</mat-icon> Record Payment
               </button>
             </div>
             <form *ngIf="showPayForm" [formGroup]="payForm" (ngSubmit)="createPayment()" class="inline-form">
@@ -71,7 +83,7 @@
                 </mat-select>
               </mat-form-field>
               <div class="form-btns">
-                <button class="btn-submit" type="submit">Process</button>
+                <button class="btn-submit" type="submit">Record</button>
                 <button class="btn-cancel" type="button" (click)="showPayForm=false">Cancel</button>
               </div>
             </form>

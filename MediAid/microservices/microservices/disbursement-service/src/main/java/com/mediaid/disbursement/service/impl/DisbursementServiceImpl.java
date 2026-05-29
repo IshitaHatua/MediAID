@@ -59,7 +59,14 @@ public class DisbursementServiceImpl implements DisbursementService {
         d.setClaimId(claimId);
         d.setCitizenId(claimData.getCitizenId());
         d.setSchemeId(claimData.getSchemeId());
-        d.setStatus("PROCESSING");
+        // Honor the requested status (auto-create from claim-service sends "Pending";
+        // the older manual UI sent "Pending" too). Normalise to upper case to keep
+        // downstream comparisons consistent — sumCompletedByClaimIds and
+        // status-badge both expect upper-case tokens.
+        String requestedStatus = requestDTO.getStatus() != null
+                ? requestDTO.getStatus().toUpperCase()
+                : "PENDING";
+        d.setStatus(requestedStatus);
 
         DisbursementResponseDTO saved = mapper.toDto(repository.save(d));
 
@@ -112,7 +119,9 @@ public class DisbursementServiceImpl implements DisbursementService {
         Disbursement disbursement = repository.findById(disbursementId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Disbursement not found with id: " + disbursementId));
-        disbursement.setStatus(status);
+        // Normalise to upper case so PENDING/PROCESSING/COMPLETED/FAILED are
+        // stored consistently regardless of caller casing.
+        disbursement.setStatus(status != null ? status.toUpperCase() : null);
         DisbursementResponseDTO updated = mapper.toDto(repository.save(disbursement));
 
         // Log status change to audit-management-service (best-effort).

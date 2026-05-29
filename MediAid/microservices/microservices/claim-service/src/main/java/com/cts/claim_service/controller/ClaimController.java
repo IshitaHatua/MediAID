@@ -6,7 +6,9 @@ import com.cts.claim_service.dto.ClaimRequestDTO;
 import com.cts.claim_service.dto.ClaimResponseDTO;
 import com.cts.claim_service.dto.ClaimStatusUpdateDTO;
 import com.cts.claim_service.exception.ResourceNotFoundException;
+import com.cts.claim_service.model.ClaimDocument;
 import com.cts.claim_service.model.ClaimValidation;
+import com.cts.claim_service.repository.ClaimDocumentRepository;
 import com.cts.claim_service.security.CurrentUserUtil;
 import com.cts.claim_service.service.ClaimService;
 import jakarta.validation.Valid;
@@ -31,13 +33,20 @@ public class ClaimController {
 
     private final ClaimService claimService;
     private final CurrentUserUtil currentUserUtil;
+    private final ClaimDocumentRepository claimDocumentRepository;
 
-    @Value("${file.upload-dir:./claim-uploads}")
+    // Fallback root only used when a row has no absolute file_path stored.
+    // The upload code writes under ${app.upload.dir} per-claim subdir, so the
+    // fallback aligns with that property — NOT the old `file.upload-dir`.
+    @Value("${app.upload.dir:uploads/claim-documents}")
     private String uploadDir;
 
-    public ClaimController(ClaimService claimService, CurrentUserUtil currentUserUtil) {
+    public ClaimController(ClaimService claimService,
+                           CurrentUserUtil currentUserUtil,
+                           ClaimDocumentRepository claimDocumentRepository) {
         this.claimService = claimService;
         this.currentUserUtil = currentUserUtil;
+        this.claimDocumentRepository = claimDocumentRepository;
     }
 
     @PreAuthorize("hasRole('CITIZEN')")
@@ -143,27 +152,60 @@ public class ClaimController {
     }
 
     /**
+     * Backfill — generate a disbursement for an already-APPROVED claim that
+     * never received one (e.g. approved before the auto-create event-listener
+     * was wired in). The same disbursement-creation Feign call as the normal
+     * approval flow is used; failure logs and returns a non-2xx so the UI can
+     * surface it.
+     */
+    @PreAuthorize("hasRole('OFFICER')")
+    @PostMapping("/{claimId}/generate-disbursement")
+    public ResponseEntity<APIResponse<Void>> generateDisbursement(@PathVariable Long claimId) {
+        claimService.generateDisbursement(claimId);
+        return ResponseEntity.ok(APIResponse.<Void>builder()
+                .status("SUCCESS").message("Disbursement generation triggered").build());
+    }
+
+    /**
      * Download a claim document by file name.
      * No @PreAuthorize — permitted without role restrictions in SecurityConfig
      * under /api/claims/documents/** so both citizens and officers can access it.
+     *
+     * Resolution order:
+     *   1. Look up the ClaimDocument row by fileName and use the absolute
+     *      file_path stored at upload time. This is the authoritative source
+     *      and tolerates any working-directory / property-name drift.
+     *   2. Fall back to <upload-dir>/<claimId>/<fileName> using the upload
+     *      property — covers any rows that were inserted without an absolute
+     *      file_path (legacy data).
      */
     @GetMapping("/documents/{fileName}/download")
     public ResponseEntity<Resource> downloadDocument(@PathVariable String fileName) {
+        Path filePath = resolveDocumentPath(fileName);
         try {
-            Path filePath = Paths.get(uploadDir).resolve(fileName);
             Resource resource = new UrlResource(filePath.toUri());
-
             if (!resource.exists()) {
                 throw new ResourceNotFoundException("File not found: " + fileName);
             }
-
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
-
         } catch (MalformedURLException e) {
             throw new ResourceNotFoundException("File not found: " + fileName);
         }
+    }
+
+    private Path resolveDocumentPath(String fileName) {
+        ClaimDocument doc = claimDocumentRepository.findFirstByFileName(fileName).orElse(null);
+        if (doc != null && doc.getFilePath() != null && !doc.getFilePath().isBlank()) {
+            return Paths.get(doc.getFilePath());
+        }
+        // Fallback: reconstruct from upload property + per-claim subdir.
+        Long claimId = (doc != null) ? doc.getClaimId() : null;
+        if (claimId != null) {
+            return Paths.get(uploadDir, String.valueOf(claimId)).resolve(fileName);
+        }
+        return Paths.get(uploadDir).resolve(fileName);
     }
 }
