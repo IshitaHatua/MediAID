@@ -1,12 +1,40 @@
-:host { display: block; position: relative; }
-.dialog-close-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 10;
-  color: rgba(0, 0, 0, 0.55);
+:host {
+  display: block;
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  padding: 1.5rem;
+  min-width: 17rem;
+  max-width: 90vw;
 }
-.dialog-close-btn:hover {
-  color: rgba(0, 0, 0, 0.85);
-  background: rgba(0, 0, 0, 0.06);
+.dialog-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: #555555;
+  padding: 0.25rem;
+  transition: color 0.2s;
+}
+.dialog-close:hover { color: #212121; }
+.dialog-title {
+  margin: 0 1.5rem 0.75rem 0;
+  font-size: 1.15rem;
+  color: #2f62e8;
+}
+.dialog-message {
+  color: #212121;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }

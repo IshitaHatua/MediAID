@@ -1,18 +1,21 @@
-.page-header { margin-bottom: 20px; }
-.page-title { margin: 0 0 4px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
-.page-sub { margin: 0; font-size: 13px; color: rgba(255,255,255,0.4); }
+.tab-bar { display: flex; gap: 0.5rem; border-bottom: 1px solid #e0e0e0; margin-bottom: 1rem; }
+.tab-btn {
+  background: none; border: none; border-bottom: 2px solid transparent;
+  padding: 0.6rem 1rem; font-family: inherit; font-size: 0.9rem; color: #555555;
+  cursor: pointer; transition: color 0.2s, border-color 0.2s;
+}
+.tab-btn:hover { color: #2f62e8; }
+.tab-btn.active { color: #2f62e8; font-weight: 600; border-bottom-color: #2f62e8; }
 
-.tab-content { padding: 18px 0; }
-.section-card { background: linear-gradient(145deg,#111827,#1a2235); border: 1px solid rgba(99,102,241,0.15); border-radius: 14px; padding: 22px; }
-.section-title { margin: 0 0 6px; color: #f1f5f9; font-size: 1.1rem; font-weight: 700; }
-.toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.count-badge { background: rgba(99,102,241,0.15); color: #818cf8; padding: 4px 12px; border-radius: 20px; font-size: 12.5px; font-weight: 600; }
-.count-badge.violations { background: rgba(239,68,68,0.15); color: #f87171; }
-.count-badge.flagged { background: rgba(245,158,11,0.15); color: #fbbf24; }
-.center { display: flex; justify-content: center; padding: 32px; }
-.data-table { width: 100%; background: transparent !important; }
-.id-cell { color: #818cf8; font-family: monospace; font-weight: 600; }
-.date-cell { color: rgba(255,255,255,0.4); font-size: 12px; }
-.empty-state { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 40px; color: rgba(255,255,255,0.25); }
-.empty-state mat-icon { font-size: 24px; }
-.empty-state p { margin: 0; font-size: 14px; }
+.tab-content { padding-top: 0.5rem; }
+.section-title { margin: 0; color: #2f62e8; font-size: 1.05rem; font-weight: 700; }
+
+.count-badge {
+  background: #eef3fc; color: #2f62e8; border: 1px solid #e0e0e0;
+  padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 600;
+}
+.count-badge.violations { color: #c62828; }
+.count-badge.flagged { color: #2f62e8; }
+
+.id-cell { color: #2f62e8; font-family: monospace; font-weight: 600; }
+.date-cell { color: #555555; font-size: 0.8rem; }

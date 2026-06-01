@@ -7,10 +7,10 @@
     </div>
 
     <div class="center" *ngIf="loading">
-      <mat-spinner diameter="40" color="accent"></mat-spinner>
+      <div class="spinner"></div>
     </div>
 
-    <div class="table-card" *ngIf="!loading && payments.length">
+    <div class="card" *ngIf="!loading && payments.length">
       <div class="table-wrap">
         <table class="data-table">
           <thead>
@@ -25,11 +25,11 @@
           </thead>
           <tbody>
             <tr *ngFor="let p of payments">
-              <td class="id-cell">#{{ p.paymentId }}</td>
-              <td class="ref-cell">#{{ p.disbursementId }}</td>
-              <td class="method-cell">{{ p.method | titlecase }}</td>
-              <td class="amount-cell">₹{{ p.amount | number:'1.0-2' }}</td>
-              <td class="date-cell">{{ p.date | date:'dd MMM y' }}</td>
+              <td>#{{ p.paymentId }}</td>
+              <td>#{{ p.disbursementId }}</td>
+              <td>{{ p.method | titlecase }}</td>
+              <td>₹{{ p.amount | number:'1.0-2' }}</td>
+              <td>{{ p.date | date:'dd MMM y' }}</td>
               <td><app-status-badge [status]="p.status"></app-status-badge></td>
             </tr>
           </tbody>
@@ -38,7 +38,6 @@
     </div>
 
     <div class="empty-state" *ngIf="!loading && !payments.length">
-      <div class="empty-icon"><mat-icon>payments</mat-icon></div>
       <h3>No payments received yet</h3>
       <p>Payments will appear here once your disbursements are processed.</p>
     </div>

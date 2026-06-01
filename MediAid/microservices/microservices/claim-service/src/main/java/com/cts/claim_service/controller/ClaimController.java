@@ -167,45 +167,51 @@ public class ClaimController {
     }
 
     /**
-     * Download a claim document by file name.
+     * Download a claim document by its document ID.
      * No @PreAuthorize — permitted without role restrictions in SecurityConfig
      * under /api/claims/documents/** so both citizens and officers can access it.
      *
+     * The document is identified by its numeric primary key rather than its
+     * file name. This avoids the encoding ambiguity that broke downloads for
+     * files whose names contain '+', spaces or parentheses (e.g. browser/gateway
+     * round-tripping '+' <-> space <-> %2B), which previously caused the
+     * file-name lookup to miss and return a 404.
+     *
      * Resolution order:
-     *   1. Look up the ClaimDocument row by fileName and use the absolute
-     *      file_path stored at upload time. This is the authoritative source
-     *      and tolerates any working-directory / property-name drift.
-     *   2. Fall back to <upload-dir>/<claimId>/<fileName> using the upload
-     *      property — covers any rows that were inserted without an absolute
-     *      file_path (legacy data).
+     *   1. Use the absolute file_path stored on the row at upload time. This is
+     *      the authoritative source and tolerates working-directory / property
+     *      drift.
+     *   2. Fall back to <upload-dir>/<claimId>/<fileName> for legacy rows that
+     *      were inserted without an absolute file_path.
      */
-    @GetMapping("/documents/{fileName}/download")
-    public ResponseEntity<Resource> downloadDocument(@PathVariable String fileName) {
-        Path filePath = resolveDocumentPath(fileName);
+    @GetMapping("/documents/{documentId}/download")
+    public ResponseEntity<Resource> downloadDocument(@PathVariable Long documentId) {
+        ClaimDocument doc = claimDocumentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found: " + documentId));
+        Path filePath = resolveDocumentPath(doc);
         try {
             Resource resource = new UrlResource(filePath.toUri());
             if (!resource.exists()) {
-                throw new ResourceNotFoundException("File not found: " + fileName);
+                throw new ResourceNotFoundException("File not found for document: " + documentId);
             }
+            // Serve the original upload name (not the timestamp-prefixed disk name).
+            String downloadName = (doc.getFileName() != null && !doc.getFileName().isBlank())
+                    ? doc.getFileName()
+                    : resource.getFilename();
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + resource.getFilename() + "\"")
+                            "attachment; filename=\"" + downloadName + "\"")
                     .body(resource);
         } catch (MalformedURLException e) {
-            throw new ResourceNotFoundException("File not found: " + fileName);
+            throw new ResourceNotFoundException("File not found for document: " + documentId);
         }
     }
 
-    private Path resolveDocumentPath(String fileName) {
-        ClaimDocument doc = claimDocumentRepository.findFirstByFileName(fileName).orElse(null);
-        if (doc != null && doc.getFilePath() != null && !doc.getFilePath().isBlank()) {
+    private Path resolveDocumentPath(ClaimDocument doc) {
+        if (doc.getFilePath() != null && !doc.getFilePath().isBlank()) {
             return Paths.get(doc.getFilePath());
         }
         // Fallback: reconstruct from upload property + per-claim subdir.
-        Long claimId = (doc != null) ? doc.getClaimId() : null;
-        if (claimId != null) {
-            return Paths.get(uploadDir, String.valueOf(claimId)).resolve(fileName);
-        }
-        return Paths.get(uploadDir).resolve(fileName);
+        return Paths.get(uploadDir, String.valueOf(doc.getClaimId())).resolve(doc.getFileName());
     }
 }

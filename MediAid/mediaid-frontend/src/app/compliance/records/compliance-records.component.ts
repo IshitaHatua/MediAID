@@ -2,12 +2,6 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { map } from 'rxjs/operators';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastrService } from 'ngx-toastr';
 import { ComplianceService } from '../../core/services/compliance.service';
 import { ClaimService } from '../../core/services/claim.service';
@@ -23,8 +17,6 @@ interface EntityOption { id: number; label: string; status: string; }
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    MatButtonModule, MatIconModule, MatTableModule,
-    MatTabsModule, MatProgressSpinnerModule, MatTooltipModule,
     StatusBadgeComponent
   ],
   templateUrl: './compliance-records.component.html',
@@ -32,14 +24,13 @@ interface EntityOption { id: number; label: string; status: string; }
 })
 export class ComplianceRecordsComponent implements OnInit {
 
-  // ── Records tables ──────────────────────────────────────────
+  activeTab: 'all' | 'violations' | 'flagged' | 'evaluate' | 'create' = 'all';
+
   all: any[] = [];
   violations: any[] = [];
   flagged: any[] = [];
   loading = true;
-  cols = ['complianceId', 'entityId', 'entityType', 'result', 'notes', 'evaluatedAt'];
 
-  // ── Full Evaluation picker state ─────────────────────────────
   evalEntityType = '';
   evalEntities: EntityOption[] = [];
   evalLoadingEntities = false;
@@ -48,7 +39,6 @@ export class ComplianceRecordsComponent implements OnInit {
   evalRunning = false;
   evalResult: any = null;
 
-  // ── Create Record picker state ───────────────────────────────
   createEntityType = '';
   createEntities: EntityOption[] = [];
   createLoadingEntities = false;
@@ -70,7 +60,6 @@ export class ComplianceRecordsComponent implements OnInit {
 
   ngOnInit() { this.loadAll(); }
 
-  // ── Load compliance tables ────────────────────────────────────
   loadAll() {
     this.loading = true;
     this.complianceSvc.getAll().subscribe({
@@ -87,7 +76,6 @@ export class ComplianceRecordsComponent implements OnInit {
     });
   }
 
-  // ── Entity type selection ────────────────────────────────────
   selectEvalType(type: string) {
     this.evalEntityType = type;
     this.evalSelected = null;
@@ -150,14 +138,12 @@ export class ComplianceRecordsComponent implements OnInit {
     });
   }
 
-  // ── Retry entity fetch ───────────────────────────────────────
   retryFetch(target: 'eval' | 'create') {
     const type = target === 'eval' ? this.evalEntityType : this.createEntityType;
     if (!type) return;
     this.fetchEntities(type, target);
   }
 
-  // ── Run evaluation ───────────────────────────────────────────
   runEvaluation() {
     if (!this.evalSelected) return;
     this.evalRunning = true;
@@ -179,7 +165,6 @@ export class ComplianceRecordsComponent implements OnInit {
     });
   }
 
-  // ── Save compliance record ───────────────────────────────────
   saveRecord() {
     if (!this.createSelected) return;
     this.createSaving = true;

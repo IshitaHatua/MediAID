@@ -1,13 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, MatIconModule, RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
@@ -38,15 +37,15 @@ export class AdminDashboardComponent implements OnInit {
 
   refreshCards() {
     this.summaryCards = [
-      { label: 'Total Users', value: this.totalUsers, icon: 'people', grad: 'linear-gradient(135deg,#6366f1,#4f46e5)', glow: '#6366f1' },
-      { label: 'Citizens', value: this.citizens, icon: 'person', grad: 'linear-gradient(135deg,#059669,#10b981)', glow: '#10b981' },
-      { label: 'Officers', value: this.officers, icon: 'badge', grad: 'linear-gradient(135deg,#f59e0b,#d97706)', glow: '#f59e0b' },
-      { label: 'Managers', value: this.managers, icon: 'supervisor_account', grad: 'linear-gradient(135deg,#8b5cf6,#7c3aed)', glow: '#8b5cf6' },
+      { label: 'Total Users', value: this.totalUsers, icon: '\u{1F465}' },
+      { label: 'Citizens', value: this.citizens, icon: '\u{1F464}' },
+      { label: 'Officers', value: this.officers, icon: '★' },
+      { label: 'Managers', value: this.managers, icon: '⚑' },
     ];
   }
 
   roleClass(role: string): string {
-    const map: Record<string, string> = { CITIZEN: 'role-citizen', OFFICER: 'role-officer', MANAGER: 'role-manager', ADMIN: 'role-admin' };
-    return map[role] || 'role-citizen';
+    const map: Record<string, string> = { CITIZEN: 'citizen', OFFICER: 'officer', MANAGER: 'manager', ADMIN: 'admin' };
+    return map[role] || 'citizen';
   }
 }

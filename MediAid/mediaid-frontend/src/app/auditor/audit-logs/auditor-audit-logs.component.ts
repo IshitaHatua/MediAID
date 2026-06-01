@@ -1,14 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTabsModule } from '@angular/material/tabs';
 import { ToastrService } from 'ngx-toastr';
 import { AuditManagementService, AuditService } from '../../core/services/audit.service';
 
@@ -16,31 +8,26 @@ import { AuditManagementService, AuditService } from '../../core/services/audit.
   selector: 'app-auditor-audit-logs',
   standalone: true,
   imports: [
-    CommonModule, FormsModule,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatTableModule, MatFormFieldModule, MatInputModule,
-    MatProgressSpinnerModule, MatTabsModule
+    CommonModule, FormsModule
   ],
   templateUrl: './auditor-audit-logs.component.html',
   styleUrl: './auditor-audit-logs.component.css'
 })
 export class AuditorAuditLogsComponent implements OnInit {
 
-  // ── Tab 1: Business Activity Logs (from audit-management-service) ──────────
+  activeTab: 'business' | 'identity' = 'business';
+
   businessLogs: any[] = [];
   allBusinessLogs: any[] = [];
   businessLoading = true;
   businessActionFilter = '';
   businessResourceFilter = '';
-  businessCols = ['logId', 'userId', 'action', 'resource', 'details', 'timestamp'];
 
-  // ── Tab 2: Identity & Access Logs (from audit-service) ────────────────────
   identityLogs: any[] = [];
   allIdentityLogs: any[] = [];
   identityLoading = true;
   identityActionFilter = '';
   identityResourceFilter = '';
-  identityCols = ['auditId', 'userId', 'action', 'resource', 'details', 'timestamp'];
 
   accessDenied = false;
 
@@ -55,8 +42,6 @@ export class AuditorAuditLogsComponent implements OnInit {
     this.loadBusinessLogs();
     this.loadIdentityLogs();
   }
-
-  // ── Business logs ─────────────────────────────────────────────────────────
 
   loadBusinessLogs() {
     this.businessLoading = true;
@@ -100,8 +85,6 @@ export class AuditorAuditLogsComponent implements OnInit {
     this.downloadCSV(this.businessLogs, 'business-audit-logs.csv');
   }
 
-  // ── Identity logs ─────────────────────────────────────────────────────────
-
   loadIdentityLogs() {
     this.identityLoading = true;
     this.auditSvc.getLatest100Logs().subscribe({
@@ -140,8 +123,6 @@ export class AuditorAuditLogsComponent implements OnInit {
   exportIdentityCSV() {
     this.downloadCSV(this.identityLogs, 'identity-audit-logs.csv');
   }
-
-  // ── Shared CSV helper ─────────────────────────────────────────────────────
 
   private downloadCSV(data: any[], filename: string) {
     if (!data.length) return;

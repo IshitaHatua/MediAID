@@ -1,84 +1,62 @@
 
-    .page-header { margin-bottom: 20px; }
-    .page-title { margin: 0 0 4px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
-    .page-sub { margin: 0; font-size: 13px; color: rgba(255,255,255,0.4); }
+    .page-header { margin-bottom: 1.25rem; }
 
-    .tab-content { padding: 20px 0; }
-    .section-card { background: linear-gradient(145deg, #111827, #1a2235); border: 1px solid rgba(99,102,241,0.15); border-radius: 14px; padding: 24px; }
-    .section-title { margin: 0 0 20px; font-size: 15px; font-weight: 700; color: #f1f5f9; }
-
-    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .filters { display: flex; gap: 12px; }
-    .filter-field { width: 180px; }
-    .btn-new {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;
-      border: none; border-radius: 10px; padding: 10px 18px;
-      font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    .tabs { display: flex; flex-wrap: wrap; gap: 0.25rem; border-bottom: 1px solid #e0e0e0; margin-bottom: 0.5rem; }
+    .tab-btn {
+      background: transparent; border: none; border-bottom: 2px solid transparent;
+      padding: 0.625rem 1rem; font-family: inherit; font-size: 0.9rem; font-weight: 600;
+      color: #555555; cursor: pointer; transition: color 0.2s, border-color 0.2s;
     }
-    .btn-new:hover { box-shadow: 0 4px 14px rgba(99,102,241,0.4); transform: translateY(-1px); }
-    .btn-new mat-icon { font-size: 17px; height: 17px; width: 17px; }
+    .tab-btn:hover { color: #2f62e8; }
+    .tab-btn.active { color: #2f62e8; border-bottom-color: #2f62e8; }
 
-    .audit-form {
-      display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start;
-      padding: 16px; background: rgba(99,102,241,0.07);
-      border: 1px solid rgba(99,102,241,0.15); border-radius: 10px; margin-bottom: 20px;
-    }
-    .audit-form mat-form-field { width: 180px; }
-    .form-btns { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
-    .btn-submit {
-      background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;
-      border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer;
-    }
-    .btn-cancel {
-      background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 16px;
-      font-size: 13px; cursor: pointer;
-    }
+    .tab-content { padding: 1.25rem 0; }
+    .section-card { padding: 1.5rem; }
+    .section-title { margin: 0 0 1.25rem; font-size: 1rem; font-weight: 700; color: #2f62e8; }
 
-    .center { display: flex; justify-content: center; padding: 40px; }
+    .toolbar { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.25rem; gap: 1rem; }
+    .filters { display: flex; gap: 0.75rem; }
+    .filter-field { width: 11.25rem; }
 
-    .audit-accordion { display: flex; flex-direction: column; gap: 8px; }
-    .audit-panel {
-      background: rgba(255,255,255,0.02) !important;
-      border: 1px solid rgba(99,102,241,0.12) !important;
-      border-radius: 10px !important; box-shadow: none !important; color: #f1f5f9 !important;
+    .audit-form { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end; margin-bottom: 1.25rem; }
+    .audit-form .form-group { width: 11.25rem; }
+    .audit-form .findings-field { width: 17.5rem; }
+    .form-btns { display: flex; gap: 0.5rem; align-items: center; }
+
+    .center { display: flex; justify-content: center; padding: 2.5rem; }
+
+    .audit-accordion { display: flex; flex-direction: column; gap: 0.5rem; }
+    .audit-panel { background: #fff; border: 1px solid #e0e0e0; border-radius: var(--radius, 0.5rem); }
+    .audit-panel:hover { border-color: #bdbdbd; }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.875rem 1rem; cursor: pointer;
     }
-    .audit-panel:hover { border-color: rgba(99,102,241,0.25) !important; }
-    .panel-title { display: flex; align-items: center; gap: 10px; }
-    .audit-id { color: #818cf8; font-weight: 700; font-family: monospace; }
-    .scope-tag { background: rgba(99,102,241,0.15); color: #a5b4fc; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .panel-title { display: flex; align-items: center; gap: 0.625rem; }
+    .panel-desc { display: flex; align-items: center; gap: 0.625rem; }
+    .chevron { color: #555555; font-size: 0.7rem; }
+    .audit-id { color: #2f62e8; font-weight: 700; }
+    .scope-tag { background: #eef3fc; color: #2f62e8; padding: 0.125rem 0.5rem; border: 1px solid #e0e0e0; border-radius: 0.375rem; font-size: 0.7rem; font-weight: 600; }
 
-    .audit-detail { padding: 8px 0; }
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .info-item { display: flex; flex-direction: column; gap: 4px; }
+    .audit-detail { padding: 0.5rem 1rem 1rem; border-top: 1px solid #e0e0e0; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .info-item { display: flex; flex-direction: column; gap: 0.25rem; }
     .info-item.full { grid-column: span 2; }
-    .label { font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .value { font-size: 14px; color: rgba(255,255,255,0.8); }
-    .value.date { color: rgba(255,255,255,0.4); font-size: 12px; }
+    .label { font-size: 0.7rem; color: #555555; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+    .value { font-size: 0.9rem; color: #212121; }
+    .value.date { color: #555555; font-size: 0.8rem; }
 
-    .audit-actions { display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .btn-update {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(99,102,241,0.15); color: #818cf8;
-      border: 1px solid rgba(99,102,241,0.3); border-radius: 8px;
-      padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.18s;
+    .audit-actions { display: flex; align-items: flex-end; gap: 0.625rem; padding-top: 0.75rem; border-top: 1px solid #e0e0e0; }
+    .status-field { width: 11.25rem; }
+
+    .id-cell { color: #2f62e8; font-weight: 700; }
+    .date-cell { color: #555555; font-size: 0.8rem; }
+
+    .empty-state { display: flex; align-items: center; gap: 0.625rem; justify-content: center; padding: 2.5rem; color: #555555; }
+    .empty-state p { margin: 0; font-size: 0.9rem; }
+
+    @media (max-width: 600px) {
+      .info-grid { grid-template-columns: 1fr; }
+      .info-item.full { grid-column: span 1; }
+      .toolbar { flex-direction: column; align-items: stretch; }
     }
-    .btn-update:hover { background: rgba(99,102,241,0.25); }
-    .btn-update mat-icon { font-size: 15px; height: 15px; width: 15px; }
-    .btn-compliance {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(56,189,248,0.1); color: #38bdf8;
-      border: 1px solid rgba(56,189,248,0.25); border-radius: 8px;
-      padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.18s;
-    }
-    .btn-compliance:hover { background: rgba(56,189,248,0.2); }
-    .btn-compliance mat-icon { font-size: 15px; height: 15px; width: 15px; }
-
-    .data-table { width: 100%; }
-    .id-cell { color: #818cf8; font-weight: 700; font-family: monospace; }
-    .date-cell { color: rgba(255,255,255,0.4); font-size: 12px; }
-
-    .empty-state { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 40px; color: rgba(255,255,255,0.25); }
-    .empty-state mat-icon { font-size: 24px; }
-    .empty-state p { margin: 0; font-size: 14px; }

@@ -1,59 +1,47 @@
+<div class="dashboard">
+  <div class="page-header">
+    <div>
+      <div class="dash-eyebrow"><span class="eyebrow-dot"></span> Overview</div>
+      <h1 class="page-title">Officer Dashboard</h1>
+      <p class="page-sub">Manage citizen verifications, claims, and disbursements</p>
+    </div>
+    <div class="dash-controls">
+      <span class="dash-updated" *ngIf="lastUpdated">Updated {{ lastUpdated | date:'HH:mm:ss' }}</span>
+      <button class="btn btn-outline" type="button" (click)="loadAll()" [disabled]="loading" title="Refresh dashboard">
+        {{ loading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
 
-    <div class="dashboard">
-      <!-- Header -->
-      <div class="dash-header">
-        <div>
-          <div class="dash-eyebrow">
-            
-          </div>
-          <h1 class="dash-title">Officer Dashboard</h1>
-          <p class="dash-subtitle">Manage citizen verifications, claims, and disbursements</p>
-        </div>
-        <div class="dash-controls">
-          <span class="dash-updated" *ngIf="lastUpdated">
-            <span class="live-dot"></span> Updated {{ lastUpdated | date:'HH:mm:ss' }}
-          </span>
-          <button class="dash-refresh" type="button" (click)="loadAll()" [disabled]="loading" title="Refresh dashboard">
-            <mat-icon>refresh</mat-icon>
-            <span>{{ loading ? 'Refreshing...' : 'Refresh' }}</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Summary Cards -->
-      <div class="summary-grid">
-        <div class="summary-card" *ngFor="let card of summaryCards">
-          <div class="card-glow" [style.background]="card.glow"></div>
-          <div class="card-icon-wrap" [style.background]="card.grad">
-            <mat-icon>{{ card.icon }}</mat-icon>
-          </div>
-          <div class="card-content">
-            <div class="card-value">{{ card.value }}</div>
-            <div class="card-label">{{ card.label }}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="quick-actions-card">
-        <h3 class="qa-title">Quick Actions</h3>
-        <div class="qa-grid">
-          <a routerLink="/officer/citizens" class="qa-item">
-            <div class="qa-icon blue"><mat-icon>people</mat-icon></div>
-            <span>Verify Citizens</span>
-          </a>
-          <a routerLink="/officer/enrollments" class="qa-item">
-            <div class="qa-icon green"><mat-icon>assignment</mat-icon></div>
-            <span>Review Enrollments</span>
-          </a>
-          <a routerLink="/officer/claims" class="qa-item">
-            <div class="qa-icon amber"><mat-icon>receipt_long</mat-icon></div>
-            <span>Process Claims</span>
-          </a>
-          <a routerLink="/officer/disbursements" class="qa-item">
-            <div class="qa-icon purple"><mat-icon>account_balance_wallet</mat-icon></div>
-            <span>Disbursements</span>
-          </a>
-        </div>
+  <div class="summary-grid">
+    <div class="summary-card" *ngFor="let card of summaryCards">
+      <div class="card-icon-wrap">{{ card.icon }}</div>
+      <div class="card-content">
+        <div class="card-value">{{ card.value }}</div>
+        <div class="card-label">{{ card.label }}</div>
       </div>
     </div>
+  </div>
+
+  <div class="quick-actions-card">
+    <h3 class="qa-title">Quick Actions</h3>
+    <div class="qa-grid">
+      <a routerLink="/officer/citizens" class="qa-item">
+        <div class="qa-icon">&#128101;</div>
+        <span>Verify Citizens</span>
+      </a>
+      <a routerLink="/officer/enrollments" class="qa-item">
+        <div class="qa-icon">&#9776;</div>
+        <span>Review Enrollments</span>
+      </a>
+      <a routerLink="/officer/claims" class="qa-item">
+        <div class="qa-icon">&#9636;</div>
+        <span>Process Claims</span>
+      </a>
+      <a routerLink="/officer/disbursements" class="qa-item">
+        <div class="qa-icon">&#8377;</div>
+        <span>Disbursements</span>
+      </a>
+    </div>
+  </div>
+</div>

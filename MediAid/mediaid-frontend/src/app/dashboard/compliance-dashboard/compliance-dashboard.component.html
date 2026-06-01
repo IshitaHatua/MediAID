@@ -1,18 +1,15 @@
 <div class="dashboard">
-  <div class="dash-header">
+  <div class="page-header">
     <div>
-      <div class="dash-eyebrow"></div>
-      <h1 class="dash-title">Compliance Dashboard</h1>
-      <p class="dash-subtitle">Evaluate claims and enrollments against compliance rules</p>
+      <div class="dash-eyebrow"><span class="eyebrow-dot"></span> Overview</div>
+      <h1 class="page-title">Compliance Dashboard</h1>
+      <p class="page-sub">Evaluate claims and enrollments against compliance rules</p>
     </div>
   </div>
 
   <div class="summary-grid">
     <div class="summary-card" *ngFor="let card of summaryCards">
-      <div class="card-glow" [style.background]="card.glow"></div>
-      <div class="card-icon-wrap" [style.background]="card.grad">
-        <mat-icon>{{ card.icon }}</mat-icon>
-      </div>
+      <div class="card-icon-wrap">{{ card.icon }}</div>
       <div class="card-content">
         <div class="card-value">{{ card.value }}</div>
         <div class="card-label">{{ card.label }}</div>
@@ -22,17 +19,17 @@
 
   <div class="quick-actions-card">
     <h3 class="qa-title">Quick Actions</h3>
-    <div class="qa-grid qa-grid-3">
+    <div class="qa-grid">
       <a routerLink="/compliance/records" class="qa-item">
-        <div class="qa-icon blue"><mat-icon>verified_user</mat-icon></div>
+        <div class="qa-icon">&#10004;</div>
         <span>Compliance Records</span>
       </a>
       <a routerLink="/compliance/audits" class="qa-item">
-        <div class="qa-icon green"><mat-icon>fact_check</mat-icon></div>
+        <div class="qa-icon">&#9745;</div>
         <span>Formal Audits</span>
       </a>
       <a routerLink="/compliance/audit-logs" class="qa-item">
-        <div class="qa-icon sky"><mat-icon>manage_search</mat-icon></div>
+        <div class="qa-icon">&#9906;</div>
         <span>Audit Logs</span>
       </a>
     </div>

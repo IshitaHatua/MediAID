@@ -1,7 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { DisbursementService } from '../../core/services/disbursement.service';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
@@ -9,7 +7,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 @Component({
   selector: 'app-citizen-disbursements',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatProgressSpinnerModule, StatusBadgeComponent],
+  imports: [CommonModule, StatusBadgeComponent],
   templateUrl: './citizen-disbursements.component.html',
   styleUrl: './citizen-disbursements.component.css'
 })

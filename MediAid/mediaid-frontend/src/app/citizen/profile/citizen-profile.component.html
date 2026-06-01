@@ -1,13 +1,12 @@
 
     <h2 class="page-title">My Profile</h2>
-    <mat-card class="profile-card">
+    <div class="card profile-card">
       <ng-container *ngIf="loading">
-        <div class="center"><mat-spinner diameter="40"></mat-spinner></div>
+        <div class="center"><div class="spinner"></div></div>
       </ng-container>
       <ng-container *ngIf="!loading && citizen && !editing">
         <div class="profile-view">
           <div class="profile-header">
-            <mat-icon class="avatar">account_circle</mat-icon>
             <div>
               <h3>{{ citizen.name }}</h3>
               <app-status-badge [status]="citizen.status"></app-status-badge>
@@ -19,43 +18,39 @@
             <div class="info-item"><span class="label">Contact</span><span>{{ citizen.contactInfo }}</span></div>
             <div class="info-item full"><span class="label">Address</span><span>{{ citizen.address }}</span></div>
           </div>
-          <button mat-flat-button color="primary" (click)="startEdit()"><mat-icon>edit</mat-icon> Edit Profile</button>
+          <button class="btn btn-primary" (click)="startEdit()">✎ Edit Profile</button>
         </div>
       </ng-container>
       <ng-container *ngIf="!loading && !citizen">
         <h3>Create Your Profile</h3>
-        <p style="color:#666;">Complete your profile to access MediAid services. You can upload supporting documents once your profile is created.</p>
+        <p class="text-muted">Complete your profile to access MediAid services. You can upload supporting documents once your profile is created.</p>
         <ng-container *ngTemplateOutlet="profileForm"></ng-container>
       </ng-container>
       <ng-container *ngIf="!loading && citizen && editing">
         <h3>Edit Profile</h3>
         <ng-container *ngTemplateOutlet="profileForm"></ng-container>
-        <button mat-button (click)="editing=false" style="margin-top:8px;">Cancel</button>
+        <button class="btn btn-secondary cancel-edit-btn" (click)="editing=false">Cancel</button>
       </ng-container>
-    </mat-card>
+    </div>
 
-    <!-- Documents section: visible once the profile exists -->
-    <mat-card class="docs-card" *ngIf="!loading && citizen">
+    <div class="card docs-card" *ngIf="!loading && citizen">
       <div class="docs-header">
         <div>
           <h3>Supporting Document</h3>
           <p class="docs-hint">Upload <strong>one</strong> supporting document (PDF, JPG, or PNG; max 10MB). An officer will review and verify it. To replace it, delete the existing file first.</p>
         </div>
-        <button class="btn-refresh-docs" type="button" (click)="loadDocs()" title="Refresh status">
-          <mat-icon>refresh</mat-icon> Refresh
-        </button>
+        <button class="btn btn-outline btn-sm" type="button" (click)="loadDocs()" title="Refresh status">Refresh</button>
       </div>
 
       <div class="upload-row" *ngIf="!hasDocument">
-        <mat-form-field appearance="outline" class="doc-type-field">
-          <mat-label>Document Type</mat-label>
-          <mat-select [(ngModel)]="selectedDocType">
-            <mat-option *ngFor="let t of docTypes" [value]="t">{{ t }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <button type="button" class="upload-btn" [class.disabled]="uploading" [disabled]="uploading" (click)="triggerFilePicker()">
-          <mat-icon>upload_file</mat-icon>
-          <span *ngIf="!uploading">Upload Document</span>
+        <div class="form-group doc-type-field">
+          <label>Document Type</label>
+          <select class="form-input" [(ngModel)]="selectedDocType">
+            <option *ngFor="let t of docTypes" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary" [disabled]="uploading" (click)="triggerFilePicker()">
+          <span *ngIf="!uploading">↑ Upload Document</span>
           <span *ngIf="uploading">Uploading... {{ uploadProgress }}%</span>
         </button>
         <input #fileInput type="file" (change)="onFileSelect($event)" accept=".pdf,.jpg,.jpeg,.png" hidden>
@@ -65,83 +60,74 @@
         <div class="progress-bar" [style.width.%]="uploadProgress"></div>
       </div>
 
-      <div class="doc-limit-note" *ngIf="hasDocument && !uploading">
-        <mat-icon>info</mat-icon>
+      <div class="doc-limit-note info-banner" *ngIf="hasDocument && !uploading">
         <span>You already have a document on file. Delete it below to upload a different one.</span>
       </div>
 
-      <div class="center" *ngIf="docsLoading"><mat-spinner diameter="32"></mat-spinner></div>
+      <div class="center" *ngIf="docsLoading"><div class="spinner"></div></div>
 
-      <table mat-table [dataSource]="documents" class="docs-table" *ngIf="!docsLoading && documents.length">
-        <ng-container matColumnDef="docType">
-          <th mat-header-cell *matHeaderCellDef>Type</th>
-          <td mat-cell *matCellDef="let d">{{ d.docType }}</td>
-        </ng-container>
-        <ng-container matColumnDef="fileUri">
-          <th mat-header-cell *matHeaderCellDef>File</th>
-          <td mat-cell *matCellDef="let d">{{ originalFileName(d.fileUri) }}</td>
-        </ng-container>
-        <ng-container matColumnDef="uploadedDate">
-          <th mat-header-cell *matHeaderCellDef>Uploaded</th>
-          <td mat-cell *matCellDef="let d">{{ d.uploadedDate }}</td>
-        </ng-container>
-        <ng-container matColumnDef="verificationStatus">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
-          <td mat-cell *matCellDef="let d"><app-status-badge [status]="d.verificationStatus"></app-status-badge></td>
-        </ng-container>
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let d">
-            <button mat-icon-button color="primary" (click)="download(d.fileUri)" title="Download">
-              <mat-icon>download</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="deleteDoc(d)" title="Delete / Replace">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="docCols"></tr>
-        <tr mat-row *matRowDef="let row; columns: docCols;"></tr>
-      </table>
+      <div class="table-wrap" *ngIf="!docsLoading && documents.length">
+        <table class="data-table docs-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>File</th>
+              <th>Uploaded</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of documents">
+              <td>{{ d.docType }}</td>
+              <td>{{ originalFileName(d.fileUri) }}</td>
+              <td>{{ d.uploadedDate }}</td>
+              <td><app-status-badge [status]="d.verificationStatus"></app-status-badge></td>
+              <td>
+                <button class="btn btn-outline btn-sm" (click)="download(d.fileUri)" title="Download">↓</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteDoc(d)" title="Delete / Replace">✕</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p *ngIf="!docsLoading && !documents.length" class="empty">No documents uploaded yet.</p>
-    </mat-card>
+    </div>
 
     <ng-template #profileForm>
       <form [formGroup]="form" (ngSubmit)="submit()" class="profile-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Full Name</mat-label>
-          <input matInput formControlName="name">
-          <mat-error>Required</mat-error>
-        </mat-form-field>
-        <div class="two-col">
-          <mat-form-field appearance="outline">
-            <mat-label>Date of Birth</mat-label>
-            <input matInput [matDatepicker]="dobPicker" formControlName="dob" [max]="today" placeholder="DD/MM/YYYY" readonly (click)="dobPicker.open()">
-            <mat-datepicker-toggle matIconSuffix [for]="dobPicker"></mat-datepicker-toggle>
-            <mat-datepicker #dobPicker></mat-datepicker>
-            <mat-error>Required</mat-error>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Gender</mat-label>
-            <mat-select formControlName="gender">
-              <mat-option value="MALE">Male</mat-option>
-              <mat-option value="FEMALE">Female</mat-option>
-              <mat-option value="OTHER">Other</mat-option>
-            </mat-select>
-            <mat-error>Required</mat-error>
-          </mat-form-field>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input class="form-input" formControlName="name">
+          <div class="field-error" *ngIf="form.get('name')?.touched && form.get('name')?.invalid">Required</div>
         </div>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Contact (10-digit phone)</mat-label>
-          <input matInput formControlName="contactInfo" maxlength="10">
-          <mat-error>Valid 10-digit number required</mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Address</mat-label>
-          <textarea matInput formControlName="address" rows="3" maxlength="500"></textarea>
-          <mat-error>Required</mat-error>
-        </mat-form-field>
-        <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+        <div class="two-col">
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <input class="form-input" type="date" formControlName="dob" [max]="today">
+            <div class="field-error" *ngIf="form.get('dob')?.touched && form.get('dob')?.invalid">Required</div>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select class="form-input" formControlName="gender">
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="OTHER">Other</option>
+            </select>
+            <div class="field-error" *ngIf="form.get('gender')?.touched && form.get('gender')?.invalid">Required</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Contact (10-digit phone)</label>
+          <input class="form-input" formControlName="contactInfo" maxlength="10">
+          <div class="field-error" *ngIf="form.get('contactInfo')?.touched && form.get('contactInfo')?.invalid">Valid 10-digit number required</div>
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <textarea class="form-input" formControlName="address" rows="3" maxlength="500"></textarea>
+          <div class="field-error" *ngIf="form.get('address')?.touched && form.get('address')?.invalid">Required</div>
+        </div>
+        <button class="btn btn-primary" type="submit" [disabled]="saving">
           {{ saving ? 'Saving...' : (citizen ? 'Update Profile' : 'Create Profile') }}
         </button>
       </form>

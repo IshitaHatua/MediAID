@@ -2,15 +2,6 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { AuditManagementService } from '../../core/services/audit.service';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
@@ -18,7 +9,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 @Component({
   selector: 'app-formal-audit-management',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatButtonModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTabsModule, MatExpansionModule, MatProgressSpinnerModule, StatusBadgeComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, StatusBadgeComponent],
   templateUrl: './formal-audit-management.component.html',
   styleUrl: './formal-audit-management.component.css'
 })
@@ -29,9 +20,9 @@ export class FormalAuditManagementComponent implements OnInit {
   loading = true;
   logsLoading = true;
   showCreateForm = false;
+  activeTab = 0;
   filterStatus = '';
   filterScope = '';
-  logCols = ['logId', 'userId', 'action', 'resource', 'timestamp'];
 
   private fb = inject(FormBuilder);
   auditForm = this.fb.group({

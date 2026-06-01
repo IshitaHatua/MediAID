@@ -1,16 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { ToastrService } from 'ngx-toastr';
 import { ClaimService } from '../../core/services/claim.service';
-import { CitizenService } from '../../core/services/citizen.service';
+import { ClaimDocumentResponse } from '../../core/models/claim.models';
 import { RefreshService } from '../../core/services/refresh.service';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -18,7 +12,7 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
 @Component({
   selector: 'app-claim-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, MatSelectModule, MatFormFieldModule, MatProgressSpinnerModule, MatDialogModule, MatExpansionModule, StatusBadgeComponent],
+  imports: [CommonModule, FormsModule, MatDialogModule, StatusBadgeComponent],
   templateUrl: './claim-management.component.html',
   styleUrl: './claim-management.component.css'
 })
@@ -29,10 +23,10 @@ export class ClaimManagementComponent implements OnInit {
   loading = true;
   claimDocs: Record<number, any[]> = {};
   docsLoading: Record<number, boolean> = {};
+  expandedClaim: number | null = null;
 
   constructor(
     private claimSvc: ClaimService,
-    private citizenSvc: CitizenService,
     private refresh: RefreshService,
     private toastr: ToastrService,
     private dialog: MatDialog,
@@ -50,6 +44,11 @@ export class ClaimManagementComponent implements OnInit {
     this.filtered = this.filterStatus ? this.claims.filter(c => c.status === this.filterStatus) : this.claims;
   }
 
+  toggleClaim(claimId: number) {
+    this.expandedClaim = this.expandedClaim === claimId ? null : claimId;
+    if (this.expandedClaim === claimId) this.loadClaimDocs(claimId);
+  }
+
   loadClaimDocs(claimId: number) {
     if (this.claimDocs[claimId] || this.docsLoading[claimId]) return;
     this.docsLoading[claimId] = true;
@@ -65,12 +64,6 @@ export class ClaimManagementComponent implements OnInit {
     return idx >= 0 ? name.substring(idx + 1) : name;
   }
 
-  /**
-   * Filesystem-friendly version of the original filename for use as a download
-   * target. Replaces characters that cause Edge / Chrome PDF viewers to reject
-   * the resulting file:// path (spaces, parens) with underscores. The bytes
-   * saved to disk are unchanged.
-   */
   private safeDownloadName(name: string): string {
     return this.originalFileName(name)
       .replace(/[()\s]+/g, '_')
@@ -90,10 +83,10 @@ export class ClaimManagementComponent implements OnInit {
     }
   }
 
-  viewDoc(fileName: string) {
-    this.claimSvc.downloadDocument(fileName).subscribe({
+  viewDoc(doc: ClaimDocumentResponse) {
+    this.claimSvc.downloadDocument(doc.documentId).subscribe({
       next: blob => {
-        const typed = new Blob([blob], { type: this.mimeFor(fileName) });
+        const typed = new Blob([blob], { type: this.mimeFor(doc.fileName) });
         const url = URL.createObjectURL(typed);
         const win = window.open(url, '_blank');
         if (!win) this.toastr.warning('Pop-up blocked. Allow pop-ups or use Download.');
@@ -104,13 +97,13 @@ export class ClaimManagementComponent implements OnInit {
     });
   }
 
-  downloadDoc(fileName: string) {
-    this.claimSvc.downloadDocument(fileName).subscribe({
+  downloadDoc(doc: ClaimDocumentResponse) {
+    this.claimSvc.downloadDocument(doc.documentId).subscribe({
       next: blob => {
-        const typed = new Blob([blob], { type: this.mimeFor(fileName) });
+        const typed = new Blob([blob], { type: this.mimeFor(doc.fileName) });
         const url = URL.createObjectURL(typed);
         const a = document.createElement('a');
-        a.href = url; a.download = this.safeDownloadName(fileName); a.click();
+        a.href = url; a.download = this.safeDownloadName(doc.fileName); a.click();
         URL.revokeObjectURL(url);
         this.cdr.markForCheck();
       },
@@ -137,11 +130,6 @@ export class ClaimManagementComponent implements OnInit {
     });
   }
 
-  /**
-   * Backfill for already-APPROVED claims with no disbursement (legacy approvals
-   * from before the auto-create event listener was wired in, or approvals that
-   * raced with disbursement-service being down).
-   */
   generateDisbursement(c: any) {
     this.claimSvc.generateDisbursement(c.claimId).subscribe({
       next: () => {

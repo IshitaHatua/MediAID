@@ -1,24 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuditService } from '../../core/services/audit.service';
 
 @Component({
   selector: 'app-audit-logs',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    MatCardModule, MatButtonModule, MatIconModule,
-    MatTableModule, MatFormFieldModule, MatInputModule,
-    MatProgressSpinnerModule
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './audit-logs.component.html',
   styleUrl: './audit-logs.component.css'
 })
@@ -28,8 +16,6 @@ export class AuditLogsComponent implements OnInit {
   basicLoading = true;
   userIdFilter = '';
   actionFilter = '';
-  // auditId is the correct primary-key field on AuditLog — fixes the blank ID column
-  basicCols = ['auditId', 'userId', 'action', 'resource', 'details', 'timestamp'];
 
   constructor(private auditSvc: AuditService) {}
 
@@ -50,7 +36,6 @@ export class AuditLogsComponent implements OnInit {
     });
   }
 
-  // Client-side filter — no extra API calls
   applyFilter() {
     const a = this.actionFilter.toLowerCase();
     const u = this.userIdFilter.toLowerCase();
@@ -61,7 +46,6 @@ export class AuditLogsComponent implements OnInit {
     );
   }
 
-  // Reset both filters and restore the full dataset
   clear() {
     this.userIdFilter = '';
     this.actionFilter = '';

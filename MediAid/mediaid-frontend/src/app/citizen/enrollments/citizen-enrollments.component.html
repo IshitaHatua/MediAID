@@ -1,111 +1,88 @@
 
     <h2 class="page-title">My Enrollments</h2>
 
-    <!-- No Profile Banner -->
     <div class="no-profile-banner" *ngIf="!profileLoading && !hasProfile">
-      <mat-icon>account_circle</mat-icon>
       <div>
         <strong>Profile Required</strong>
         <p>You need to create your citizen profile before you can enroll in schemes.</p>
       </div>
-      <a mat-flat-button color="primary" routerLink="/citizen/profile">Create Profile</a>
+      <a class="btn btn-primary" routerLink="/citizen/profile">Create Profile</a>
     </div>
 
-    <!-- Pending Approval Banner -->
     <div class="pending-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'PENDING'">
-      <mat-icon>hourglass_top</mat-icon>
       <div>
         <strong>Profile Pending Approval</strong>
         <p>Your citizen profile is awaiting officer verification. You can enroll in schemes once your profile is approved.</p>
       </div>
     </div>
 
-    <!-- Rejected Banner -->
     <div class="rejected-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'REJECTED'">
-      <mat-icon>cancel</mat-icon>
       <div>
         <strong>Profile Rejected</strong>
         <p>Your citizen profile was rejected. Please update your profile and contact support.</p>
       </div>
-      <a mat-flat-button color="warn" routerLink="/citizen/profile">Update Profile</a>
+      <a class="btn btn-danger" routerLink="/citizen/profile">Update Profile</a>
     </div>
 
-    <!-- Suspended Banner -->
     <div class="rejected-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'SUSPENDED'">
-      <mat-icon>block</mat-icon>
       <div>
         <strong>Profile Suspended</strong>
         <p>Your citizen profile has been suspended. Please contact support for assistance.</p>
       </div>
     </div>
 
-    <mat-card class="page-card" *ngIf="!profileLoading && hasProfile && citizenStatus === 'VERIFIED'">
+    <div class="card" *ngIf="!profileLoading && hasProfile && citizenStatus === 'VERIFIED'">
       <div class="toolbar">
-        <span>{{ enrollments.length }} enrollment(s)</span>
-        <button mat-flat-button color="primary" (click)="openEnrollDialog()">
-          <mat-icon>add</mat-icon> Enroll in Scheme
-        </button>
+        <span class="text-muted">{{ enrollments.length }} enrollment(s)</span>
+        <button class="btn btn-primary" (click)="openEnrollDialog()">+ Enroll in Scheme</button>
       </div>
-      <div class="center" *ngIf="loading"><mat-spinner diameter="40"></mat-spinner></div>
-      <table mat-table [dataSource]="enrollments" class="full-width" *ngIf="!loading && enrollments.length">
-        <ng-container matColumnDef="enrollmentId">
-          <th mat-header-cell *matHeaderCellDef>ID</th>
-          <td mat-cell *matCellDef="let e">{{ e.enrollmentId }}</td>
-        </ng-container>
-        <ng-container matColumnDef="schemeId">
-          <th mat-header-cell *matHeaderCellDef>Scheme</th>
-          <td mat-cell *matCellDef="let e">{{ schemeName(e.schemeId) }}</td>
-        </ng-container>
-        <ng-container matColumnDef="enrollmentDate">
-          <th mat-header-cell *matHeaderCellDef>Enrolled On</th>
-          <td mat-cell *matCellDef="let e">{{ e.enrollmentDate | date:'mediumDate' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="expiryDate">
-          <th mat-header-cell *matHeaderCellDef>Expires</th>
-          <td mat-cell *matCellDef="let e">{{ e.expiryDate | date:'mediumDate' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
-          <td mat-cell *matCellDef="let e"><app-status-badge [status]="e.status"></app-status-badge></td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="cols"></tr>
-        <tr mat-row *matRowDef="let row; columns: cols;"></tr>
-      </table>
+      <div class="center" *ngIf="loading"><div class="spinner"></div></div>
+      <div class="table-wrap" *ngIf="!loading && enrollments.length">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Scheme</th>
+              <th>Enrolled On</th>
+              <th>Expires</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of enrollments">
+              <td>{{ e.enrollmentId }}</td>
+              <td>{{ schemeName(e.schemeId) }}</td>
+              <td>{{ e.enrollmentDate | date:'mediumDate' }}</td>
+              <td>{{ e.expiryDate | date:'mediumDate' }}</td>
+              <td><app-status-badge [status]="e.status"></app-status-badge></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p *ngIf="!loading && !enrollments.length" class="empty">No enrollments yet.</p>
-    </mat-card>
-    <div class="center" *ngIf="profileLoading"><mat-spinner diameter="40"></mat-spinner></div>
+    </div>
+    <div class="center" *ngIf="profileLoading"><div class="spinner"></div></div>
 
     <div class="dialog-overlay" *ngIf="showDialog">
-      <mat-card class="dialog-card">
-        <button mat-icon-button class="dialog-close-btn" type="button" aria-label="Close" (click)="showDialog=false">
-          <mat-icon>close</mat-icon>
-        </button>
+      <div class="card dialog-card">
+        <button class="btn btn-secondary btn-sm dialog-close-btn" type="button" aria-label="Close" (click)="showDialog=false">✕</button>
         <h3>Enroll in a Scheme</h3>
         <form [formGroup]="enrollForm" (ngSubmit)="submitEnroll()">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Select Scheme</mat-label>
-            <mat-select formControlName="schemeId">
-              <mat-option *ngIf="schemesLoading" disabled>Loading schemes...</mat-option>
-              <mat-option *ngIf="!schemesLoading && schemes.length === 0" disabled>No active schemes available</mat-option>
-              <mat-option *ngFor="let s of schemes" [value]="s.schemeId">{{ s.name }}</mat-option>
-            </mat-select>
-            <mat-error>Please select a scheme</mat-error>
-          </mat-form-field>
+          <div class="form-group">
+            <label>Select Scheme</label>
+            <select class="form-input" formControlName="schemeId">
+              <option [ngValue]="null" disabled *ngIf="schemesLoading">Loading schemes...</option>
+              <option [ngValue]="null" disabled *ngIf="!schemesLoading && schemes.length === 0">No active schemes available</option>
+              <option *ngFor="let s of schemes" [ngValue]="s.schemeId">{{ s.name }}</option>
+            </select>
+            <div class="field-error" *ngIf="enrollForm.get('schemeId')?.touched && enrollForm.get('schemeId')?.invalid">Please select a scheme</div>
+          </div>
 
           <div class="scheme-details" *ngIf="selectedScheme as s">
-            <div class="scheme-details-header">
-              <mat-icon>info</mat-icon>
-              <span>About this scheme</span>
-            </div>
+            <div class="scheme-details-header">About this scheme</div>
             <div class="scheme-pills">
-              <span class="pill pill-coverage">
-                <mat-icon>payments</mat-icon>
-                Max coverage: ₹{{ s.maxCoverageAmount | number:'1.0-0' }}
-              </span>
-              <span class="pill pill-validity">
-                <mat-icon>schedule</mat-icon>
-                Valid for {{ s.validityYears }} year{{ s.validityYears === 1 ? '' : 's' }}
-              </span>
+              <span class="pill pill-coverage">Max coverage: ₹{{ s.maxCoverageAmount | number:'1.0-0' }}</span>
+              <span class="pill pill-validity">Valid for {{ s.validityYears }} year{{ s.validityYears === 1 ? '' : 's' }}</span>
             </div>
             <div class="scheme-section" *ngIf="s.description">
               <div class="scheme-section-label">Description</div>
@@ -122,9 +99,9 @@
           </div>
 
           <div class="dialog-actions">
-            <button mat-button type="button" (click)="showDialog=false">Cancel</button>
-            <button mat-flat-button color="primary" type="submit" [disabled]="schemes.length === 0">Enroll</button>
+            <button class="btn btn-secondary" type="button" (click)="showDialog=false">Cancel</button>
+            <button class="btn btn-primary" type="submit" [disabled]="schemes.length === 0">Enroll</button>
           </div>
         </form>
-      </mat-card>
+      </div>
     </div>

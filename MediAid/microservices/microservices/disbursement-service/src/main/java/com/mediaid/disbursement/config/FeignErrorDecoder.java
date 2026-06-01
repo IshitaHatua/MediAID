@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class FeignErrorDecoder implements ErrorDecoder {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();//Jackson's JSON parser
     private final ErrorDecoder defaultDecoder = new Default();
 
     @Override
@@ -23,8 +23,8 @@ public class FeignErrorDecoder implements ErrorDecoder {
             String message = "Resource not found";
             if (response.body() != null) {
                 try {
-                    String body = Util.toString(response.body().asReader(StandardCharsets.UTF_8));
-                    JsonNode node = objectMapper.readTree(body);
+                    String body = Util.toString(response.body().asReader(StandardCharsets.UTF_8)); //Gets response body as a stream of characters
+                    JsonNode node = objectMapper.readTree(body);//Parses JSON string to JsonNode tree
                     String parsed = node.path("message").asText(null);
                     if (parsed != null && !parsed.isEmpty()) {
                         message = parsed;

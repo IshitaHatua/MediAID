@@ -7,10 +7,10 @@
     </div>
 
     <div class="center" *ngIf="loading">
-      <mat-spinner diameter="40" color="accent"></mat-spinner>
+      <div class="spinner"></div>
     </div>
 
-    <div class="table-card" *ngIf="!loading && disbursements.length">
+    <div class="card" *ngIf="!loading && disbursements.length">
       <div class="table-wrap">
         <table class="data-table">
           <thead>
@@ -24,10 +24,10 @@
           </thead>
           <tbody>
             <tr *ngFor="let d of disbursements">
-              <td class="id-cell">#{{ d.disbursementId }}</td>
-              <td class="ref-cell">#{{ d.claimId }}</td>
-              <td class="amount-cell">₹{{ d.amount | number:'1.0-2' }}</td>
-              <td class="date-cell">{{ d.date | date:'dd MMM y' }}</td>
+              <td>#{{ d.disbursementId }}</td>
+              <td>#{{ d.claimId }}</td>
+              <td>₹{{ d.amount | number:'1.0-2' }}</td>
+              <td>{{ d.date | date:'dd MMM y' }}</td>
               <td><app-status-badge [status]="d.status"></app-status-badge></td>
             </tr>
           </tbody>
@@ -36,7 +36,6 @@
     </div>
 
     <div class="empty-state" *ngIf="!loading && !disbursements.length">
-      <div class="empty-icon"><mat-icon>account_balance_wallet</mat-icon></div>
       <h3>No disbursements yet</h3>
       <p>Disbursements will appear here once your claims are approved and processed.</p>
     </div>

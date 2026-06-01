@@ -2,14 +2,6 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -22,7 +14,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 @Component({
   selector: 'app-citizen-enrollments',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatCardModule, MatButtonModule, MatIconModule, MatTableModule, MatDialogModule, MatFormFieldModule, MatSelectModule, MatProgressSpinnerModule, StatusBadgeComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, StatusBadgeComponent],
   templateUrl: './citizen-enrollments.component.html',
   styleUrl: './citizen-enrollments.component.css'
 })
@@ -35,7 +27,6 @@ export class CitizenEnrollmentsComponent implements OnInit {
   hasProfile = false;
   citizenStatus = '';
   showDialog = false;
-  cols = ['enrollmentId', 'schemeId', 'enrollmentDate', 'expiryDate', 'status'];
 
   private fb = inject(FormBuilder);
   enrollForm = this.fb.group({ schemeId: [null, Validators.required] });

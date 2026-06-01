@@ -3,16 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpEventType } from '@angular/common/http';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { Subject, interval } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
@@ -27,7 +18,7 @@ const DOC_TYPES = ['Aadhaar', 'PAN', 'Address Proof', 'Income Certificate', 'Med
 @Component({
   selector: 'app-citizen-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSelectModule, MatIconModule, MatTableModule, MatProgressSpinnerModule, MatDialogModule, MatDatepickerModule, StatusBadgeComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, MatDialogModule, StatusBadgeComponent],
   templateUrl: './citizen-profile.component.html',
   styleUrl: './citizen-profile.component.css'
 })
@@ -39,7 +30,7 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
   loading = true;
   saving = false;
   editing = false;
-  today = new Date();
+  today = new Date().toISOString().split('T')[0];
 
   docTypes = DOC_TYPES;
   documents: any[] = [];
@@ -47,7 +38,6 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
   uploading = false;
   uploadProgress = 0;
   selectedDocType: string = DOC_TYPES[0];
-  docCols = ['docType', 'fileUri', 'uploadedDate', 'verificationStatus', 'actions'];
 
   get hasDocument(): boolean { return this.documents.length > 0; }
 
@@ -80,12 +70,10 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
       error: () => { this.loading = false; this.cdr.markForCheck(); }
     });
 
-    // Auto-refresh document statuses every 20s so officer verifications appear without manual refresh.
     interval(20_000).pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (this.citizen && !this.uploading) this.loadDocs(true);
     });
 
-    // Same-session refresh (e.g. when this user is also acting as an officer in another tab).
     this.refresh.events$.pipe(takeUntil(this.destroy$)).subscribe(topic => {
       if (topic === 'citizens' && this.citizen) this.loadDocs(true);
     });
@@ -104,16 +92,11 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
   startEdit() {
     this.editing = true;
     const patch: any = { ...this.citizen };
-    // Backend uses dd-MM-yyyy strings; MatDatepicker needs a Date object.
     if (patch.dob && typeof patch.dob === 'string') {
       const parts = patch.dob.split('-');
       if (parts.length === 3) {
         const [a, b, c] = parts;
-        // dd-MM-yyyy if the first part is 2 chars, otherwise yyyy-MM-dd
-        const date = a.length === 2
-          ? new Date(`${c}-${b}-${a}T00:00:00`)
-          : new Date(`${a}-${b}-${c}T00:00:00`);
-        patch.dob = isNaN(date.getTime()) ? null : date;
+        patch.dob = a.length === 2 ? `${c}-${b}-${a}` : `${a}-${b}-${c}`;
       }
     }
     this.form.patchValue(patch);
@@ -124,13 +107,7 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
     this.saving = true;
     const userId = Number(this.auth.getUserId());
     const raw = this.form.value as any;
-    // Convert Date back to dd-MM-yyyy for the backend.
-    if (raw.dob instanceof Date) {
-      const d = String(raw.dob.getDate()).padStart(2, '0');
-      const m = String(raw.dob.getMonth() + 1).padStart(2, '0');
-      const y = raw.dob.getFullYear();
-      raw.dob = `${d}-${m}-${y}`;
-    } else if (raw.dob && raw.dob.includes('-') && raw.dob.indexOf('-') === 4) {
+    if (raw.dob && raw.dob.includes('-') && raw.dob.indexOf('-') === 4) {
       const [y, m, d] = raw.dob.split('-');
       raw.dob = `${d}-${m}-${y}`;
     }
@@ -167,7 +144,6 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
       return;
     }
     if (!this.selectedDocType) { this.toastr.error('Please choose a document type first.'); return; }
-    // Reset value BEFORE opening picker so picking the same filename still fires `change`.
     if (this.fileInput?.nativeElement) {
       this.fileInput.nativeElement.value = '';
       this.fileInput.nativeElement.click();

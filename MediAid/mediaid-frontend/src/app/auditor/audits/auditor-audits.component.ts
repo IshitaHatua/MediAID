@@ -1,12 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { AuditManagementService } from '../../core/services/audit.service';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
@@ -16,9 +10,6 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    MatButtonModule, MatIconModule,
-    MatFormFieldModule, MatSelectModule,
-    MatExpansionModule, MatProgressSpinnerModule,
     StatusBadgeComponent
   ],
   templateUrl: './auditor-audits.component.html',

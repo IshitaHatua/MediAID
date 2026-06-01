@@ -24,66 +24,7 @@ import { AuthService } from './core/services/auth.service';
       <router-outlet></router-outlet>
     </ng-template>
   `,
-  styles: [`
-    .app-shell {
-      display: flex;
-      margin-top: 64px;
-      min-height: calc(100vh - 64px);
-      position: relative;
-    }
-    .main-content {
-      flex: 1;
-      padding: 28px 32px;
-      min-height: calc(100vh - 64px);
-      overflow-y: auto;
-      overflow-x: hidden;
-      max-width: calc(100vw - 230px);
-
-      background-color: #0d1526;
-      background-image:
-        radial-gradient(rgba(99,102,241,0.12) 1px, transparent 1px);
-      background-size: 28px 28px;
-      background-attachment: local;
-    }
-
-    .sidebar-backdrop {
-      position: fixed;
-      top: 64px; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 90;
-      animation: fadeIn 0.18s ease-out;
-    }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    @media (max-width: 1024px) {
-      .main-content { padding: 22px 20px; }
-    }
-
-    @media (max-width: 768px) {
-      .main-content {
-        padding: 18px 14px;
-        max-width: 100vw;
-        width: 100vw;
-      }
-      app-sidebar {
-        position: fixed;
-        top: 64px;
-        left: 0;
-        bottom: 0;
-        z-index: 95;
-        transform: translateX(-100%);
-        transition: transform 0.22s ease-out;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      }
-      .app-shell.sidebar-open app-sidebar {
-        transform: translateX(0);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .main-content { padding: 14px 10px; }
-    }
-  `]
+  styleUrl: './app.css'
 })
 export class App {
   sidebarOpen = signal(false);

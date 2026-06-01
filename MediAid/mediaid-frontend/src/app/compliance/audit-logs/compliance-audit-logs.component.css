@@ -1,26 +1,40 @@
-.page-header { margin-bottom: 20px; }
-.tab-content { padding-top: 20px; }
-.page-title { margin: 0 0 4px; font-size: 1.6rem; font-weight: 800; color: #f1f5f9; }
-.page-sub { margin: 0; font-size: 13px; color: rgba(255,255,255,0.4); }
-
-.section-card { background: linear-gradient(145deg,#111827,#1a2235); border: 1px solid rgba(99,102,241,0.15); border-radius: 14px; padding: 24px; }
-.toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-.center { display: flex; justify-content: center; padding: 32px; }
-.data-table { width: 100%; }
-.id-cell { color: #818cf8; font-family: monospace; font-weight: 600; }
-.date-cell { color: rgba(255,255,255,0.4); font-size: 12px; }
-.empty-state { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 40px; color: rgba(255,255,255,0.25); }
-.empty-state mat-icon { font-size: 24px; }
-.empty-state p { margin: 0; font-size: 14px; }
-
-/* ── 403 access-denied banner ────────────────────────────── */
-.access-denied-banner {
-  display: flex; align-items: flex-start; gap: 14px;
-  padding: 16px 20px; margin: 8px 0 16px;
-  background: rgba(245,158,11,0.08);
-  border: 1px solid rgba(245,158,11,0.3); border-radius: 12px;
-  color: rgba(255,255,255,0.7);
+.tab-bar {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 1.25rem;
 }
-.access-denied-banner mat-icon { color: #fbbf24; font-size: 22px; height: 22px; width: 22px; flex-shrink: 0; margin-top: 2px; }
-.access-denied-banner strong { display: block; color: #fbbf24; font-size: 14px; margin-bottom: 4px; }
-.access-denied-banner p { margin: 0; font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.6rem 1rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555555;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tab-btn:hover { color: #2f62e8; }
+.tab-btn.active { color: #2f62e8; border-bottom-color: #2f62e8; }
+
+.tab-content { padding-top: 0.25rem; }
+
+.id-cell { color: #2f62e8; font-family: monospace; font-weight: 600; }
+.date-cell { color: #555555; font-size: 0.8rem; }
+
+.access-denied-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 1rem 1.25rem;
+  margin: 0.5rem 0 1rem;
+  background: #fbe7e7;
+  border: 1px solid #f0c4c4;
+  border-radius: 0.25rem;
+  color: #555555;
+}
+.access-denied-banner .adb-icon { font-size: 1.25rem; flex-shrink: 0; }
+.access-denied-banner strong { display: block; color: #c62828; font-size: 0.9rem; margin-bottom: 0.25rem; }
+.access-denied-banner p { margin: 0; font-size: 0.85rem; line-height: 1.5; }

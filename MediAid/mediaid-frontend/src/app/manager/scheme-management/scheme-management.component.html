@@ -1,60 +1,92 @@
 
     <h2 class="page-title">Scheme Management</h2>
-    <mat-card class="page-card">
+    <div class="card">
       <div class="toolbar">
-        <input class="search-input" placeholder="Search schemes..." [(ngModel)]="search" (input)="applyFilter()">
-        <button mat-flat-button color="primary" (click)="showForm=!showForm; resetForm()">
-          <mat-icon>add</mat-icon> Create Scheme
-        </button>
+        <input class="form-input search-input" placeholder="Search schemes..." [(ngModel)]="search" (input)="applyFilter()">
+        <button class="btn btn-primary" (click)="showForm=!showForm; resetForm()">+ Create Scheme</button>
       </div>
 
-      <div *ngIf="showForm" class="scheme-form-panel">
+      <div *ngIf="showForm" class="inline-form scheme-form-panel">
         <h3>{{ editMode ? 'Edit' : 'New' }} Scheme</h3>
         <form [formGroup]="schemeForm" (ngSubmit)="submit()" class="scheme-form">
           <div class="two-col">
-            <mat-form-field appearance="outline"><mat-label>Name</mat-label><input matInput formControlName="name"><mat-error>Required</mat-error></mat-form-field>
-            <mat-form-field appearance="outline"><mat-label>Max Coverage (₹)</mat-label><input matInput formControlName="maxCoverageAmount" type="number"><mat-error>Required</mat-error></mat-form-field>
+            <div class="form-group">
+              <label>Name</label>
+              <input class="form-input" formControlName="name">
+              <div class="field-error" *ngIf="schemeForm.get('name')?.touched && schemeForm.get('name')?.invalid">Required</div>
+            </div>
+            <div class="form-group">
+              <label>Max Coverage (₹)</label>
+              <input class="form-input" formControlName="maxCoverageAmount" type="number">
+              <div class="field-error" *ngIf="schemeForm.get('maxCoverageAmount')?.touched && schemeForm.get('maxCoverageAmount')?.invalid">Required</div>
+            </div>
           </div>
-          <mat-form-field appearance="outline" class="full-width"><mat-label>Description</mat-label><textarea matInput formControlName="description" rows="2" maxlength="1000"></textarea><mat-error>Required</mat-error></mat-form-field>
-          <mat-form-field appearance="outline" class="full-width"><mat-label>Eligibility Criteria</mat-label><textarea matInput formControlName="eligibilityCriteria" rows="2" maxlength="500"></textarea><mat-error>Required</mat-error></mat-form-field>
-          <mat-form-field appearance="outline" class="full-width"><mat-label>Benefits</mat-label><textarea matInput formControlName="benefits" rows="2" maxlength="500"></textarea><mat-error>Required</mat-error></mat-form-field>
+          <div class="form-group full-width">
+            <label>Description</label>
+            <textarea class="form-input" formControlName="description" rows="2" maxlength="1000"></textarea>
+            <div class="field-error" *ngIf="schemeForm.get('description')?.touched && schemeForm.get('description')?.invalid">Required</div>
+          </div>
+          <div class="form-group full-width">
+            <label>Eligibility Criteria</label>
+            <textarea class="form-input" formControlName="eligibilityCriteria" rows="2" maxlength="500"></textarea>
+            <div class="field-error" *ngIf="schemeForm.get('eligibilityCriteria')?.touched && schemeForm.get('eligibilityCriteria')?.invalid">Required</div>
+          </div>
+          <div class="form-group full-width">
+            <label>Benefits</label>
+            <textarea class="form-input" formControlName="benefits" rows="2" maxlength="500"></textarea>
+            <div class="field-error" *ngIf="schemeForm.get('benefits')?.touched && schemeForm.get('benefits')?.invalid">Required</div>
+          </div>
           <div class="two-col">
-            <mat-form-field appearance="outline"><mat-label>Validity (Years)</mat-label><input matInput formControlName="validityYears" type="number" min="1"><mat-error>Must be 1 or more</mat-error></mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <mat-select formControlName="status">
-                <mat-option value="ACTIVE">Active</mat-option>
-                <mat-option value="INACTIVE">Inactive</mat-option>
-              </mat-select>
-              <mat-error>Required</mat-error>
-            </mat-form-field>
+            <div class="form-group">
+              <label>Validity (Years)</label>
+              <input class="form-input" formControlName="validityYears" type="number" min="1">
+              <div class="field-error" *ngIf="schemeForm.get('validityYears')?.touched && schemeForm.get('validityYears')?.invalid">Must be 1 or more</div>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select class="form-input" formControlName="status">
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+              </select>
+              <div class="field-error" *ngIf="schemeForm.get('status')?.touched && schemeForm.get('status')?.invalid">Required</div>
+            </div>
           </div>
           <div class="form-actions">
-            <button mat-button type="button" (click)="showForm=false">Cancel</button>
-            <button mat-flat-button color="primary" type="submit">{{ editMode ? 'Update' : 'Create' }}</button>
+            <button class="btn btn-secondary" type="button" (click)="showForm=false">Cancel</button>
+            <button class="btn btn-primary" type="submit">{{ editMode ? 'Update' : 'Create' }}</button>
           </div>
         </form>
       </div>
 
-      <div class="center" *ngIf="loading"><mat-spinner diameter="40"></mat-spinner></div>
-      <table mat-table [dataSource]="filtered" class="full-width" *ngIf="!loading && filtered.length">
-        <ng-container matColumnDef="name"><th mat-header-cell *matHeaderCellDef>Name</th><td mat-cell *matCellDef="let s">{{ s.name }}</td></ng-container>
-        <ng-container matColumnDef="maxCoverageAmount"><th mat-header-cell *matHeaderCellDef>Max Coverage</th><td mat-cell *matCellDef="let s">₹{{ s.maxCoverageAmount | number:'1.0-0' }}</td></ng-container>
-        <ng-container matColumnDef="validityYears"><th mat-header-cell *matHeaderCellDef>Validity</th><td mat-cell *matCellDef="let s">{{ s.validityYears }} yr(s)</td></ng-container>
-        <ng-container matColumnDef="status"><th mat-header-cell *matHeaderCellDef>Status</th><td mat-cell *matCellDef="let s"><app-status-badge [status]="s.status"></app-status-badge></td></ng-container>
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let s">
-            <button mat-icon-button (click)="toggleStatus(s)" [title]="s.status === 'ACTIVE' ? 'Deactivate' : 'Activate'">
-              <mat-icon>{{ s.status === 'ACTIVE' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="deleteScheme(s)" title="Delete">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="cols"></tr>
-        <tr mat-row *matRowDef="let row; columns: cols;"></tr>
-      </table>
+      <div class="center" *ngIf="loading"><div class="spinner"></div></div>
+
+      <div class="table-wrap" *ngIf="!loading && filtered.length">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Max Coverage</th>
+              <th>Validity</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let s of filtered">
+              <td>{{ s.name }}</td>
+              <td>₹{{ s.maxCoverageAmount | number:'1.0-0' }}</td>
+              <td>{{ s.validityYears }} yr(s)</td>
+              <td><app-status-badge [status]="s.status"></app-status-badge></td>
+              <td>
+                <button class="btn btn-outline btn-sm" (click)="toggleStatus(s)" [title]="s.status === 'ACTIVE' ? 'Deactivate' : 'Activate'">
+                  {{ s.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="deleteScheme(s)" title="Delete">✕ Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <p *ngIf="!loading && !filtered.length" class="empty">No schemes found.</p>
-    </mat-card>
+    </div>

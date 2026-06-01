@@ -3,15 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { map } from 'rxjs/operators';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { AuditManagementService } from '../../core/services/audit.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -27,15 +18,13 @@ interface EntityOption { id: number; label: string; status: string; }
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, FormsModule,
-    MatButtonModule, MatIconModule, MatTableModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatTabsModule, MatExpansionModule, MatProgressSpinnerModule,
     StatusBadgeComponent
   ],
   templateUrl: './compliance-audits.component.html',
   styleUrl: './compliance-audits.component.css'
 })
 export class ComplianceAuditsComponent implements OnInit {
+  activeTab: 'audits' | 'logs' = 'audits';
   audits: any[] = [];
   filtered: any[] = [];
   logs: any[] = [];
@@ -46,12 +35,9 @@ export class ComplianceAuditsComponent implements OnInit {
   showCreateForm = false;
   filterStatus = '';
   filterScope = '';
-  logCols = ['logId', 'userId', 'action', 'resource', 'timestamp'];
 
-  // ── Officer ID auto-populated from auth (never shown to user) ──
   loggedInOfficerId = 0;
 
-  // ── Audit entity picker state ────────────────────────────────
   auditEntities: EntityOption[] = [];
   auditEntitiesLoading = false;
   auditEntitiesError = false;
@@ -79,8 +65,6 @@ export class ComplianceAuditsComponent implements OnInit {
     this.loadLogs();
   }
 
-  // Toggle form open/close — auto-fetches entities for default scope on open,
-  // resets entity state on close.
   toggleAuditForm() {
     this.showCreateForm = !this.showCreateForm;
     if (this.showCreateForm) {
@@ -92,7 +76,6 @@ export class ComplianceAuditsComponent implements OnInit {
     }
   }
 
-  // Called when scope mat-select changes AND when the form is first opened.
   onAuditScopeChange() {
     this.auditSelectedEntity = null;
     this.auditEntities = [];

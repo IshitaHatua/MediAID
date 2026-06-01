@@ -1,12 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin, of } from 'rxjs';
@@ -23,7 +16,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 @Component({
   selector: 'app-enrollment-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatCardModule, MatButtonModule, MatIconModule, MatTableModule, MatSelectModule, MatFormFieldModule, MatProgressSpinnerModule, MatDialogModule, StatusBadgeComponent],
+  imports: [CommonModule, FormsModule, MatDialogModule, StatusBadgeComponent],
   templateUrl: './enrollment-management.component.html',
   styleUrl: './enrollment-management.component.css'
 })
@@ -35,8 +28,6 @@ export class EnrollmentManagementComponent implements OnInit {
 
   private citizensById: Record<number, any> = {};
   private schemesById: Record<number, any> = {};
-
-  cols = ['citizenId', 'citizenAge', 'schemeName', 'eligibility', 'status', 'actions'];
 
   eligibilityDialog: { open: boolean; schemeName: string; text: string } =
     { open: false, schemeName: '', text: '' };
@@ -79,9 +70,6 @@ export class EnrollmentManagementComponent implements OnInit {
   citizenAge(citizenId: number): string {
     const c = this.citizensById[citizenId];
     if (!c?.dob) return '—';
-    // Backend stores DOB as a string in dd-MM-yyyy format (see citizen-service
-    // ValidDateValidator). new Date(dd-MM-yyyy) returns Invalid Date in JS,
-    // so parse the parts explicitly.
     const dob = this.parseDob(c.dob);
     if (!dob) return '—';
     const today = new Date();
@@ -92,7 +80,6 @@ export class EnrollmentManagementComponent implements OnInit {
   }
 
   private parseDob(s: string): Date | null {
-    // Accept both dd-MM-yyyy (canonical) and yyyy-MM-dd (legacy/ISO) just in case.
     const m1 = /^(\d{2})-(\d{2})-(\d{4})$/.exec(s);
     if (m1) return new Date(+m1[3], +m1[2] - 1, +m1[1]);
     const m2 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);

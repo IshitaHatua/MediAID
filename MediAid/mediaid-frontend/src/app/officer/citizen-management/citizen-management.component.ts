@@ -1,10 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { CitizenService } from '../../core/services/citizen.service';
 import { RefreshService } from '../../core/services/refresh.service';
@@ -13,7 +9,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 @Component({
   selector: 'app-citizen-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, MatTableModule, MatProgressSpinnerModule, StatusBadgeComponent],
+  imports: [CommonModule, FormsModule, StatusBadgeComponent],
   templateUrl: './citizen-management.component.html',
   styleUrl: './citizen-management.component.css'
 })
@@ -24,8 +20,6 @@ export class CitizenManagementComponent implements OnInit {
   expandedCitizen: number | null = null;
   citizenDocs: Record<number, any[]> = {};
   docsLoading: Record<number, boolean> = {};
-
-  docCols = ['docType', 'fileUri', 'uploadedDate', 'verificationStatus', 'actions'];
 
   constructor(private citizenSvc: CitizenService, private refresh: RefreshService, private toastr: ToastrService) {}
 
@@ -67,12 +61,6 @@ export class CitizenManagementComponent implements OnInit {
     return idx >= 0 ? fileUri.substring(idx + 1) : fileUri;
   }
 
-  /**
-   * Returns a filesystem-friendly version of the original filename for use
-   * as a download target. Edge/Chromium PDF viewers reject file:// URLs whose
-   * paths contain unbalanced parens or sequences of `%20 (` — replacing
-   * spaces and parens with underscores avoids that without changing the bytes.
-   */
   private safeDownloadName(fileUri: string): string {
     return this.originalFileName(fileUri)
       .replace(/[()\s]+/g, '_')

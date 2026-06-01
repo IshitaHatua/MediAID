@@ -1,10 +1,7 @@
-
-    <button mat-icon-button class="dialog-close-btn" aria-label="Close" (click)="ref.close(false)">
-      <mat-icon>close</mat-icon>
-    </button>
-    <h2 mat-dialog-title>{{ data.title }}</h2>
-    <mat-dialog-content>{{ data.message }}</mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="ref.close(false)">Cancel</button>
-      <button mat-flat-button color="warn" (click)="ref.close(true)">Confirm</button>
-    </mat-dialog-actions>
+<button type="button" class="dialog-close" aria-label="Close" (click)="ref.close(false)">&#10005;</button>
+<h2 class="dialog-title">{{ data.title }}</h2>
+<div class="dialog-message">{{ data.message }}</div>
+<div class="dialog-actions">
+  <button type="button" class="btn btn-secondary" (click)="ref.close(false)">Cancel</button>
+  <button type="button" class="btn btn-danger" (click)="ref.close(true)">Confirm</button>
+</div>

@@ -4,15 +4,6 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { ToastrService } from 'ngx-toastr';
 import { ClaimService } from '../../core/services/claim.service';
 import { SchemeService } from '../../core/services/scheme.service';
@@ -24,13 +15,13 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 @Component({
   selector: 'app-citizen-claims',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatCardModule, MatButtonModule, MatIconModule, MatTableModule, MatFormFieldModule, MatSelectModule, MatInputModule, MatProgressSpinnerModule, MatExpansionModule, StatusBadgeComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, StatusBadgeComponent],
   templateUrl: './citizen-claims.component.html',
   styleUrl: './citizen-claims.component.css'
 })
 export class CitizenClaimsComponent implements OnInit {
   claims: any[] = [];
-  schemes: any[] = []; // Only schemes the citizen has an APPROVED, non-expired enrollment in.
+  schemes: any[] = [];
   claimDocs: Record<number, any[]> = {};
   loading = true;
   profileLoading = true;
@@ -38,6 +29,7 @@ export class CitizenClaimsComponent implements OnInit {
   citizenStatus = '';
   showDialog = false;
   pendingFile: File | null = null;
+  expanded: Record<number, boolean> = {};
 
   private fb = inject(FormBuilder);
   claimForm = this.fb.group({
@@ -86,8 +78,6 @@ export class CitizenClaimsComponent implements OnInit {
       const allSchemes = schemes.data ?? [];
       const myEnrollments = enrollments.data ?? [];
 
-      // Claims can only be raised against schemes the citizen has an APPROVED, non-expired enrollment in.
-      // Matches the backend's validation in ClaimServiceImpl.createClaim so users don't see schemes that would fail.
       const today = new Date();
       const eligibleSchemeIds = new Set<number>(
         myEnrollments
@@ -100,6 +90,8 @@ export class CitizenClaimsComponent implements OnInit {
       this.cdr.markForCheck();
     });
   }
+
+  toggle(claimId: number) { this.expanded[claimId] = !this.expanded[claimId]; }
 
   schemeName(id: number) { return this.schemes.find(s => s.schemeId === id)?.name || `Scheme #${id}`; }
 
@@ -161,9 +153,6 @@ export class CitizenClaimsComponent implements OnInit {
             this.cdr.markForCheck();
           },
           error: () => {
-            // Claim row exists but the supporting document failed to attach.
-            // Surface it clearly so the citizen knows to retry attaching the doc
-            // from the claim's expansion panel.
             this.toastr.error(
               'Claim was created but the document failed to upload. ' +
               'Open the claim and re-attach the document.'
@@ -173,7 +162,6 @@ export class CitizenClaimsComponent implements OnInit {
           }
         });
       }
-      // Errors on the claim create itself are surfaced by the global JWT interceptor.
     });
   }
 

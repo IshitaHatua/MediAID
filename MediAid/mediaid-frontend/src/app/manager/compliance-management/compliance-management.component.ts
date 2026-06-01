@@ -1,14 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ComplianceService } from '../../core/services/compliance.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -17,7 +9,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 @Component({
   selector: 'app-compliance-management',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatIconModule, MatTableModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTabsModule, MatProgressSpinnerModule, StatusBadgeComponent],
+  imports: [CommonModule, ReactiveFormsModule, StatusBadgeComponent],
   templateUrl: './compliance-management.component.html',
   styleUrl: './compliance-management.component.css'
 })
@@ -25,10 +17,9 @@ export class ComplianceManagementComponent implements OnInit {
   all: any[] = []; violations: any[] = []; flagged: any[] = [];
   loading = true;
   evalResult: any = null;
-  cols = ['complianceId', 'entityId', 'entityType', 'result', 'notes', 'evaluatedAt'];
+  activeTab = 0;
 
   private fb = inject(FormBuilder);
-  // requestedBy removed from form — auto-sourced from JWT for the evaluate endpoint
   evalForm = this.fb.group({ entityId: [null, Validators.required], entityType: ['CLAIM'] });
   recordForm = this.fb.group({ entityId: [null, Validators.required], entityType: ['CLAIM'], result: ['PASS'], notes: [''] });
 
