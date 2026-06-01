@@ -38,19 +38,15 @@
     }
 
     @media (max-width: 768px) {
+      /* Keep the navbar a single compact row of fixed height (4rem) so it never
+         grows past the height the layout assumes (app.css uses top/margin 4rem).
+         The user identity + Sign Out remain available in the sidebar drawer footer. */
       .hamburger-btn { display: inline-flex; }
-      .navbar {
-        padding: 0.5rem 0.75rem;
-        height: auto;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-      }
-      .spacer { display: none; }
-      .nav-right { justify-content: space-between; width: 100%; }
-      .user-chip { width: 100%; justify-content: space-between; padding: 0.25rem 0; }
+      .navbar { padding: 0 0.75rem; }
+      .nav-right { display: none; }
     }
 
     @media (max-width: 480px) {
-      .navbar { padding: 0.5rem; }
+      .navbar { padding: 0 0.5rem; }
+      .brand-name { font-size: 1.05rem; }
     }

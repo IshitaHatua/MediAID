@@ -18,8 +18,11 @@
 
 .auth-form { display: flex; flex-direction: column; }
 
-.password-row { display: flex; gap: 0.5rem; }
-.password-row .form-input { flex: 1; }
+.password-row { display: flex; gap: 0.5rem; align-items: stretch; }
+.password-row .form-input { flex: 1 1 auto; min-width: 0; }
+/* Keep the Show/Hide button compact so the input always stays the larger field.
+   Overrides the global mobile rule `.btn { width: 100% }`. */
+.password-row .btn { width: auto; flex: 0 0 auto; white-space: nowrap; }
 
 .switch-link {
   text-align: center;

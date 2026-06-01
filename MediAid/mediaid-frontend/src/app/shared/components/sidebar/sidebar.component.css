@@ -66,18 +66,16 @@
     }
 
     @media (max-width: 768px) {
+      /* On mobile the sidebar is a vertical sliding drawer (positioned by app.css).
+         It fills the fixed drawer wrapper; nav items stay stacked vertically. */
       .sidebar {
         width: 100%;
-        min-height: auto;
+        height: 100%;
+        min-height: 0;
         position: static;
         top: auto;
         border-right: none;
-        border-bottom: 1px solid #161c26;
-
-
-
       }
-      .nav-section { flex-direction: row; flex-wrap: wrap; }
-      .nav-item { padding: 0.625rem 0.875rem; font-size: 0.875rem; }
-      .sidebar-footer { flex-wrap: wrap; }
+      .nav-section { flex-direction: column; flex-wrap: nowrap; }
+      .nav-item { padding: 0.75rem 0.875rem; font-size: 0.9375rem; }
     }
