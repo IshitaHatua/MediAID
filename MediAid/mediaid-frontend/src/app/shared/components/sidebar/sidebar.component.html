@@ -1,26 +1,28 @@
+<nav class="sidebar">
+  <div class="sidebar-inner">
+    <div class="nav-section">
+      @for (item of navItems; track item) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          class="nav-item"
+          [title]="item.label"
+        >
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </div>
+  </div>
 
-    <nav class="sidebar">
-      <div class="sidebar-inner">
-        <div class="nav-section">
-          <a
-            *ngFor="let item of navItems"
-            [routerLink]="item.route"
-            routerLinkActive="active"
-            class="nav-item"
-            [title]="item.label"
-          >
-            <span class="nav-label">{{ item.label }}</span>
-          </a>
-        </div>
+  <div class="sidebar-footer">
+    <div class="user-footer-info">
+      <div class="user-footer-text">
+        <div class="user-footer-name">{{ auth.getUserName() }}</div>
+        <div class="user-footer-role">{{ auth.getRole() }}</div>
       </div>
-
-      <div class="sidebar-footer">
-        <div class="user-footer-info">
-          <div class="user-footer-text">
-            <div class="user-footer-name">{{ auth.getUserName() }}</div>
-            <div class="user-footer-role">{{ auth.getRole() }}</div>
-          </div>
-        </div>
-        <button type="button" class="logout-btn" (click)="auth.logout()" title="Sign Out">Sign Out</button>
-      </div>
-    </nav>
+    </div>
+    <button type="button" class="logout-btn" (click)="auth.logout()" title="Sign Out">
+      Sign Out
+    </button>
+  </div>
+</nav>

@@ -1,142 +1,221 @@
 <h2 class="page-title">My Claims</h2>
 
-<div class="no-profile-banner" *ngIf="!profileLoading && !hasProfile">
-  <div>
-    <strong>Profile Required</strong>
-    <p>You need to create your citizen profile before you can submit claims.</p>
+@if (!profileLoading && !hasProfile) {
+  <div class="no-profile-banner">
+    <div>
+      <strong>Profile Required</strong>
+      <p>You need to create your citizen profile before you can submit claims.</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/citizen/profile">Create Profile</a>
   </div>
-  <a class="btn btn-primary" routerLink="/citizen/profile">Create Profile</a>
-</div>
+}
 
-<div class="pending-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'PENDING'">
-  <div>
-    <strong>Profile Pending Approval</strong>
-    <p>Your citizen profile is awaiting officer verification. You can submit claims once your profile is approved.</p>
+@if (!profileLoading && hasProfile && citizenStatus === 'PENDING') {
+  <div class="pending-banner">
+    <div>
+      <strong>Profile Pending Approval</strong>
+      <p>
+        Your citizen profile is awaiting officer verification. You can submit claims once your
+        profile is approved.
+      </p>
+    </div>
   </div>
-</div>
+}
 
-<div class="rejected-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'REJECTED'">
-  <div>
-    <strong>Profile Rejected</strong>
-    <p>Your citizen profile was rejected. Please update your profile and contact support.</p>
+@if (!profileLoading && hasProfile && citizenStatus === 'REJECTED') {
+  <div class="rejected-banner">
+    <div>
+      <strong>Profile Rejected</strong>
+      <p>Your citizen profile was rejected. Please update your profile and contact support.</p>
+    </div>
+    <a class="btn btn-danger" routerLink="/citizen/profile">Update Profile</a>
   </div>
-  <a class="btn btn-danger" routerLink="/citizen/profile">Update Profile</a>
-</div>
+}
 
-<div class="rejected-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'SUSPENDED'">
-  <div>
-    <strong>Profile Suspended</strong>
-    <p>Your citizen profile has been suspended. Please contact support for assistance.</p>
+@if (!profileLoading && hasProfile && citizenStatus === 'SUSPENDED') {
+  <div class="rejected-banner">
+    <div>
+      <strong>Profile Suspended</strong>
+      <p>Your citizen profile has been suspended. Please contact support for assistance.</p>
+    </div>
   </div>
-</div>
+}
 
-<div class="card" *ngIf="!profileLoading && hasProfile && citizenStatus === 'VERIFIED'">
-  <div class="toolbar">
-    <span class="text-muted">{{ claims.length }} claim(s)</span>
-    <button class="btn btn-primary" (click)="openDialog()">+ Submit Claim</button>
+@if (!profileLoading && hasProfile && citizenStatus === 'VERIFIED') {
+  <div class="card">
+    <div class="toolbar">
+      <span class="text-muted">{{ claims.length }} claim(s)</span>
+      <button class="btn btn-primary" (click)="openDialog()">+ Submit Claim</button>
+    </div>
+    @if (loading) {
+      <div class="center"><div class="spinner"></div></div>
+    }
+    @if (!loading && claims.length) {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Claim</th>
+              <th>Scheme</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Documents</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of claims; track c) {
+              <tr>
+                <td>#{{ c.claimId }}</td>
+                <td>{{ schemeName(c.schemeId) }}</td>
+                <td>₹{{ c.claimAmount | number: '1.0-0' }}</td>
+                <td>{{ c.claimDate | date: 'mediumDate' }}</td>
+                <td><app-status-badge [status]="c.status"></app-status-badge></td>
+                <td>
+                  <button class="btn btn-outline btn-sm" type="button" (click)="toggle(c.claimId)">
+                    {{ expanded[c.claimId] ? 'Hide' : 'View' }}
+                  </button>
+                </td>
+              </tr>
+              @if (expanded[c.claimId]) {
+                <tr>
+                  <td colspan="6">
+                    <div class="claim-detail">
+                      <div class="detail-row">
+                        <span class="label">Description</span
+                        ><span>{{ c.description || '—' }}</span>
+                      </div>
+                    </div>
+                    <div class="upload-section">
+                      <div class="docs-header">
+                        <b>Documents</b>
+                        @if (claimDocs[c.claimId]?.length) {
+                          <span class="docs-inline">
+                            @for (d of claimDocs[c.claimId]; track d) {
+                              <span class="doc-chip"> ▤ {{ originalFileName(d.fileName) }} </span>
+                            }
+                          </span>
+                        }
+                        @if (claimDocs[c.claimId] && !claimDocs[c.claimId].length) {
+                          <span class="docs-empty-inline"> No documents attached yet. </span>
+                        }
+                      </div>
+                      <label class="btn btn-outline btn-sm upload-btn">
+                        ↑ Attach Document
+                        <input
+                          type="file"
+                          (change)="uploadDoc($event, c.claimId)"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          hidden
+                        />
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    @if (!loading && !claims.length) {
+      <p class="empty">No claims submitted yet.</p>
+    }
   </div>
-  <div class="center" *ngIf="loading"><div class="spinner"></div></div>
+}
+@if (profileLoading) {
+  <div class="center"><div class="spinner"></div></div>
+}
 
-  <div class="table-wrap" *ngIf="!loading && claims.length">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Claim</th>
-          <th>Scheme</th>
-          <th>Amount</th>
-          <th>Date</th>
-          <th>Status</th>
-          <th>Documents</th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let c of claims">
-          <tr>
-            <td>#{{ c.claimId }}</td>
-            <td>{{ schemeName(c.schemeId) }}</td>
-            <td>₹{{ c.claimAmount | number:'1.0-0' }}</td>
-            <td>{{ c.claimDate | date:'mediumDate' }}</td>
-            <td><app-status-badge [status]="c.status"></app-status-badge></td>
-            <td>
-              <button class="btn btn-outline btn-sm" type="button" (click)="toggle(c.claimId)">
-                {{ expanded[c.claimId] ? 'Hide' : 'View' }}
+@if (showDialog) {
+  <div class="dialog-overlay">
+    <div class="card dialog-card">
+      <button
+        class="btn btn-secondary btn-sm dialog-close-btn"
+        type="button"
+        aria-label="Close"
+        (click)="closeDialog()"
+      >
+        ✕
+      </button>
+      <h3>Submit a Claim</h3>
+      <form [formGroup]="claimForm" (ngSubmit)="submitClaim()">
+        <div class="form-group">
+          <label>Scheme</label>
+          <select class="form-input" formControlName="schemeId">
+            @if (schemes.length === 0) {
+              <option [ngValue]="null" disabled>
+                No approved enrollments &mdash; enroll in a scheme first
+              </option>
+            }
+            @for (s of schemes; track s) {
+              <option [ngValue]="s.schemeId">{{ s.name }}</option>
+            }
+          </select>
+          @if (claimForm.get('schemeId')?.touched && claimForm.get('schemeId')?.invalid) {
+            <div class="field-error">Required</div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Claim Amount (₹)</label>
+          <input class="form-input" formControlName="claimAmount" type="number" min="1" />
+          @if (claimForm.get('claimAmount')?.touched && claimForm.get('claimAmount')?.invalid) {
+            <div class="field-error">Required</div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea
+            class="form-input"
+            formControlName="description"
+            rows="3"
+            maxlength="500"
+            placeholder="Briefly describe the reason for this claim"
+          ></textarea>
+          @if (claimForm.get('description')?.touched && claimForm.get('description')?.invalid) {
+            <div class="field-error">Description is required</div>
+          }
+        </div>
+        <div class="dialog-attach">
+          <label class="btn btn-outline btn-sm">
+            ↑ <span>{{ pendingFile ? 'Change Document' : 'Attach Document *' }}</span>
+            <input
+              type="file"
+              (change)="onFileSelected($event)"
+              accept=".pdf,.jpg,.jpeg,.png"
+              hidden
+            />
+          </label>
+          @if (pendingFile) {
+            <span class="dialog-attach-file">
+              ▤ {{ pendingFile.name }}
+              <button
+                class="btn btn-secondary btn-sm"
+                type="button"
+                (click)="pendingFile = null"
+                aria-label="Remove"
+              >
+                ✕
               </button>
-            </td>
-          </tr>
-          <tr *ngIf="expanded[c.claimId]">
-            <td colspan="6">
-              <div class="claim-detail">
-                <div class="detail-row"><span class="label">Description</span><span>{{ c.description || '—' }}</span></div>
-              </div>
-              <div class="upload-section">
-                <div class="docs-header">
-                  <b>Documents</b>
-                  <span class="docs-inline" *ngIf="claimDocs[c.claimId]?.length">
-                    <span class="doc-chip" *ngFor="let d of claimDocs[c.claimId]">
-                      ▤ {{ originalFileName(d.fileName) }}
-                    </span>
-                  </span>
-                  <span class="docs-empty-inline" *ngIf="claimDocs[c.claimId] && !claimDocs[c.claimId].length">
-                    No documents attached yet.
-                  </span>
-                </div>
-                <label class="btn btn-outline btn-sm upload-btn">
-                  ↑ Attach Document
-                  <input type="file" (change)="uploadDoc($event, c.claimId)" accept=".pdf,.jpg,.jpeg,.png" hidden>
-                </label>
-              </div>
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
+            </span>
+          }
+          @if (!pendingFile) {
+            <span class="dialog-attach-hint text-muted"
+              >PDF, JPG, or PNG (max 10MB) &mdash; required</span
+            >
+          }
+        </div>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" type="button" (click)="closeDialog()">Cancel</button>
+          <button
+            class="btn btn-primary"
+            type="submit"
+            [disabled]="claimForm.invalid || !pendingFile"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
-  <p *ngIf="!loading && !claims.length" class="empty">No claims submitted yet.</p>
-</div>
-<div class="center" *ngIf="profileLoading"><div class="spinner"></div></div>
-
-<div class="dialog-overlay" *ngIf="showDialog">
-  <div class="card dialog-card">
-    <button class="btn btn-secondary btn-sm dialog-close-btn" type="button" aria-label="Close" (click)="closeDialog()">✕</button>
-    <h3>Submit a Claim</h3>
-    <form [formGroup]="claimForm" (ngSubmit)="submitClaim()">
-      <div class="form-group">
-        <label>Scheme</label>
-        <select class="form-input" formControlName="schemeId">
-          <option [ngValue]="null" disabled *ngIf="schemes.length === 0">No approved enrollments &mdash; enroll in a scheme first</option>
-          <option *ngFor="let s of schemes" [ngValue]="s.schemeId">{{ s.name }}</option>
-        </select>
-        <div class="field-error" *ngIf="claimForm.get('schemeId')?.touched && claimForm.get('schemeId')?.invalid">Required</div>
-      </div>
-      <div class="form-group">
-        <label>Claim Amount (₹)</label>
-        <input class="form-input" formControlName="claimAmount" type="number" min="1">
-        <div class="field-error" *ngIf="claimForm.get('claimAmount')?.touched && claimForm.get('claimAmount')?.invalid">Required</div>
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea class="form-input" formControlName="description" rows="3" maxlength="500"
-                  placeholder="Briefly describe the reason for this claim"></textarea>
-        <div class="field-error" *ngIf="claimForm.get('description')?.touched && claimForm.get('description')?.invalid">Description is required</div>
-      </div>
-
-      <div class="dialog-attach">
-        <label class="btn btn-outline btn-sm">
-          ↑ <span>{{ pendingFile ? 'Change Document' : 'Attach Document *' }}</span>
-          <input type="file" (change)="onFileSelected($event)" accept=".pdf,.jpg,.jpeg,.png" hidden>
-        </label>
-        <span class="dialog-attach-file" *ngIf="pendingFile">
-          ▤ {{ pendingFile.name }}
-          <button class="btn btn-secondary btn-sm" type="button" (click)="pendingFile=null" aria-label="Remove">✕</button>
-        </span>
-        <span class="dialog-attach-hint text-muted" *ngIf="!pendingFile">PDF, JPG, or PNG (max 10MB) &mdash; required</span>
-      </div>
-
-      <div class="dialog-actions">
-        <button class="btn btn-secondary" type="button" (click)="closeDialog()">Cancel</button>
-        <button class="btn btn-primary" type="submit"
-                [disabled]="claimForm.invalid || !pendingFile">Submit</button>
-      </div>
-    </form>
-  </div>
-</div>
+}

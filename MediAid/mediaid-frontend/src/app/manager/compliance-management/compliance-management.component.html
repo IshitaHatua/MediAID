@@ -1,116 +1,147 @@
+<div class="page-header">
+  <h2 class="page-title">Compliance Management</h2>
+  <p class="page-sub">Monitor compliance records, violations, and trigger evaluations</p>
+</div>
 
-    <div class="page-header">
-      <h2 class="page-title">Compliance Management</h2>
-      <p class="page-sub">Monitor compliance records, violations, and trigger evaluations</p>
-    </div>
+<div class="tabs">
+  <button class="tab-btn" [class.active]="activeTab === 0" (click)="activeTab = 0">
+    All Records
+  </button>
+  <button class="tab-btn" [class.active]="activeTab === 1" (click)="activeTab = 1">
+    Violations
+  </button>
+  <button class="tab-btn" [class.active]="activeTab === 2" (click)="activeTab = 2">Flagged</button>
+  <button class="tab-btn" [class.active]="activeTab === 3" (click)="activeTab = 3">
+    Full Evaluation
+  </button>
+  <button class="tab-btn" [class.active]="activeTab === 4" (click)="activeTab = 4">
+    Create Record
+  </button>
+</div>
 
-    <div class="tabs">
-      <button class="tab-btn" [class.active]="activeTab===0" (click)="activeTab=0">All Records</button>
-      <button class="tab-btn" [class.active]="activeTab===1" (click)="activeTab=1">Violations</button>
-      <button class="tab-btn" [class.active]="activeTab===2" (click)="activeTab=2">Flagged</button>
-      <button class="tab-btn" [class.active]="activeTab===3" (click)="activeTab=3">Full Evaluation</button>
-      <button class="tab-btn" [class.active]="activeTab===4" (click)="activeTab=4">Create Record</button>
-    </div>
+@if (activeTab === 0) {
+  <div class="tab-content">
+    <ng-container *ngTemplateOutlet="table; context: { data: all }"></ng-container>
+  </div>
+}
+@if (activeTab === 1) {
+  <div class="tab-content">
+    <ng-container *ngTemplateOutlet="table; context: { data: violations }"></ng-container>
+  </div>
+}
+@if (activeTab === 2) {
+  <div class="tab-content">
+    <ng-container *ngTemplateOutlet="table; context: { data: flagged }"></ng-container>
+  </div>
+}
 
-    <div class="tab-content" *ngIf="activeTab===0">
-      <ng-container *ngTemplateOutlet="table; context:{data: all}"></ng-container>
-    </div>
-    <div class="tab-content" *ngIf="activeTab===1">
-      <ng-container *ngTemplateOutlet="table; context:{data: violations}"></ng-container>
-    </div>
-    <div class="tab-content" *ngIf="activeTab===2">
-      <ng-container *ngTemplateOutlet="table; context:{data: flagged}"></ng-container>
-    </div>
-
-    <div class="tab-content" *ngIf="activeTab===3">
-      <div class="card section-card">
-        <h3 class="section-title">Full Compliance Evaluation</h3>
-        <form [formGroup]="evalForm" (ngSubmit)="evaluateFull()" class="inline-form eval-form">
-          <div class="form-group">
-            <label>Entity ID</label>
-            <input class="form-input" formControlName="entityId" type="number">
-            <div class="field-error" *ngIf="evalForm.get('entityId')?.touched && evalForm.get('entityId')?.invalid">Required</div>
-          </div>
-          <div class="form-group">
-            <label>Entity Type</label>
-            <select class="form-input" formControlName="entityType">
-              <option value="CLAIM">Claim</option>
-              <option value="ENROLLMENT">Enrollment</option>
-              <option value="DISBURSEMENT">Disbursement</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" type="submit">⚖ Evaluate</button>
-        </form>
-        <div *ngIf="evalResult" class="eval-result">
+@if (activeTab === 3) {
+  <div class="tab-content">
+    <div class="card section-card">
+      <h3 class="section-title">Full Compliance Evaluation</h3>
+      <form [formGroup]="evalForm" (ngSubmit)="evaluateFull()" class="inline-form eval-form">
+        <div class="form-group">
+          <label>Entity ID</label>
+          <input class="form-input" formControlName="entityId" type="number" />
+          @if (evalForm.get('entityId')?.touched && evalForm.get('entityId')?.invalid) {
+            <div class="field-error">Required</div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Entity Type</label>
+          <select class="form-input" formControlName="entityType">
+            <option value="CLAIM">Claim</option>
+            <option value="ENROLLMENT">Enrollment</option>
+            <option value="DISBURSEMENT">Disbursement</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit">⚖ Evaluate</button>
+      </form>
+      @if (evalResult) {
+        <div class="eval-result">
           <h4>Evaluation Result</h4>
           <pre>{{ evalResult | json }}</pre>
         </div>
-      </div>
+      }
     </div>
+  </div>
+}
 
-    <div class="tab-content" *ngIf="activeTab===4">
-      <div class="card section-card">
-        <h3 class="section-title">Create Compliance Record</h3>
-        <form [formGroup]="recordForm" (ngSubmit)="createRecord()" class="inline-form eval-form">
-          <div class="form-group">
-            <label>Entity ID</label>
-            <input class="form-input" formControlName="entityId" type="number">
-            <div class="field-error" *ngIf="recordForm.get('entityId')?.touched && recordForm.get('entityId')?.invalid">Required</div>
-          </div>
-          <div class="form-group">
-            <label>Entity Type</label>
-            <select class="form-input" formControlName="entityType">
-              <option value="CLAIM">Claim</option>
-              <option value="ENROLLMENT">Enrollment</option>
-              <option value="DISBURSEMENT">Disbursement</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Result</label>
-            <select class="form-input" formControlName="result">
-              <option value="PASS">Pass</option>
-              <option value="FAIL">Fail</option>
-              <option value="FLAGGED">Flagged</option>
-            </select>
-          </div>
-          <div class="form-group notes-field">
-            <label>Notes</label>
-            <textarea class="form-input" formControlName="notes" rows="2"></textarea>
-          </div>
-          <button class="btn btn-primary" type="submit">✓ Save Record</button>
-        </form>
-      </div>
+@if (activeTab === 4) {
+  <div class="tab-content">
+    <div class="card section-card">
+      <h3 class="section-title">Create Compliance Record</h3>
+      <form [formGroup]="recordForm" (ngSubmit)="createRecord()" class="inline-form eval-form">
+        <div class="form-group">
+          <label>Entity ID</label>
+          <input class="form-input" formControlName="entityId" type="number" />
+          @if (recordForm.get('entityId')?.touched && recordForm.get('entityId')?.invalid) {
+            <div class="field-error">Required</div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Entity Type</label>
+          <select class="form-input" formControlName="entityType">
+            <option value="CLAIM">Claim</option>
+            <option value="ENROLLMENT">Enrollment</option>
+            <option value="DISBURSEMENT">Disbursement</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Result</label>
+          <select class="form-input" formControlName="result">
+            <option value="PASS">Pass</option>
+            <option value="FAIL">Fail</option>
+            <option value="FLAGGED">Flagged</option>
+          </select>
+        </div>
+        <div class="form-group notes-field">
+          <label>Notes</label>
+          <textarea class="form-input" formControlName="notes" rows="2"></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">✓ Save Record</button>
+      </form>
     </div>
+  </div>
+}
 
-    <ng-template #table let-data="data">
-      <div class="card section-card">
-        <div class="center" *ngIf="loading"><div class="spinner"></div></div>
-        <div class="table-wrap" *ngIf="!loading && data.length">
-          <table class="data-table">
-            <thead>
+<ng-template #table let-data="data">
+  <div class="card section-card">
+    @if (loading) {
+      <div class="center"><div class="spinner"></div></div>
+    }
+    @if (!loading && data.length) {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Entity</th>
+              <th>Type</th>
+              <th>Result</th>
+              <th>Notes</th>
+              <th>Evaluated</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of data; track r) {
               <tr>
-                <th>ID</th>
-                <th>Entity</th>
-                <th>Type</th>
-                <th>Result</th>
-                <th>Notes</th>
-                <th>Evaluated</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let r of data">
                 <td class="id-cell">#{{ r.complianceId }}</td>
                 <td>{{ r.entityId }}</td>
                 <td>{{ r.entityType }}</td>
                 <td><app-status-badge [status]="r.result"></app-status-badge></td>
                 <td>{{ r.notes }}</td>
-                <td class="date-cell">{{ r.evaluatedAt | date:'dd MMM y' }}</td>
+                <td class="date-cell">{{ r.evaluatedAt | date: 'dd MMM y' }}</td>
               </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="empty-state" *ngIf="!loading && !data.length">
-          <p>No records found</p>
-        </div>
+            }
+          </tbody>
+        </table>
       </div>
-    </ng-template>
+    }
+    @if (!loading && !data.length) {
+      <div class="empty-state">
+        <p>No records found</p>
+      </div>
+    }
+  </div>
+</ng-template>

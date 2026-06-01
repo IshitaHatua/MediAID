@@ -4,7 +4,6 @@
 </div>
 
 <div class="card">
-
   <div class="toolbar">
     <div class="form-group">
       <label>Status</label>
@@ -25,69 +24,82 @@
         <option value="DISBURSEMENT">Disbursement</option>
       </select>
     </div>
-    <button class="btn btn-secondary btn-sm" (click)="clearFilters()" *ngIf="filterStatus || filterScope">&#10005; Clear</button>
+    @if (filterStatus || filterScope) {
+      <button class="btn btn-secondary btn-sm" (click)="clearFilters()">&#10005; Clear</button>
+    }
     <span class="count-badge">{{ filtered.length }} audit(s)</span>
   </div>
 
-  <div class="center" *ngIf="loading"><div class="spinner"></div></div>
+  @if (loading) {
+    <div class="center"><div class="spinner"></div></div>
+  }
 
-  <div class="table-wrap" *ngIf="!loading && filtered.length">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Scope</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let a of filtered">
+  @if (!loading && filtered.length) {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
           <tr>
-            <td class="id-cell">#{{ a.auditId }}</td>
-            <td>{{ a.scope }}</td>
-            <td><app-status-badge [status]="a.status"></app-status-badge></td>
-            <td>
-              <button class="btn btn-outline btn-sm" (click)="a.expanded = !a.expanded">
-                {{ a.expanded ? 'Hide' : 'View' }}
-              </button>
-            </td>
+            <th>ID</th>
+            <th>Scope</th>
+            <th>Status</th>
+            <th></th>
           </tr>
-          <tr *ngIf="a.expanded">
-            <td colspan="4">
-              <div class="audit-detail">
-                <div class="info-grid">
-                  <div class="info-item">
-                    <span class="label">Officer ID</span>
-                    <span class="value">{{ a.officerId }}</span>
+        </thead>
+        <tbody>
+          @for (a of filtered; track a) {
+            <tr>
+              <td class="id-cell">#{{ a.auditId }}</td>
+              <td>{{ a.scope }}</td>
+              <td><app-status-badge [status]="a.status"></app-status-badge></td>
+              <td>
+                <button class="btn btn-outline btn-sm" (click)="a.expanded = !a.expanded">
+                  {{ a.expanded ? 'Hide' : 'View' }}
+                </button>
+              </td>
+            </tr>
+            @if (a.expanded) {
+              <tr>
+                <td colspan="4">
+                  <div class="audit-detail">
+                    <div class="info-grid">
+                      <div class="info-item">
+                        <span class="label">Officer ID</span>
+                        <span class="value">{{ a.officerId }}</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="label">Entity ID</span>
+                        <span class="value">{{ a.scopeEntityId }}</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="label">Status</span>
+                        <span class="value"
+                          ><app-status-badge [status]="a.status"></app-status-badge
+                        ></span>
+                      </div>
+                      <div class="info-item">
+                        <span class="label">Created</span>
+                        <span class="value date">{{ a.createdAt | date: 'dd MMM y, h:mm a' }}</span>
+                      </div>
+                      <div class="info-item full">
+                        <span class="label">Findings</span>
+                        <span class="value findings-text">{{
+                          a.findings || 'No findings recorded.'
+                        }}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div class="info-item">
-                    <span class="label">Entity ID</span>
-                    <span class="value">{{ a.scopeEntityId }}</span>
-                  </div>
-                  <div class="info-item">
-                    <span class="label">Status</span>
-                    <span class="value"><app-status-badge [status]="a.status"></app-status-badge></span>
-                  </div>
-                  <div class="info-item">
-                    <span class="label">Created</span>
-                    <span class="value date">{{ a.createdAt | date:'dd MMM y, h:mm a' }}</span>
-                  </div>
-                  <div class="info-item full">
-                    <span class="label">Findings</span>
-                    <span class="value findings-text">{{ a.findings || 'No findings recorded.' }}</span>
-                  </div>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
-  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 
-  <div class="empty-state" *ngIf="!loading && !filtered.length">
-    <p>No audits match the selected filters</p>
-  </div>
-
+  @if (!loading && !filtered.length) {
+    <div class="empty-state">
+      <p>No audits match the selected filters</p>
+    </div>
+  }
 </div>

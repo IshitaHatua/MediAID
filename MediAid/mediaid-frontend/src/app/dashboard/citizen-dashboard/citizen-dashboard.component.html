@@ -9,13 +9,15 @@
   </div>
 
   <div class="summary-grid">
-    <div class="summary-card" *ngFor="let card of summaryCards">
-      <div class="card-icon-wrap">{{ card.icon }}</div>
-      <div class="card-content">
-        <div class="card-value">{{ card.value }}</div>
-        <div class="card-label">{{ card.label }}</div>
+    @for (card of summaryCards; track card) {
+      <div class="summary-card">
+        <div class="card-icon-wrap">{{ card.icon }}</div>
+        <div class="card-content">
+          <div class="card-value">{{ card.value }}</div>
+          <div class="card-label">{{ card.label }}</div>
+        </div>
       </div>
-    </div>
+    }
   </div>
 
   <div class="tables-row">
@@ -27,32 +29,35 @@
         </div>
         <a routerLink="/citizen/enrollments" class="view-all-btn">View all &rarr;</a>
       </div>
-      <div class="table-wrap" *ngIf="enrollments.length; else noEnroll">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Enrollment ID</th>
-              <th>Scheme</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let e of enrollments.slice(0,5)">
-              <td class="id-cell">{{ e.enrollmentId }}</td>
-              <td class="scheme-cell">{{ schemeName(e.schemeId) }}</td>
-              <td class="date-cell">{{ e.enrollmentDate | date:'dd MMM y' }}</td>
-              <td><app-status-badge [status]="e.status"></app-status-badge></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <ng-template #noEnroll>
+      @if (enrollments.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Enrollment ID</th>
+                <th>Scheme</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (e of enrollments.slice(0, 5); track e) {
+                <tr>
+                  <td class="id-cell">{{ e.enrollmentId }}</td>
+                  <td class="scheme-cell">{{ schemeName(e.schemeId) }}</td>
+                  <td class="date-cell">{{ e.enrollmentDate | date: 'dd MMM y' }}</td>
+                  <td><app-status-badge [status]="e.status"></app-status-badge></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
         <div class="empty-state">
           <p>No enrollments yet</p>
           <a routerLink="/citizen/enrollments">Browse schemes &rarr;</a>
         </div>
-      </ng-template>
+      }
     </div>
 
     <div class="table-card">
@@ -63,32 +68,35 @@
         </div>
         <a routerLink="/citizen/claims" class="view-all-btn">View all &rarr;</a>
       </div>
-      <div class="table-wrap" *ngIf="claims.length; else noClaim">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Claim ID</th>
-              <th>Amount</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let c of claims.slice(0,5)">
-              <td class="id-cell">{{ c.claimId }}</td>
-              <td class="amount-cell">&#8377;{{ c.claimAmount | number:'1.0-0' }}</td>
-              <td class="date-cell">{{ c.claimDate | date:'dd MMM y' }}</td>
-              <td><app-status-badge [status]="c.status"></app-status-badge></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <ng-template #noClaim>
+      @if (claims.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Claim ID</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of claims.slice(0, 5); track c) {
+                <tr>
+                  <td class="id-cell">{{ c.claimId }}</td>
+                  <td class="amount-cell">&#8377;{{ c.claimAmount | number: '1.0-0' }}</td>
+                  <td class="date-cell">{{ c.claimDate | date: 'dd MMM y' }}</td>
+                  <td><app-status-badge [status]="c.status"></app-status-badge></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
         <div class="empty-state">
           <p>No claims submitted</p>
           <a routerLink="/citizen/claims">Submit a claim &rarr;</a>
         </div>
-      </ng-template>
+      }
     </div>
   </div>
 </div>

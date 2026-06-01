@@ -8,9 +8,18 @@
     <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
       <div class="form-group">
         <label>Email Address</label>
-        <input class="form-input" formControlName="email" type="email" placeholder="your@email.com">
-        <div class="field-error" *ngIf="form.get('email')?.hasError('required')">Email is required</div>
-        <div class="field-error" *ngIf="form.get('email')?.hasError('email')">Please enter a valid email</div>
+        <input
+          class="form-input"
+          formControlName="email"
+          type="email"
+          placeholder="your@email.com"
+        />
+        @if (form.get('email')?.hasError('required')) {
+          <div class="field-error">Email is required</div>
+        }
+        @if (form.get('email')?.hasError('email')) {
+          <div class="field-error">Please enter a valid email</div>
+        }
       </div>
 
       <div class="form-group">
@@ -19,15 +28,28 @@
           <a routerLink="/auth/forgot-password" class="forgot-link">Forgot password?</a>
         </div>
         <div class="password-row">
-          <input class="form-input" formControlName="password" [type]="showPw ? 'text' : 'password'" placeholder="Enter your password">
-          <button type="button" class="btn btn-secondary btn-sm" (click)="showPw=!showPw">{{ showPw ? 'Hide' : 'Show' }}</button>
+          <input
+            class="form-input"
+            formControlName="password"
+            [type]="showPw ? 'text' : 'password'"
+            placeholder="Enter your password"
+          />
+          <button type="button" class="btn btn-secondary btn-sm" (click)="showPw = !showPw">
+            {{ showPw ? 'Hide' : 'Show' }}
+          </button>
         </div>
-        <div class="field-error" *ngIf="form.get('password')?.hasError('required')">Password is required</div>
+        @if (form.get('password')?.hasError('required')) {
+          <div class="field-error">Password is required</div>
+        }
       </div>
 
       <button type="submit" class="btn btn-primary full-width" [disabled]="loading">
-        <span *ngIf="!loading">Sign In</span>
-        <span *ngIf="loading">Signing in...</span>
+        @if (!loading) {
+          <span>Sign In</span>
+        }
+        @if (loading) {
+          <span>Signing in...</span>
+        }
       </button>
     </form>
 

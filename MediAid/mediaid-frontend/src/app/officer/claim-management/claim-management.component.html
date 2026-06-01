@@ -1,95 +1,130 @@
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Claim Management</h2>
+    <p class="page-sub">Review and process citizen claim submissions</p>
+  </div>
+</div>
 
-    <div class="page-header">
-      <div>
-        <h2 class="page-title">Claim Management</h2>
-        <p class="page-sub">Review and process citizen claim submissions</p>
-      </div>
-    </div>
+<div class="toolbar">
+  <div class="form-group filter-field">
+    <label>Filter by Status</label>
+    <select class="form-input" [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()">
+      <option value="">All</option>
+      <option value="PENDING">Pending</option>
+      <option value="APPROVED">Approved</option>
+      <option value="REJECTED">Rejected</option>
+    </select>
+  </div>
+  <span>{{ filtered.length }} claim(s)</span>
+</div>
 
-    <div class="toolbar">
-      <div class="form-group filter-field">
-        <label>Filter by Status</label>
-        <select class="form-input" [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()">
-          <option value="">All</option>
-          <option value="PENDING">Pending</option>
-          <option value="APPROVED">Approved</option>
-          <option value="REJECTED">Rejected</option>
-        </select>
-      </div>
-      <span>{{ filtered.length }} claim(s)</span>
-    </div>
+@if (loading) {
+  <div class="center">
+    <div class="spinner"></div>
+  </div>
+}
 
-    <div class="center" *ngIf="loading">
-      <div class="spinner"></div>
-    </div>
-
-    <div class="claims-accordion" *ngIf="!loading && filtered.length">
-      <div class="card claim-panel" *ngFor="let c of filtered">
+@if (!loading && filtered.length) {
+  <div class="claims-accordion">
+    @for (c of filtered; track c) {
+      <div class="card claim-panel">
         <button type="button" class="panel-header" (click)="toggleClaim(c.claimId)">
           <span class="panel-title">
             <span class="claim-id">#{{ c.claimId }}</span>
-            <span class="claim-amount">₹{{ c.claimAmount | number:'1.0-0' }}</span>
+            <span class="claim-amount">₹{{ c.claimAmount | number: '1.0-0' }}</span>
           </span>
           <span class="panel-desc">
             <app-status-badge [status]="c.status"></app-status-badge>
             <span class="toggle-icon">{{ expandedClaim === c.claimId ? '▲' : '▼' }}</span>
           </span>
         </button>
-
-        <div class="panel-body" *ngIf="expandedClaim === c.claimId">
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="label">Citizen ID</span>
-              <span class="value">{{ c.citizenId }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Scheme ID</span>
-              <span class="value">{{ c.schemeId }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Date Filed</span>
-              <span class="value">{{ c.claimDate | date:'dd MMM y' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Amount</span>
-              <span class="value amount">₹{{ c.claimAmount | number:'1.0-2' }}</span>
-            </div>
-            <div class="info-item full">
-              <span class="label">Description</span>
-              <span class="value">{{ c.description || '—' }}</span>
-            </div>
-          </div>
-
-          <div class="docs-section">
-            <h4 class="docs-title">Claim Documents</h4>
-            <div *ngIf="docsLoading[c.claimId]" class="docs-loading">
-              <div class="spinner"></div> Loading...
-            </div>
-            <div *ngIf="!docsLoading[c.claimId] && claimDocs[c.claimId]?.length" class="docs-list">
-              <div *ngFor="let d of claimDocs[c.claimId]" class="doc-item">
-                <span class="doc-name">{{ originalFileName(d.fileName) }}</span>
-                <button class="btn btn-outline btn-sm" (click)="viewDoc(d)" title="View">👁 View</button>
-                <button class="btn btn-secondary btn-sm" (click)="downloadDoc(d)" title="Download">↓ Download</button>
+        @if (expandedClaim === c.claimId) {
+          <div class="panel-body">
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">Citizen ID</span>
+                <span class="value">{{ c.citizenId }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Scheme ID</span>
+                <span class="value">{{ c.schemeId }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Date Filed</span>
+                <span class="value">{{ c.claimDate | date: 'dd MMM y' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Amount</span>
+                <span class="value amount">₹{{ c.claimAmount | number: '1.0-2' }}</span>
+              </div>
+              <div class="info-item full">
+                <span class="label">Description</span>
+                <span class="value">{{ c.description || '—' }}</span>
               </div>
             </div>
-            <div *ngIf="!docsLoading[c.claimId] && claimDocs[c.claimId] && !claimDocs[c.claimId].length" class="docs-empty">
-              No documents attached to this claim.
+            <div class="docs-section">
+              <h4 class="docs-title">Claim Documents</h4>
+              @if (docsLoading[c.claimId]) {
+                <div class="docs-loading">
+                  <div class="spinner"></div>
+                  Loading...
+                </div>
+              }
+              @if (!docsLoading[c.claimId] && claimDocs[c.claimId]?.length) {
+                <div class="docs-list">
+                  @for (d of claimDocs[c.claimId]; track d) {
+                    <div class="doc-item">
+                      <span class="doc-name">{{ originalFileName(d.fileName) }}</span>
+                      <button class="btn btn-outline btn-sm" (click)="viewDoc(d)" title="View">
+                        👁 View
+                      </button>
+                      <button
+                        class="btn btn-secondary btn-sm"
+                        (click)="downloadDoc(d)"
+                        title="Download"
+                      >
+                        ↓ Download
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+              @if (
+                !docsLoading[c.claimId] && claimDocs[c.claimId] && !claimDocs[c.claimId].length
+              ) {
+                <div class="docs-empty">No documents attached to this claim.</div>
+              }
             </div>
+            @if (c.status === 'PENDING') {
+              <div class="action-bar">
+                <button class="btn btn-success btn-sm" (click)="updateStatus(c, 'APPROVED')">
+                  ✓ Approve
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="updateStatus(c, 'REJECTED')">
+                  ✕ Reject
+                </button>
+              </div>
+            }
+            @if (c.status === 'APPROVED') {
+              <div class="action-bar">
+                <button
+                  class="btn btn-primary btn-sm"
+                  (click)="generateDisbursement(c)"
+                  title="If no disbursement was auto-created, click to generate one"
+                >
+                  Generate Disbursement
+                </button>
+              </div>
+            }
           </div>
-
-          <div class="action-bar" *ngIf="c.status === 'PENDING'">
-            <button class="btn btn-success btn-sm" (click)="updateStatus(c, 'APPROVED')">✓ Approve</button>
-            <button class="btn btn-danger btn-sm" (click)="updateStatus(c, 'REJECTED')">✕ Reject</button>
-          </div>
-          <div class="action-bar" *ngIf="c.status === 'APPROVED'">
-            <button class="btn btn-primary btn-sm" (click)="generateDisbursement(c)" title="If no disbursement was auto-created, click to generate one">
-              Generate Disbursement
-            </button>
-          </div>
-        </div>
+        }
       </div>
-    </div>
+    }
+  </div>
+}
 
-    <div class="empty-state" *ngIf="!loading && !filtered.length">
-      <p>No claims found</p>
-    </div>
+@if (!loading && !filtered.length) {
+  <div class="empty-state">
+    <p>No claims found</p>
+  </div>
+}

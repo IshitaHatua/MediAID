@@ -1,216 +1,375 @@
 <h2 class="page-title">Compliance Records</h2>
 
 <div class="tab-bar">
-  <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">All Records</button>
-  <button class="tab-btn" [class.active]="activeTab === 'violations'" (click)="activeTab = 'violations'">Violations</button>
-  <button class="tab-btn" [class.active]="activeTab === 'flagged'" (click)="activeTab = 'flagged'">Flagged</button>
-  <button class="tab-btn" [class.active]="activeTab === 'evaluate'" (click)="activeTab = 'evaluate'">Full Evaluation</button>
-  <button class="tab-btn" [class.active]="activeTab === 'create'" (click)="activeTab = 'create'">Create Record</button>
+  <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+    All Records
+  </button>
+  <button
+    class="tab-btn"
+    [class.active]="activeTab === 'violations'"
+    (click)="activeTab = 'violations'"
+  >
+    Violations
+  </button>
+  <button class="tab-btn" [class.active]="activeTab === 'flagged'" (click)="activeTab = 'flagged'">
+    Flagged
+  </button>
+  <button
+    class="tab-btn"
+    [class.active]="activeTab === 'evaluate'"
+    (click)="activeTab = 'evaluate'"
+  >
+    Full Evaluation
+  </button>
+  <button class="tab-btn" [class.active]="activeTab === 'create'" (click)="activeTab = 'create'">
+    Create Record
+  </button>
 </div>
 
-<div class="tab-content" *ngIf="activeTab === 'all'">
-  <div class="card">
-    <div class="toolbar">
-      <h3 class="section-title">All Compliance Records</h3>
-      <span class="count-badge">{{ all.length }} record(s)</span>
-    </div>
-    <div class="center" *ngIf="loading"><div class="spinner"></div></div>
-    <div class="table-wrap" *ngIf="!loading && all.length">
-      <table class="data-table">
-        <thead>
-          <tr><th>ID</th><th>Entity</th><th>Type</th><th>Result</th><th>Notes</th><th>Evaluated</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of all">
-            <td class="id-cell">#{{ r.complianceId }}</td>
-            <td>{{ r.entityType }} #{{ r.entityId }}</td>
-            <td>{{ r.entityType }}</td>
-            <td><app-status-badge [status]="r.result"></app-status-badge></td>
-            <td>{{ r.notes }}</td>
-            <td>{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p *ngIf="!loading && !all.length" class="empty">No compliance records yet.</p>
-  </div>
-</div>
-
-<div class="tab-content" *ngIf="activeTab === 'violations'">
-  <div class="card">
-    <div class="toolbar">
-      <h3 class="section-title">Compliance Violations</h3>
-      <span class="count-badge violations">{{ violations.length }} violation(s)</span>
-    </div>
-    <div class="table-wrap" *ngIf="violations.length">
-      <table class="data-table">
-        <thead>
-          <tr><th>ID</th><th>Entity</th><th>Type</th><th>Result</th><th>Notes</th><th>Evaluated</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of violations">
-            <td class="id-cell">#{{ r.complianceId }}</td>
-            <td>{{ r.entityType }} #{{ r.entityId }}</td>
-            <td>{{ r.entityType }}</td>
-            <td><app-status-badge [status]="r.result"></app-status-badge></td>
-            <td>{{ r.notes }}</td>
-            <td>{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p *ngIf="!violations.length" class="empty">No violations.</p>
-  </div>
-</div>
-
-<div class="tab-content" *ngIf="activeTab === 'flagged'">
-  <div class="card">
-    <div class="toolbar">
-      <h3 class="section-title">Flagged Items</h3>
-      <span class="count-badge flagged">{{ flagged.length }} flagged</span>
-    </div>
-    <div class="table-wrap" *ngIf="flagged.length">
-      <table class="data-table">
-        <thead>
-          <tr><th>ID</th><th>Entity</th><th>Type</th><th>Result</th><th>Notes</th><th>Evaluated</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of flagged">
-            <td class="id-cell">#{{ r.complianceId }}</td>
-            <td>{{ r.entityType }} #{{ r.entityId }}</td>
-            <td>{{ r.entityType }}</td>
-            <td><app-status-badge [status]="r.result"></app-status-badge></td>
-            <td>{{ r.notes }}</td>
-            <td>{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p *ngIf="!flagged.length" class="empty">No flagged items.</p>
-  </div>
-</div>
-
-<div class="tab-content" *ngIf="activeTab === 'evaluate'">
-  <div class="card">
-    <h3 class="section-title">Run Compliance Evaluation</h3>
-    <p class="section-sub">Select an entity type, pick a record from the live list, then run the compliance check.</p>
-
-    <div class="step-label"><span class="step-num">1</span> Select entity type</div>
-    <div class="type-btns">
-      <button class="type-btn" [class.active]="evalEntityType === 'CLAIM'" (click)="selectEvalType('CLAIM')">Claim</button>
-      <button class="type-btn" [class.active]="evalEntityType === 'POLICY'" (click)="selectEvalType('POLICY')">Enrollment / Policy</button>
-      <button class="type-btn" [class.active]="evalEntityType === 'DISBURSEMENT'" (click)="selectEvalType('DISBURSEMENT')">Disbursement</button>
-    </div>
-
-    <ng-container *ngIf="evalEntityType">
-      <div class="step-label"><span class="step-num">2</span> Select a record</div>
-      <div class="center" *ngIf="evalLoadingEntities"><div class="spinner"></div></div>
-      <div class="entity-list" *ngIf="!evalLoadingEntities && evalEntities.length">
-        <div class="entity-row"
-             *ngFor="let e of evalEntities"
-             [class.selected]="evalSelected?.id === e.id"
-             (click)="evalSelected = e; evalResult = null">
-          <span class="radio-icon">{{ evalSelected?.id === e.id ? '&#9679;' : '&#9675;' }}</span>
-          <span class="entity-label">{{ e.label }}</span>
-          <app-status-badge [status]="e.status"></app-status-badge>
+@if (activeTab === 'all') {
+  <div class="tab-content">
+    <div class="card">
+      <div class="toolbar">
+        <h3 class="section-title">All Compliance Records</h3>
+        <span class="count-badge">{{ all.length }} record(s)</span>
+      </div>
+      @if (loading) {
+        <div class="center"><div class="spinner"></div></div>
+      }
+      @if (!loading && all.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Entity</th>
+                <th>Type</th>
+                <th>Result</th>
+                <th>Notes</th>
+                <th>Evaluated</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of all; track r) {
+                <tr>
+                  <td class="id-cell">#{{ r.complianceId }}</td>
+                  <td>{{ r.entityType }} #{{ r.entityId }}</td>
+                  <td>{{ r.entityType }}</td>
+                  <td><app-status-badge [status]="r.result"></app-status-badge></td>
+                  <td>{{ r.notes }}</td>
+                  <td>{{ r.evaluatedAt | date: 'dd MMM y, h:mm a' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-      </div>
-      <p class="empty" *ngIf="!evalLoadingEntities && !evalEntities.length && !evalLoadError">No records found for this type.</p>
-
-      <div class="entity-load-error" *ngIf="evalLoadError && !evalLoadingEntities">
-        <span>&#9888; Could not load records. Check your connection and try again.</span>
-        <button class="btn btn-outline btn-sm" (click)="retryFetch('eval')">&#8635; Retry</button>
-      </div>
-    </ng-container>
-
-    <ng-container *ngIf="evalSelected">
-      <div class="step-label"><span class="step-num">3</span> Run the check</div>
-      <div class="eval-summary">
-        <span>Evaluating: <strong>{{ evalSelected.label }}</strong></span>
-      </div>
-      <button class="btn btn-primary eval-btn" (click)="runEvaluation()" [disabled]="evalRunning">
-        {{ evalRunning ? 'Evaluating…' : 'Run Compliance Check' }}
-      </button>
-    </ng-container>
-
-    <div class="eval-result-box"
-         *ngIf="evalResult"
-         [class.box-pass]="evalResult.result?.toUpperCase() === 'PASS'"
-         [class.box-fail]="evalResult.result?.toUpperCase() === 'FAIL'"
-         [class.box-flagged]="evalResult.result?.toUpperCase() === 'FLAGGED'">
-      <span class="result-icon">
-        {{ evalResult.result?.toUpperCase() === 'PASS' ? '&#10003;' :
-           evalResult.result?.toUpperCase() === 'FAIL' ? '&#10007;' : '&#9873;' }}
-      </span>
-      <div class="result-text">
-        <div class="result-heading">{{ evalResult.result }}</div>
-        <div class="result-notes" *ngIf="evalResult.notes">{{ evalResult.notes }}</div>
-      </div>
+      }
+      @if (!loading && !all.length) {
+        <p class="empty">No compliance records yet.</p>
+      }
     </div>
-
   </div>
-</div>
+}
 
-<div class="tab-content" *ngIf="activeTab === 'create'">
-  <div class="card">
-    <h3 class="section-title">Create Compliance Record</h3>
-    <p class="section-sub">Pick a live record from the system, set the compliance result, and save.</p>
-
-    <div class="step-label"><span class="step-num">1</span> Select entity type</div>
-    <div class="type-btns">
-      <button class="type-btn" [class.active]="createEntityType === 'CLAIM'" (click)="selectCreateType('CLAIM')">Claim</button>
-      <button class="type-btn" [class.active]="createEntityType === 'POLICY'" (click)="selectCreateType('POLICY')">Enrollment / Policy</button>
-      <button class="type-btn" [class.active]="createEntityType === 'DISBURSEMENT'" (click)="selectCreateType('DISBURSEMENT')">Disbursement</button>
+@if (activeTab === 'violations') {
+  <div class="tab-content">
+    <div class="card">
+      <div class="toolbar">
+        <h3 class="section-title">Compliance Violations</h3>
+        <span class="count-badge violations">{{ violations.length }} violation(s)</span>
+      </div>
+      @if (violations.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Entity</th>
+                <th>Type</th>
+                <th>Result</th>
+                <th>Notes</th>
+                <th>Evaluated</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of violations; track r) {
+                <tr>
+                  <td class="id-cell">#{{ r.complianceId }}</td>
+                  <td>{{ r.entityType }} #{{ r.entityId }}</td>
+                  <td>{{ r.entityType }}</td>
+                  <td><app-status-badge [status]="r.result"></app-status-badge></td>
+                  <td>{{ r.notes }}</td>
+                  <td>{{ r.evaluatedAt | date: 'dd MMM y, h:mm a' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @if (!violations.length) {
+        <p class="empty">No violations.</p>
+      }
     </div>
+  </div>
+}
 
-    <ng-container *ngIf="createEntityType">
-      <div class="step-label"><span class="step-num">2</span> Select a record</div>
-      <div class="center" *ngIf="createLoadingEntities"><div class="spinner"></div></div>
-      <div class="entity-list" *ngIf="!createLoadingEntities && createEntities.length">
-        <div class="entity-row"
-             *ngFor="let e of createEntities"
-             [class.selected]="createSelected?.id === e.id"
-             (click)="createSelected = e">
-          <span class="radio-icon">{{ createSelected?.id === e.id ? '&#9679;' : '&#9675;' }}</span>
-          <span class="entity-label">{{ e.label }}</span>
-          <app-status-badge [status]="e.status"></app-status-badge>
+@if (activeTab === 'flagged') {
+  <div class="tab-content">
+    <div class="card">
+      <div class="toolbar">
+        <h3 class="section-title">Flagged Items</h3>
+        <span class="count-badge flagged">{{ flagged.length }} flagged</span>
+      </div>
+      @if (flagged.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Entity</th>
+                <th>Type</th>
+                <th>Result</th>
+                <th>Notes</th>
+                <th>Evaluated</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of flagged; track r) {
+                <tr>
+                  <td class="id-cell">#{{ r.complianceId }}</td>
+                  <td>{{ r.entityType }} #{{ r.entityId }}</td>
+                  <td>{{ r.entityType }}</td>
+                  <td><app-status-badge [status]="r.result"></app-status-badge></td>
+                  <td>{{ r.notes }}</td>
+                  <td>{{ r.evaluatedAt | date: 'dd MMM y, h:mm a' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-      </div>
-      <p class="empty" *ngIf="!createLoadingEntities && !createEntities.length && !createLoadError">No records found for this type.</p>
+      }
+      @if (!flagged.length) {
+        <p class="empty">No flagged items.</p>
+      }
+    </div>
+  </div>
+}
 
-      <div class="entity-load-error" *ngIf="createLoadError && !createLoadingEntities">
-        <span>&#9888; Could not load records. Check your connection and try again.</span>
-        <button class="btn btn-outline btn-sm" (click)="retryFetch('create')">&#8635; Retry</button>
-      </div>
-    </ng-container>
-
-    <ng-container *ngIf="createSelected">
-      <div class="step-label"><span class="step-num">3</span> Record the finding</div>
-      <div class="eval-summary">
-        <span>Recording finding for: <strong>{{ createSelected.label }}</strong></span>
-      </div>
-
-      <div class="create-form">
-        <div class="create-form-label">Compliance Result</div>
-        <div class="result-picker">
-          <button class="result-btn" [class.active-pass]="createResult === 'PASS'" (click)="createResult = 'PASS'">&#10003; Pass</button>
-          <button class="result-btn" [class.active-fail]="createResult === 'FAIL'" (click)="createResult = 'FAIL'">&#10007; Fail / Violation</button>
-          <button class="result-btn" [class.active-flagged]="createResult === 'FLAGGED'" (click)="createResult = 'FLAGGED'">&#9873; Flagged for Review</button>
-        </div>
-
-        <div class="create-form-label">Notes <span class="optional">(optional)</span></div>
-        <textarea class="form-input notes-input"
-                  [(ngModel)]="createNotes"
-                  placeholder="Describe the compliance finding…"
-                  rows="3"
-                  maxlength="500"></textarea>
-        <div class="notes-count">{{ createNotes.length }}/500</div>
-
-        <button class="btn btn-primary" (click)="saveRecord()" [disabled]="createSaving">
-          {{ createSaving ? 'Saving…' : 'Save Record' }}
+@if (activeTab === 'evaluate') {
+  <div class="tab-content">
+    <div class="card">
+      <h3 class="section-title">Run Compliance Evaluation</h3>
+      <p class="section-sub">
+        Select an entity type, pick a record from the live list, then run the compliance check.
+      </p>
+      <div class="step-label"><span class="step-num">1</span> Select entity type</div>
+      <div class="type-btns">
+        <button
+          class="type-btn"
+          [class.active]="evalEntityType === 'CLAIM'"
+          (click)="selectEvalType('CLAIM')"
+        >
+          Claim
+        </button>
+        <button
+          class="type-btn"
+          [class.active]="evalEntityType === 'POLICY'"
+          (click)="selectEvalType('POLICY')"
+        >
+          Enrollment / Policy
+        </button>
+        <button
+          class="type-btn"
+          [class.active]="evalEntityType === 'DISBURSEMENT'"
+          (click)="selectEvalType('DISBURSEMENT')"
+        >
+          Disbursement
         </button>
       </div>
-    </ng-container>
-
+      @if (evalEntityType) {
+        <div class="step-label"><span class="step-num">2</span> Select a record</div>
+        @if (evalLoadingEntities) {
+          <div class="center"><div class="spinner"></div></div>
+        }
+        @if (!evalLoadingEntities && evalEntities.length) {
+          <div class="entity-list">
+            @for (e of evalEntities; track e) {
+              <div
+                class="entity-row"
+                [class.selected]="evalSelected?.id === e.id"
+                (click)="evalSelected = e; evalResult = null"
+              >
+                <span class="radio-icon">{{
+                  evalSelected?.id === e.id ? '&#9679;' : '&#9675;'
+                }}</span>
+                <span class="entity-label">{{ e.label }}</span>
+                <app-status-badge [status]="e.status"></app-status-badge>
+              </div>
+            }
+          </div>
+        }
+        @if (!evalLoadingEntities && !evalEntities.length && !evalLoadError) {
+          <p class="empty">No records found for this type.</p>
+        }
+        @if (evalLoadError && !evalLoadingEntities) {
+          <div class="entity-load-error">
+            <span>&#9888; Could not load records. Check your connection and try again.</span>
+            <button class="btn btn-outline btn-sm" (click)="retryFetch('eval')">
+              &#8635; Retry
+            </button>
+          </div>
+        }
+      }
+      @if (evalSelected) {
+        <div class="step-label"><span class="step-num">3</span> Run the check</div>
+        <div class="eval-summary">
+          <span
+            >Evaluating: <strong>{{ evalSelected.label }}</strong></span
+          >
+        </div>
+        <button class="btn btn-primary eval-btn" (click)="runEvaluation()" [disabled]="evalRunning">
+          {{ evalRunning ? 'Evaluating…' : 'Run Compliance Check' }}
+        </button>
+      }
+      @if (evalResult) {
+        <div
+          class="eval-result-box"
+          [class.box-pass]="evalResult.result?.toUpperCase() === 'PASS'"
+          [class.box-fail]="evalResult.result?.toUpperCase() === 'FAIL'"
+          [class.box-flagged]="evalResult.result?.toUpperCase() === 'FLAGGED'"
+        >
+          <span class="result-icon">
+            {{
+              evalResult.result?.toUpperCase() === 'PASS'
+                ? '&#10003;'
+                : evalResult.result?.toUpperCase() === 'FAIL'
+                  ? '&#10007;'
+                  : '&#9873;'
+            }}
+          </span>
+          <div class="result-text">
+            <div class="result-heading">{{ evalResult.result }}</div>
+            @if (evalResult.notes) {
+              <div class="result-notes">{{ evalResult.notes }}</div>
+            }
+          </div>
+        </div>
+      }
+    </div>
   </div>
-</div>
+}
+
+@if (activeTab === 'create') {
+  <div class="tab-content">
+    <div class="card">
+      <h3 class="section-title">Create Compliance Record</h3>
+      <p class="section-sub">
+        Pick a live record from the system, set the compliance result, and save.
+      </p>
+      <div class="step-label"><span class="step-num">1</span> Select entity type</div>
+      <div class="type-btns">
+        <button
+          class="type-btn"
+          [class.active]="createEntityType === 'CLAIM'"
+          (click)="selectCreateType('CLAIM')"
+        >
+          Claim
+        </button>
+        <button
+          class="type-btn"
+          [class.active]="createEntityType === 'POLICY'"
+          (click)="selectCreateType('POLICY')"
+        >
+          Enrollment / Policy
+        </button>
+        <button
+          class="type-btn"
+          [class.active]="createEntityType === 'DISBURSEMENT'"
+          (click)="selectCreateType('DISBURSEMENT')"
+        >
+          Disbursement
+        </button>
+      </div>
+      @if (createEntityType) {
+        <div class="step-label"><span class="step-num">2</span> Select a record</div>
+        @if (createLoadingEntities) {
+          <div class="center"><div class="spinner"></div></div>
+        }
+        @if (!createLoadingEntities && createEntities.length) {
+          <div class="entity-list">
+            @for (e of createEntities; track e) {
+              <div
+                class="entity-row"
+                [class.selected]="createSelected?.id === e.id"
+                (click)="createSelected = e"
+              >
+                <span class="radio-icon">{{
+                  createSelected?.id === e.id ? '&#9679;' : '&#9675;'
+                }}</span>
+                <span class="entity-label">{{ e.label }}</span>
+                <app-status-badge [status]="e.status"></app-status-badge>
+              </div>
+            }
+          </div>
+        }
+        @if (!createLoadingEntities && !createEntities.length && !createLoadError) {
+          <p class="empty">No records found for this type.</p>
+        }
+        @if (createLoadError && !createLoadingEntities) {
+          <div class="entity-load-error">
+            <span>&#9888; Could not load records. Check your connection and try again.</span>
+            <button class="btn btn-outline btn-sm" (click)="retryFetch('create')">
+              &#8635; Retry
+            </button>
+          </div>
+        }
+      }
+      @if (createSelected) {
+        <div class="step-label"><span class="step-num">3</span> Record the finding</div>
+        <div class="eval-summary">
+          <span
+            >Recording finding for: <strong>{{ createSelected.label }}</strong></span
+          >
+        </div>
+        <div class="create-form">
+          <div class="create-form-label">Compliance Result</div>
+          <div class="result-picker">
+            <button
+              class="result-btn"
+              [class.active-pass]="createResult === 'PASS'"
+              (click)="createResult = 'PASS'"
+            >
+              &#10003; Pass
+            </button>
+            <button
+              class="result-btn"
+              [class.active-fail]="createResult === 'FAIL'"
+              (click)="createResult = 'FAIL'"
+            >
+              &#10007; Fail / Violation
+            </button>
+            <button
+              class="result-btn"
+              [class.active-flagged]="createResult === 'FLAGGED'"
+              (click)="createResult = 'FLAGGED'"
+            >
+              &#9873; Flagged for Review
+            </button>
+          </div>
+          <div class="create-form-label">Notes <span class="optional">(optional)</span></div>
+          <textarea
+            class="form-input notes-input"
+            [(ngModel)]="createNotes"
+            placeholder="Describe the compliance finding…"
+            rows="3"
+            maxlength="500"
+          ></textarea>
+          <div class="notes-count">{{ createNotes.length }}/500</div>
+          <button class="btn btn-primary" (click)="saveRecord()" [disabled]="createSaving">
+            {{ createSaving ? 'Saving…' : 'Save Record' }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}

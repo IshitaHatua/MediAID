@@ -1,29 +1,52 @@
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Disbursement &amp; Payment Management</h2>
+    <p class="page-sub">
+      Disbursements are created automatically when claims are approved. Process pending ones here
+      and record payments against them.
+    </p>
+  </div>
+</div>
 
-    <div class="page-header">
-      <div>
-        <h2 class="page-title">Disbursement &amp; Payment Management</h2>
-        <p class="page-sub">Disbursements are created automatically when claims are approved. Process pending ones here and record payments against them.</p>
+<div class="tab-bar">
+  <button
+    type="button"
+    class="tab-btn"
+    [class.active]="activeTab === 'disbursements'"
+    (click)="activeTab = 'disbursements'"
+  >
+    Disbursements
+  </button>
+  <button
+    type="button"
+    class="tab-btn"
+    [class.active]="activeTab === 'payments'"
+    (click)="activeTab = 'payments'"
+  >
+    Payments
+  </button>
+</div>
+
+@if (activeTab === 'disbursements') {
+  <div class="tab-content">
+    <div class="card section-card">
+      <div class="toolbar">
+        <h3 class="section-title">Active Disbursements</h3>
+        @if (!disbLoading) {
+          <span>{{ disbursements.length }} active</span>
+        }
       </div>
-    </div>
-
-    <div class="tab-bar">
-      <button type="button" class="tab-btn" [class.active]="activeTab === 'disbursements'" (click)="activeTab = 'disbursements'">Disbursements</button>
-      <button type="button" class="tab-btn" [class.active]="activeTab === 'payments'" (click)="activeTab = 'payments'">Payments</button>
-    </div>
-
-    <div class="tab-content" *ngIf="activeTab === 'disbursements'">
-      <div class="card section-card">
-        <div class="toolbar">
-          <h3 class="section-title">Active Disbursements</h3>
-          <span *ngIf="!disbLoading">{{ disbursements.length }} active</span>
-        </div>
-        <p class="hint" *ngIf="!disbLoading">
+      @if (!disbLoading) {
+        <p class="hint">
           Only <strong>PENDING</strong> and <strong>PROCESSING</strong> disbursements are listed.
           Completed ones drop out once total payments reach the disbursement amount.
         </p>
-        <div class="center" *ngIf="disbLoading"><div class="spinner"></div></div>
-
-        <div class="table-wrap" *ngIf="!disbLoading && disbursements.length">
+      }
+      @if (disbLoading) {
+        <div class="center"><div class="spinner"></div></div>
+      }
+      @if (!disbLoading && disbursements.length) {
+        <div class="table-wrap">
           <table class="data-table">
             <thead>
               <tr>
@@ -34,47 +57,65 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let d of disbursements">
-                <td>
-                  <div class="disb-sentence">{{ describe(d) }}</div>
-                  <div class="disb-meta">Disbursement #{{ d.disbursementId }} &middot; Claim #{{ d.claimId }}</div>
-                </td>
-                <td class="amount-cell">₹{{ d.amount | number:'1.0-2' }}</td>
-                <td><app-status-badge [status]="d.status"></app-status-badge></td>
-                <td>
-                  <button class="btn btn-success btn-sm"
-                          *ngIf="(d.status || '').toUpperCase() === 'PENDING'"
-                          (click)="processDisbursement(d)">
-                    ▶ Process
-                  </button>
-                </td>
-              </tr>
+              @for (d of disbursements; track d) {
+                <tr>
+                  <td>
+                    <div class="disb-sentence">{{ describe(d) }}</div>
+                    <div class="disb-meta">
+                      Disbursement #{{ d.disbursementId }} &middot; Claim #{{ d.claimId }}
+                    </div>
+                  </td>
+                  <td class="amount-cell">₹{{ d.amount | number: '1.0-2' }}</td>
+                  <td><app-status-badge [status]="d.status"></app-status-badge></td>
+                  <td>
+                    @if ((d.status || '').toUpperCase() === 'PENDING') {
+                      <button class="btn btn-success btn-sm" (click)="processDisbursement(d)">
+                        ▶ Process
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-
-        <div class="empty-state" *ngIf="!disbLoading && !disbursements.length">
-          <p>No active disbursements. New ones will appear here automatically when an officer approves a claim.</p>
+      }
+      @if (!disbLoading && !disbursements.length) {
+        <div class="empty-state">
+          <p>
+            No active disbursements. New ones will appear here automatically when an officer
+            approves a claim.
+          </p>
         </div>
-      </div>
+      }
     </div>
+  </div>
+}
 
-    <div class="tab-content" *ngIf="activeTab === 'payments'">
-      <div class="card section-card">
-        <div class="toolbar">
-          <h3 class="section-title">All Payments</h3>
-          <button class="btn btn-primary btn-sm" (click)="showPayForm=!showPayForm">+ Record Payment</button>
-        </div>
-        <form *ngIf="showPayForm" [formGroup]="payForm" (ngSubmit)="createPayment()" class="inline-form">
+@if (activeTab === 'payments') {
+  <div class="tab-content">
+    <div class="card section-card">
+      <div class="toolbar">
+        <h3 class="section-title">All Payments</h3>
+        <button class="btn btn-primary btn-sm" (click)="showPayForm = !showPayForm">
+          + Record Payment
+        </button>
+      </div>
+      @if (showPayForm) {
+        <form [formGroup]="payForm" (ngSubmit)="createPayment()" class="inline-form">
           <div class="form-group">
             <label>Disbursement ID</label>
-            <input class="form-input" formControlName="disbursementId" type="number">
-            <span class="field-error" *ngIf="payForm.get('disbursementId')?.touched && payForm.get('disbursementId')?.invalid">Required</span>
+            <input class="form-input" formControlName="disbursementId" type="number" />
+            @if (payForm.get('disbursementId')?.touched && payForm.get('disbursementId')?.invalid) {
+              <span class="field-error">Required</span>
+            }
           </div>
           <div class="form-group">
             <label>Amount (₹)</label>
-            <input class="form-input" formControlName="amount" type="number">
-            <span class="field-error" *ngIf="payForm.get('amount')?.touched && payForm.get('amount')?.invalid">Required</span>
+            <input class="form-input" formControlName="amount" type="number" />
+            @if (payForm.get('amount')?.touched && payForm.get('amount')?.invalid) {
+              <span class="field-error">Required</span>
+            }
           </div>
           <div class="form-group">
             <label>Method</label>
@@ -86,11 +127,17 @@
           </div>
           <div class="form-btns">
             <button class="btn btn-primary" type="submit">Record</button>
-            <button class="btn btn-secondary" type="button" (click)="showPayForm=false">Cancel</button>
+            <button class="btn btn-secondary" type="button" (click)="showPayForm = false">
+              Cancel
+            </button>
           </div>
         </form>
-        <div class="center" *ngIf="payLoading"><div class="spinner"></div></div>
-        <div class="table-wrap" *ngIf="!payLoading && payments.length">
+      }
+      @if (payLoading) {
+        <div class="center"><div class="spinner"></div></div>
+      }
+      @if (!payLoading && payments.length) {
+        <div class="table-wrap">
           <table class="data-table">
             <thead>
               <tr>
@@ -102,18 +149,24 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let p of payments">
-                <td class="id-cell">#{{ p.paymentId }}</td>
-                <td>#{{ p.disbursementId }}</td>
-                <td>{{ p.method }}</td>
-                <td class="amount-cell">₹{{ p.amount | number:'1.0-2' }}</td>
-                <td><app-status-badge [status]="p.status"></app-status-badge></td>
-              </tr>
+              @for (p of payments; track p) {
+                <tr>
+                  <td class="id-cell">#{{ p.paymentId }}</td>
+                  <td>#{{ p.disbursementId }}</td>
+                  <td>{{ p.method }}</td>
+                  <td class="amount-cell">₹{{ p.amount | number: '1.0-2' }}</td>
+                  <td><app-status-badge [status]="p.status"></app-status-badge></td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-        <div class="empty-state" *ngIf="!payLoading && !payments.length">
+      }
+      @if (!payLoading && !payments.length) {
+        <div class="empty-state">
           <p>No payments found</p>
         </div>
-      </div>
+      }
     </div>
+  </div>
+}

@@ -1,43 +1,50 @@
+<div class="page-header">
+  <div>
+    <h2 class="page-title">My Payments</h2>
+    <p class="page-sub">Track payments credited for your approved disbursements</p>
+  </div>
+</div>
 
-    <div class="page-header">
-      <div>
-        <h2 class="page-title">My Payments</h2>
-        <p class="page-sub">Track payments credited for your approved disbursements</p>
-      </div>
-    </div>
+@if (loading) {
+  <div class="center">
+    <div class="spinner"></div>
+  </div>
+}
 
-    <div class="center" *ngIf="loading">
-      <div class="spinner"></div>
-    </div>
-
-    <div class="card" *ngIf="!loading && payments.length">
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead>
+@if (!loading && payments.length) {
+  <div class="card">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>Disbursement</th>
+            <th>Method</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of payments; track p) {
             <tr>
-              <th>Payment ID</th>
-              <th>Disbursement</th>
-              <th>Method</th>
-              <th>Amount</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let p of payments">
               <td>#{{ p.paymentId }}</td>
               <td>#{{ p.disbursementId }}</td>
               <td>{{ p.method | titlecase }}</td>
-              <td>₹{{ p.amount | number:'1.0-2' }}</td>
-              <td>{{ p.date | date:'dd MMM y' }}</td>
+              <td>₹{{ p.amount | number: '1.0-2' }}</td>
+              <td>{{ p.date | date: 'dd MMM y' }}</td>
               <td><app-status-badge [status]="p.status"></app-status-badge></td>
             </tr>
-          </tbody>
-        </table>
-      </div>
+          }
+        </tbody>
+      </table>
     </div>
+  </div>
+}
 
-    <div class="empty-state" *ngIf="!loading && !payments.length">
-      <h3>No payments received yet</h3>
-      <p>Payments will appear here once your disbursements are processed.</p>
-    </div>
+@if (!loading && !payments.length) {
+  <div class="empty-state">
+    <h3>No payments received yet</h3>
+    <p>Payments will appear here once your disbursements are processed.</p>
+  </div>
+}

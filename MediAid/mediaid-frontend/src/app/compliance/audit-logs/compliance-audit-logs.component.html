@@ -5,107 +5,159 @@
 
 <div class="card">
   <div class="tab-bar">
-    <button class="tab-btn" [class.active]="activeTab === 'business'" (click)="activeTab = 'business'">Business Activity Logs</button>
-    <button class="tab-btn" [class.active]="activeTab === 'identity'" (click)="activeTab = 'identity'">Identity &amp; Access Logs</button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'business'"
+      (click)="activeTab = 'business'"
+    >
+      Business Activity Logs
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'identity'"
+      (click)="activeTab = 'identity'"
+    >
+      Identity &amp; Access Logs
+    </button>
   </div>
 
-  <div class="tab-content" *ngIf="activeTab === 'business'">
-
-    <div class="toolbar">
-      <div class="form-group">
-        <label>Filter by Action</label>
-        <input class="form-input" [(ngModel)]="businessActionFilter" placeholder="e.g. CREATE, UPDATE">
+  @if (activeTab === 'business') {
+    <div class="tab-content">
+      <div class="toolbar">
+        <div class="form-group">
+          <label>Filter by Action</label>
+          <input
+            class="form-input"
+            [(ngModel)]="businessActionFilter"
+            placeholder="e.g. CREATE, UPDATE"
+          />
+        </div>
+        <div class="form-group">
+          <label>Filter by Resource</label>
+          <input
+            class="form-input"
+            [(ngModel)]="businessResourceFilter"
+            placeholder="e.g. CLAIM:42"
+          />
+        </div>
+        <button class="btn btn-primary" (click)="applyBusinessFilter()">Filter</button>
+        <button class="btn btn-secondary" (click)="clearBusinessFilter()">Clear</button>
+        <button class="btn btn-outline" (click)="exportBusinessCSV()">&#8595; Export CSV</button>
       </div>
-      <div class="form-group">
-        <label>Filter by Resource</label>
-        <input class="form-input" [(ngModel)]="businessResourceFilter" placeholder="e.g. CLAIM:42">
+      @if (accessDenied && !businessLoading) {
+        <div class="access-denied-banner">
+          <span class="adb-icon">&#128274;</span>
+          <div>
+            <strong>Access Restricted</strong>
+            <p>
+              Your role does not have permission to view audit logs. Contact your administrator if
+              you believe this is an error.
+            </p>
+          </div>
+        </div>
+      }
+      @if (businessLoading) {
+        <div class="center">
+          <div class="spinner"></div>
+        </div>
+      }
+      @if (!businessLoading && !accessDenied && businessLogs.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User ID</th>
+                <th>Action</th>
+                <th>Resource</th>
+                <th>Details</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of businessLogs; track l) {
+                <tr>
+                  <td class="id-cell">#{{ l.logId }}</td>
+                  <td>{{ l.userId }}</td>
+                  <td>{{ l.action }}</td>
+                  <td>{{ l.resource }}</td>
+                  <td>{{ l.details }}</td>
+                  <td class="date-cell">{{ l.timestamp | date: 'medium' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @if (!businessLoading && !accessDenied && !businessLogs.length) {
+        <div class="empty-state">
+          <p>No business audit logs found</p>
+        </div>
+      }
+    </div>
+  }
+
+  @if (activeTab === 'identity') {
+    <div class="tab-content">
+      <div class="toolbar">
+        <div class="form-group">
+          <label>Filter by Action</label>
+          <input
+            class="form-input"
+            [(ngModel)]="identityActionFilter"
+            placeholder="e.g. LOGIN, REGISTER"
+          />
+        </div>
+        <div class="form-group">
+          <label>Filter by Resource</label>
+          <input
+            class="form-input"
+            [(ngModel)]="identityResourceFilter"
+            placeholder="e.g. USER:42"
+          />
+        </div>
+        <button class="btn btn-primary" (click)="applyIdentityFilter()">Filter</button>
+        <button class="btn btn-secondary" (click)="clearIdentityFilter()">Clear</button>
+        <button class="btn btn-outline" (click)="exportIdentityCSV()">&#8595; Export CSV</button>
       </div>
-      <button class="btn btn-primary" (click)="applyBusinessFilter()">Filter</button>
-      <button class="btn btn-secondary" (click)="clearBusinessFilter()">Clear</button>
-      <button class="btn btn-outline" (click)="exportBusinessCSV()">&#8595; Export CSV</button>
+      @if (identityLoading) {
+        <div class="center">
+          <div class="spinner"></div>
+        </div>
+      }
+      @if (!identityLoading && identityLogs.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User ID</th>
+                <th>Action</th>
+                <th>Resource</th>
+                <th>Details</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of identityLogs; track l) {
+                <tr>
+                  <td class="id-cell">#{{ l.auditId }}</td>
+                  <td>{{ l.userId }}</td>
+                  <td>{{ l.action }}</td>
+                  <td>{{ l.resource }}</td>
+                  <td>{{ l.details }}</td>
+                  <td class="date-cell">{{ l.timestamp | date: 'medium' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @if (!identityLoading && !identityLogs.length) {
+        <div class="empty-state">
+          <p>No identity logs available</p>
+        </div>
+      }
     </div>
-
-    <div class="access-denied-banner" *ngIf="accessDenied && !businessLoading">
-      <span class="adb-icon">&#128274;</span>
-      <div>
-        <strong>Access Restricted</strong>
-        <p>Your role does not have permission to view audit logs. Contact your administrator if you believe this is an error.</p>
-      </div>
-    </div>
-
-    <div class="center" *ngIf="businessLoading">
-      <div class="spinner"></div>
-    </div>
-
-    <div class="table-wrap" *ngIf="!businessLoading && !accessDenied && businessLogs.length">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>ID</th><th>User ID</th><th>Action</th><th>Resource</th><th>Details</th><th>Timestamp</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let l of businessLogs">
-            <td class="id-cell">#{{ l.logId }}</td>
-            <td>{{ l.userId }}</td>
-            <td>{{ l.action }}</td>
-            <td>{{ l.resource }}</td>
-            <td>{{ l.details }}</td>
-            <td class="date-cell">{{ l.timestamp | date:'medium' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="empty-state" *ngIf="!businessLoading && !accessDenied && !businessLogs.length">
-      <p>No business audit logs found</p>
-    </div>
-
-  </div>
-
-  <div class="tab-content" *ngIf="activeTab === 'identity'">
-
-    <div class="toolbar">
-      <div class="form-group">
-        <label>Filter by Action</label>
-        <input class="form-input" [(ngModel)]="identityActionFilter" placeholder="e.g. LOGIN, REGISTER">
-      </div>
-      <div class="form-group">
-        <label>Filter by Resource</label>
-        <input class="form-input" [(ngModel)]="identityResourceFilter" placeholder="e.g. USER:42">
-      </div>
-      <button class="btn btn-primary" (click)="applyIdentityFilter()">Filter</button>
-      <button class="btn btn-secondary" (click)="clearIdentityFilter()">Clear</button>
-      <button class="btn btn-outline" (click)="exportIdentityCSV()">&#8595; Export CSV</button>
-    </div>
-
-    <div class="center" *ngIf="identityLoading">
-      <div class="spinner"></div>
-    </div>
-
-    <div class="table-wrap" *ngIf="!identityLoading && identityLogs.length">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>ID</th><th>User ID</th><th>Action</th><th>Resource</th><th>Details</th><th>Timestamp</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let l of identityLogs">
-            <td class="id-cell">#{{ l.auditId }}</td>
-            <td>{{ l.userId }}</td>
-            <td>{{ l.action }}</td>
-            <td>{{ l.resource }}</td>
-            <td>{{ l.details }}</td>
-            <td class="date-cell">{{ l.timestamp | date:'medium' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="empty-state" *ngIf="!identityLoading && !identityLogs.length">
-      <p>No identity logs available</p>
-    </div>
-
-  </div>
+  }
 </div>

@@ -6,21 +6,31 @@
       <p class="page-sub">Manage citizen verifications, claims, and disbursements</p>
     </div>
     <div class="dash-controls">
-      <span class="dash-updated" *ngIf="lastUpdated">Updated {{ lastUpdated | date:'HH:mm:ss' }}</span>
-      <button class="btn btn-outline" type="button" (click)="loadAll()" [disabled]="loading" title="Refresh dashboard">
+      @if (lastUpdated) {
+        <span class="dash-updated">Updated {{ lastUpdated | date: 'HH:mm:ss' }}</span>
+      }
+      <button
+        class="btn btn-outline"
+        type="button"
+        (click)="loadAll()"
+        [disabled]="loading"
+        title="Refresh dashboard"
+      >
         {{ loading ? 'Refreshing...' : 'Refresh' }}
       </button>
     </div>
   </div>
 
   <div class="summary-grid">
-    <div class="summary-card" *ngFor="let card of summaryCards">
-      <div class="card-icon-wrap">{{ card.icon }}</div>
-      <div class="card-content">
-        <div class="card-value">{{ card.value }}</div>
-        <div class="card-label">{{ card.label }}</div>
+    @for (card of summaryCards; track card) {
+      <div class="summary-card">
+        <div class="card-icon-wrap">{{ card.icon }}</div>
+        <div class="card-content">
+          <div class="card-value">{{ card.value }}</div>
+          <div class="card-label">{{ card.label }}</div>
+        </div>
       </div>
-    </div>
+    }
   </div>
 
   <div class="quick-actions-card">

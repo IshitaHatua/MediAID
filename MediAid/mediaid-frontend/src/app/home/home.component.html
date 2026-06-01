@@ -18,16 +18,11 @@
 <section class="hero">
   <div class="hero-content">
     <div class="hero-text">
-      <div class="hero-badge">
-        Government Healthcare Initiative
-      </div>
-      <h1 class="hero-title">
-        Your Health, Our Priority
-      </h1>
+      <div class="hero-badge">Government Healthcare Initiative</div>
+      <h1 class="hero-title">Your Health, Our Priority</h1>
       <p class="hero-subtitle">
-        MediAid bridges citizens with government healthcare schemes.
-        Register once, enroll in programs, file claims and track every benefit
-        &mdash; securely, transparently, instantly.
+        MediAid bridges citizens with government healthcare schemes. Register once, enroll in
+        programs, file claims and track every benefit &mdash; securely, transparently, instantly.
       </p>
       <div class="hero-cta">
         <a routerLink="/auth/register" class="btn btn-primary">Register Free &rarr;</a>
@@ -42,13 +37,17 @@
     <div class="section-header">
       <div class="section-eyebrow">Core Features</div>
       <h2>Everything You Need, In One Place</h2>
-      <p>From registration to disbursement, MediAid manages the complete healthcare aid lifecycle.</p>
+      <p>
+        From registration to disbursement, MediAid manages the complete healthcare aid lifecycle.
+      </p>
     </div>
     <div class="features-grid">
-      <div class="feature-card" *ngFor="let f of features;">
-        <h3>{{ f.title }}</h3>
-        <p>{{ f.desc }}</p>
-      </div>
+      @for (f of features; track f) {
+        <div class="feature-card">
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.desc }}</p>
+        </div>
+      }
     </div>
   </div>
 </section>
@@ -61,11 +60,13 @@
       <p>Get enrolled and start receiving benefits through a streamlined digital process.</p>
     </div>
     <div class="steps-grid">
-      <div class="step-card" *ngFor="let step of steps; let i = index">
-        <div class="step-num">{{ i+1 }}</div>
-        <h3>{{ step.title }}</h3>
-        <p>{{ step.desc }}</p>
-      </div>
+      @for (step of steps; track step; let i = $index) {
+        <div class="step-card">
+          <div class="step-num">{{ i + 1 }}</div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.desc }}</p>
+        </div>
+      }
     </div>
   </div>
 </section>
@@ -75,15 +76,23 @@
     <div class="about-text">
       <div class="section-eyebrow">Our Mission</div>
       <h2>Bridging Citizens with Healthcare Benefits</h2>
-      <p class="about-lead">MediAid is a digital platform that eliminates complexity around healthcare scheme enrollment, claim processing, and disbursement.</p>
-      <p class="about-body">We believe every citizen deserves transparent, efficient access to healthcare support. Our system cuts paperwork, removes middlemen, and puts control in your hands.</p>
+      <p class="about-lead">
+        MediAid is a digital platform that eliminates complexity around healthcare scheme
+        enrollment, claim processing, and disbursement.
+      </p>
+      <p class="about-body">
+        We believe every citizen deserves transparent, efficient access to healthcare support. Our
+        system cuts paperwork, removes middlemen, and puts control in your hands.
+      </p>
       <div class="about-pillars">
-        <div class="pillar" *ngFor="let p of pillars">
-          <div>
-            <div class="pillar-title">{{ p.title }}</div>
-            <div class="pillar-desc">{{ p.desc }}</div>
+        @for (p of pillars; track p) {
+          <div class="pillar">
+            <div>
+              <div class="pillar-title">{{ p.title }}</div>
+              <div class="pillar-desc">{{ p.desc }}</div>
+            </div>
           </div>
-        </div>
+        }
       </div>
       <a routerLink="/auth/register" class="btn btn-primary about-cta">Get Started Today &rarr;</a>
     </div>
@@ -106,12 +115,20 @@
     <div class="container footer-grid">
       <div class="footer-brand-col">
         <div class="footer-brand">MediAid</div>
-        <p class="footer-tagline">Government healthcare aid &mdash; securely, transparently, instantly.</p>
+        <p class="footer-tagline">
+          Government healthcare aid &mdash; securely, transparently, instantly.
+        </p>
       </div>
-      <div class="footer-links-col" *ngFor="let col of footerLinks">
-        <div class="footer-col-title">{{ col.title }}</div>
-        <a class="footer-link" *ngFor="let l of col.links" [routerLink]="l['route'] || null" [href]="l['href'] || null">{{ l.label }}</a>
-      </div>
+      @for (col of footerLinks; track col) {
+        <div class="footer-links-col">
+          <div class="footer-col-title">{{ col.title }}</div>
+          @for (l of col.links; track l) {
+            <a class="footer-link" [routerLink]="l['route'] || null" [href]="l['href'] || null">{{
+              l.label
+            }}</a>
+          }
+        </div>
+      }
     </div>
   </div>
   <div class="footer-bottom">

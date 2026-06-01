@@ -1,72 +1,114 @@
-
-    <h2 class="page-title">My Profile</h2>
-    <div class="card profile-card">
-      <ng-container *ngIf="loading">
-        <div class="center"><div class="spinner"></div></div>
-      </ng-container>
-      <ng-container *ngIf="!loading && citizen && !editing">
-        <div class="profile-view">
-          <div class="profile-header">
-            <div>
-              <h3>{{ citizen.name }}</h3>
-              <app-status-badge [status]="citizen.status"></app-status-badge>
-            </div>
-          </div>
-          <div class="info-grid">
-            <div class="info-item"><span class="label">Date of Birth</span><span>{{ citizen.dob }}</span></div>
-            <div class="info-item"><span class="label">Gender</span><span>{{ citizen.gender }}</span></div>
-            <div class="info-item"><span class="label">Contact</span><span>{{ citizen.contactInfo }}</span></div>
-            <div class="info-item full"><span class="label">Address</span><span>{{ citizen.address }}</span></div>
-          </div>
-          <button class="btn btn-primary" (click)="startEdit()">✎ Edit Profile</button>
-        </div>
-      </ng-container>
-      <ng-container *ngIf="!loading && !citizen">
-        <h3>Create Your Profile</h3>
-        <p class="text-muted">Complete your profile to access MediAid services. You can upload supporting documents once your profile is created.</p>
-        <ng-container *ngTemplateOutlet="profileForm"></ng-container>
-      </ng-container>
-      <ng-container *ngIf="!loading && citizen && editing">
-        <h3>Edit Profile</h3>
-        <ng-container *ngTemplateOutlet="profileForm"></ng-container>
-        <button class="btn btn-secondary cancel-edit-btn" (click)="editing=false">Cancel</button>
-      </ng-container>
-    </div>
-
-    <div class="card docs-card" *ngIf="!loading && citizen">
-      <div class="docs-header">
+<h2 class="page-title">My Profile</h2>
+<div class="card profile-card">
+  @if (loading) {
+    <div class="center"><div class="spinner"></div></div>
+  }
+  @if (!loading && citizen && !editing) {
+    <div class="profile-view">
+      <div class="profile-header">
         <div>
-          <h3>Supporting Document</h3>
-          <p class="docs-hint">Upload <strong>one</strong> supporting document (PDF, JPG, or PNG; max 10MB). An officer will review and verify it. To replace it, delete the existing file first.</p>
+          <h3>{{ citizen.name }}</h3>
+          <app-status-badge [status]="citizen.status"></app-status-badge>
         </div>
-        <button class="btn btn-outline btn-sm" type="button" (click)="loadDocs()" title="Refresh status">Refresh</button>
       </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Date of Birth</span><span>{{ citizen.dob }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Gender</span><span>{{ citizen.gender }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Contact</span><span>{{ citizen.contactInfo }}</span>
+        </div>
+        <div class="info-item full">
+          <span class="label">Address</span><span>{{ citizen.address }}</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" (click)="startEdit()">✎ Edit Profile</button>
+    </div>
+  }
+  @if (!loading && !citizen) {
+    <h3>Create Your Profile</h3>
+    <p class="text-muted">
+      Complete your profile to access MediAid services. You can upload supporting documents once
+      your profile is created.
+    </p>
+    <ng-container *ngTemplateOutlet="profileForm"></ng-container>
+  }
+  @if (!loading && citizen && editing) {
+    <h3>Edit Profile</h3>
+    <ng-container *ngTemplateOutlet="profileForm"></ng-container>
+    <button class="btn btn-secondary cancel-edit-btn" (click)="editing = false">Cancel</button>
+  }
+</div>
 
-      <div class="upload-row" *ngIf="!hasDocument">
+@if (!loading && citizen) {
+  <div class="card docs-card">
+    <div class="docs-header">
+      <div>
+        <h3>Supporting Document</h3>
+        <p class="docs-hint">
+          Upload <strong>one</strong> supporting document (PDF, JPG, or PNG; max 10MB). An officer
+          will review and verify it. To replace it, delete the existing file first.
+        </p>
+      </div>
+      <button
+        class="btn btn-outline btn-sm"
+        type="button"
+        (click)="loadDocs()"
+        title="Refresh status"
+      >
+        Refresh
+      </button>
+    </div>
+    @if (!hasDocument) {
+      <div class="upload-row">
         <div class="form-group doc-type-field">
           <label>Document Type</label>
           <select class="form-input" [(ngModel)]="selectedDocType">
-            <option *ngFor="let t of docTypes" [value]="t">{{ t }}</option>
+            @for (t of docTypes; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
           </select>
         </div>
-        <button type="button" class="btn btn-primary" [disabled]="uploading" (click)="triggerFilePicker()">
-          <span *ngIf="!uploading">↑ Upload Document</span>
-          <span *ngIf="uploading">Uploading... {{ uploadProgress }}%</span>
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="uploading"
+          (click)="triggerFilePicker()"
+        >
+          @if (!uploading) {
+            <span>↑ Upload Document</span>
+          }
+          @if (uploading) {
+            <span>Uploading... {{ uploadProgress }}%</span>
+          }
         </button>
-        <input #fileInput type="file" (change)="onFileSelect($event)" accept=".pdf,.jpg,.jpeg,.png" hidden>
+        <input
+          #fileInput
+          type="file"
+          (change)="onFileSelect($event)"
+          accept=".pdf,.jpg,.jpeg,.png"
+          hidden
+        />
       </div>
-
-      <div class="upload-progress" *ngIf="uploading">
+    }
+    @if (uploading) {
+      <div class="upload-progress">
         <div class="progress-bar" [style.width.%]="uploadProgress"></div>
       </div>
-
-      <div class="doc-limit-note info-banner" *ngIf="hasDocument && !uploading">
+    }
+    @if (hasDocument && !uploading) {
+      <div class="doc-limit-note info-banner">
         <span>You already have a document on file. Delete it below to upload a different one.</span>
       </div>
-
-      <div class="center" *ngIf="docsLoading"><div class="spinner"></div></div>
-
-      <div class="table-wrap" *ngIf="!docsLoading && documents.length">
+    }
+    @if (docsLoading) {
+      <div class="center"><div class="spinner"></div></div>
+    }
+    @if (!docsLoading && documents.length) {
+      <div class="table-wrap">
         <table class="data-table docs-table">
           <thead>
             <tr>
@@ -78,57 +120,85 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let d of documents">
-              <td>{{ d.docType }}</td>
-              <td>{{ originalFileName(d.fileUri) }}</td>
-              <td>{{ d.uploadedDate }}</td>
-              <td><app-status-badge [status]="d.verificationStatus"></app-status-badge></td>
-              <td>
-                <button class="btn btn-outline btn-sm" (click)="download(d.fileUri)" title="Download">↓</button>
-                <button class="btn btn-danger btn-sm" (click)="deleteDoc(d)" title="Delete / Replace">✕</button>
-              </td>
-            </tr>
+            @for (d of documents; track d) {
+              <tr>
+                <td>{{ d.docType }}</td>
+                <td>{{ originalFileName(d.fileUri) }}</td>
+                <td>{{ d.uploadedDate }}</td>
+                <td><app-status-badge [status]="d.verificationStatus"></app-status-badge></td>
+                <td>
+                  <button
+                    class="btn btn-outline btn-sm"
+                    (click)="download(d.fileUri)"
+                    title="Download"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    class="btn btn-danger btn-sm"
+                    (click)="deleteDoc(d)"
+                    title="Delete / Replace"
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
-      <p *ngIf="!docsLoading && !documents.length" class="empty">No documents uploaded yet.</p>
-    </div>
+    }
+    @if (!docsLoading && !documents.length) {
+      <p class="empty">No documents uploaded yet.</p>
+    }
+  </div>
+}
 
-    <ng-template #profileForm>
-      <form [formGroup]="form" (ngSubmit)="submit()" class="profile-form">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input class="form-input" formControlName="name">
-          <div class="field-error" *ngIf="form.get('name')?.touched && form.get('name')?.invalid">Required</div>
-        </div>
-        <div class="two-col">
-          <div class="form-group">
-            <label>Date of Birth</label>
-            <input class="form-input" type="date" formControlName="dob" [max]="today">
-            <div class="field-error" *ngIf="form.get('dob')?.touched && form.get('dob')?.invalid">Required</div>
-          </div>
-          <div class="form-group">
-            <label>Gender</label>
-            <select class="form-input" formControlName="gender">
-              <option value="MALE">Male</option>
-              <option value="FEMALE">Female</option>
-              <option value="OTHER">Other</option>
-            </select>
-            <div class="field-error" *ngIf="form.get('gender')?.touched && form.get('gender')?.invalid">Required</div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Contact (10-digit phone)</label>
-          <input class="form-input" formControlName="contactInfo" maxlength="10">
-          <div class="field-error" *ngIf="form.get('contactInfo')?.touched && form.get('contactInfo')?.invalid">Valid 10-digit number required</div>
-        </div>
-        <div class="form-group">
-          <label>Address</label>
-          <textarea class="form-input" formControlName="address" rows="3" maxlength="500"></textarea>
-          <div class="field-error" *ngIf="form.get('address')?.touched && form.get('address')?.invalid">Required</div>
-        </div>
-        <button class="btn btn-primary" type="submit" [disabled]="saving">
-          {{ saving ? 'Saving...' : (citizen ? 'Update Profile' : 'Create Profile') }}
-        </button>
-      </form>
-    </ng-template>
+<ng-template #profileForm>
+  <form [formGroup]="form" (ngSubmit)="submit()" class="profile-form">
+    <div class="form-group">
+      <label>Full Name</label>
+      <input class="form-input" formControlName="name" />
+      @if (form.get('name')?.touched && form.get('name')?.invalid) {
+        <div class="field-error">Required</div>
+      }
+    </div>
+    <div class="two-col">
+      <div class="form-group">
+        <label>Date of Birth</label>
+        <input class="form-input" type="date" formControlName="dob" [max]="today" />
+        @if (form.get('dob')?.touched && form.get('dob')?.invalid) {
+          <div class="field-error">Required</div>
+        }
+      </div>
+      <div class="form-group">
+        <label>Gender</label>
+        <select class="form-input" formControlName="gender">
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+          <option value="OTHER">Other</option>
+        </select>
+        @if (form.get('gender')?.touched && form.get('gender')?.invalid) {
+          <div class="field-error">Required</div>
+        }
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Contact (10-digit phone)</label>
+      <input class="form-input" formControlName="contactInfo" maxlength="10" />
+      @if (form.get('contactInfo')?.touched && form.get('contactInfo')?.invalid) {
+        <div class="field-error">Valid 10-digit number required</div>
+      }
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <textarea class="form-input" formControlName="address" rows="3" maxlength="500"></textarea>
+      @if (form.get('address')?.touched && form.get('address')?.invalid) {
+        <div class="field-error">Required</div>
+      }
+    </div>
+    <button class="btn btn-primary" type="submit" [disabled]="saving">
+      {{ saving ? 'Saving...' : citizen ? 'Update Profile' : 'Create Profile' }}
+    </button>
+  </form>
+</ng-template>

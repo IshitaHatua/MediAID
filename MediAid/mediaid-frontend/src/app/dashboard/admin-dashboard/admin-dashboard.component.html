@@ -8,42 +8,50 @@
   </div>
 
   <div class="summary-grid">
-    <div class="summary-card" *ngFor="let card of summaryCards">
-      <div class="card-icon-wrap">{{ card.icon }}</div>
-      <div class="card-content">
-        <div class="card-value">{{ card.value }}</div>
-        <div class="card-label">{{ card.label }}</div>
+    @for (card of summaryCards; track card) {
+      <div class="summary-card">
+        <div class="card-icon-wrap">{{ card.icon }}</div>
+        <div class="card-content">
+          <div class="card-value">{{ card.value }}</div>
+          <div class="card-label">{{ card.label }}</div>
+        </div>
       </div>
-    </div>
+    }
   </div>
 
-  <div class="table-card" *ngIf="users.length">
-    <div class="table-header">
-      <div class="tch-left">
-        <div class="tch-icon">&#9776;</div>
-        <h3 class="table-title">Recent Users</h3>
+  @if (users.length) {
+    <div class="table-card">
+      <div class="table-header">
+        <div class="tch-left">
+          <div class="tch-icon">&#9776;</div>
+          <h3 class="table-title">Recent Users</h3>
+        </div>
+        <a routerLink="/admin/users" class="view-all-btn">View all &rarr;</a>
       </div>
-      <a routerLink="/admin/users" class="view-all-btn">View all &rarr;</a>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of users.slice(0, 8); track u) {
+              <tr>
+                <td class="id-cell">#{{ u.userId }}</td>
+                <td class="name-cell">{{ u.name }}</td>
+                <td class="email-cell">{{ u.email }}</td>
+                <td>
+                  <span class="role-chip" [ngClass]="roleClass(u.role)">{{ u.role }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>User ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let u of users.slice(0,8)">
-            <td class="id-cell">#{{ u.userId }}</td>
-            <td class="name-cell">{{ u.name }}</td>
-            <td class="email-cell">{{ u.email }}</td>
-            <td><span class="role-chip" [ngClass]="roleClass(u.role)">{{ u.role }}</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  }
 </div>

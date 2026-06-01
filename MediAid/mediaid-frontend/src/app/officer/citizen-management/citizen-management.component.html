@@ -1,76 +1,116 @@
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Citizen Management</h2>
+    <p class="page-sub">Review pending profiles, verify citizens and inspect uploaded documents</p>
+  </div>
+</div>
 
-    <div class="page-header">
-      <div>
-        <h2 class="page-title">Citizen Management</h2>
-        <p class="page-sub">Review pending profiles, verify citizens and inspect uploaded documents</p>
-      </div>
+<div class="pending-section">
+  <div class="toolbar">
+    @if (!pendingLoading) {
+      <span>{{ pendingCitizens.length }} pending</span>
+    }
+    @if (pendingLoading) {
+      <span>Loading…</span>
+    }
+    <button class="btn btn-outline btn-sm" (click)="loadPending()">↻ Refresh</button>
+  </div>
+
+  @if (pendingLoading) {
+    <div class="center"><div class="spinner"></div></div>
+  }
+
+  @if (!pendingLoading && pendingCitizens.length === 0) {
+    <div class="empty-state">
+      <p>No pending approvals</p>
     </div>
+  }
 
-    <div class="pending-section">
-      <div class="toolbar">
-        <span *ngIf="!pendingLoading">{{ pendingCitizens.length }} pending</span>
-        <span *ngIf="pendingLoading">Loading…</span>
-        <button class="btn btn-outline btn-sm" (click)="loadPending()">↻ Refresh</button>
-      </div>
-
-      <div *ngIf="pendingLoading" class="center"><div class="spinner"></div></div>
-
-      <div *ngIf="!pendingLoading && pendingCitizens.length === 0" class="empty-state">
-        <p>No pending approvals</p>
-      </div>
-
-      <div class="pending-list" *ngIf="!pendingLoading && pendingCitizens.length">
-        <div class="card pending-card" *ngFor="let c of pendingCitizens">
+  @if (!pendingLoading && pendingCitizens.length) {
+    <div class="pending-list">
+      @for (c of pendingCitizens; track c) {
+        <div class="card pending-card">
           <div class="pending-row">
             <div class="pending-info">
               <div class="citizen-name">{{ c.name }}</div>
-              <div class="citizen-meta">ID: {{ c.citizenId }} · DOB: {{ c.dob }} · {{ c.gender }} · {{ c.contactInfo }}</div>
+              <div class="citizen-meta">
+                ID: {{ c.citizenId }} · DOB: {{ c.dob }} · {{ c.gender }} · {{ c.contactInfo }}
+              </div>
               <div class="citizen-addr">{{ c.address }}</div>
             </div>
             <div class="pending-actions">
               <button class="btn btn-outline btn-sm" (click)="toggleDocs(c.citizenId)">
                 {{ expandedCitizen === c.citizenId ? 'Hide Documents' : 'View Documents' }}
               </button>
-              <button class="btn btn-success btn-sm" (click)="verifyFromList(c, 'VERIFIED')">✓ Verify</button>
-              <button class="btn btn-danger btn-sm" (click)="verifyFromList(c, 'REJECTED')">✕ Reject</button>
+              <button class="btn btn-success btn-sm" (click)="verifyFromList(c, 'VERIFIED')">
+                ✓ Verify
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="verifyFromList(c, 'REJECTED')">
+                ✕ Reject
+              </button>
             </div>
           </div>
-
-          <div class="docs-panel" *ngIf="expandedCitizen === c.citizenId">
-            <div *ngIf="docsLoading[c.citizenId]" class="center"><div class="spinner"></div></div>
-
-            <div class="table-wrap"
-                 *ngIf="!docsLoading[c.citizenId] && (citizenDocs[c.citizenId]?.length || 0) > 0">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Type</th>
-                    <th>File</th>
-                    <th>Uploaded</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let d of citizenDocs[c.citizenId]">
-                    <td>{{ d.docType }}</td>
-                    <td>{{ originalFileName(d.fileUri) }}</td>
-                    <td>{{ d.uploadedDate }}</td>
-                    <td><app-status-badge [status]="d.verificationStatus"></app-status-badge></td>
-                    <td>
-                      <button class="btn btn-outline btn-sm" (click)="viewDoc(d.fileUri)" title="View">👁 View</button>
-                      <button class="btn btn-secondary btn-sm" (click)="downloadDoc(d.fileUri)" title="Download">↓ Download</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          @if (expandedCitizen === c.citizenId) {
+            <div class="docs-panel">
+              @if (docsLoading[c.citizenId]) {
+                <div class="center"><div class="spinner"></div></div>
+              }
+              @if (!docsLoading[c.citizenId] && (citizenDocs[c.citizenId]?.length || 0) > 0) {
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>File</th>
+                        <th>Uploaded</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (d of citizenDocs[c.citizenId]; track d) {
+                        <tr>
+                          <td>{{ d.docType }}</td>
+                          <td>{{ originalFileName(d.fileUri) }}</td>
+                          <td>{{ d.uploadedDate }}</td>
+                          <td>
+                            <app-status-badge [status]="d.verificationStatus"></app-status-badge>
+                          </td>
+                          <td>
+                            <button
+                              class="btn btn-outline btn-sm"
+                              (click)="viewDoc(d.fileUri)"
+                              title="View"
+                            >
+                              👁 View
+                            </button>
+                            <button
+                              class="btn btn-secondary btn-sm"
+                              (click)="downloadDoc(d.fileUri)"
+                              title="Download"
+                            >
+                              ↓ Download
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+              @if (
+                !docsLoading[c.citizenId] &&
+                citizenDocs[c.citizenId] &&
+                citizenDocs[c.citizenId].length === 0
+              ) {
+                <div class="docs-empty">
+                  <span>No documents uploaded by this citizen.</span>
+                </div>
+              }
             </div>
-
-            <div class="docs-empty"
-                 *ngIf="!docsLoading[c.citizenId] && citizenDocs[c.citizenId] && citizenDocs[c.citizenId].length === 0">
-              <span>No documents uploaded by this citizen.</span>
-            </div>
-          </div>
+          }
         </div>
-      </div>
+      }
     </div>
+  }
+</div>

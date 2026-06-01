@@ -4,95 +4,152 @@
 </div>
 
 <div class="tab-bar">
-  <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">All Records</button>
-  <button class="tab-btn" [class.active]="activeTab === 'violations'" (click)="activeTab = 'violations'">Violations</button>
-  <button class="tab-btn" [class.active]="activeTab === 'flagged'" (click)="activeTab = 'flagged'">Flagged</button>
+  <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+    All Records
+  </button>
+  <button
+    class="tab-btn"
+    [class.active]="activeTab === 'violations'"
+    (click)="activeTab = 'violations'"
+  >
+    Violations
+  </button>
+  <button class="tab-btn" [class.active]="activeTab === 'flagged'" (click)="activeTab = 'flagged'">
+    Flagged
+  </button>
 </div>
 
-<div class="tab-content" *ngIf="activeTab === 'all'">
-  <div class="card">
-    <div class="toolbar">
-      <h3 class="section-title">All Compliance Records</h3>
-      <span class="count-badge">{{ all.length }} record(s)</span>
-    </div>
-    <div class="center" *ngIf="loading"><div class="spinner"></div></div>
-    <div class="table-wrap" *ngIf="!loading && all.length">
-      <table class="data-table">
-        <thead>
-          <tr><th>ID</th><th>Entity</th><th>Type</th><th>Result</th><th>Notes</th><th>Evaluated</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of all">
-            <td class="id-cell">#{{ r.complianceId }}</td>
-            <td>{{ r.entityType }} #{{ r.entityId }}</td>
-            <td>{{ r.entityType }}</td>
-            <td><app-status-badge [status]="r.result"></app-status-badge></td>
-            <td>{{ r.notes || '—' }}</td>
-            <td class="date-cell">{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="empty-state" *ngIf="!loading && !all.length">
-      <p>No compliance records found</p>
+@if (activeTab === 'all') {
+  <div class="tab-content">
+    <div class="card">
+      <div class="toolbar">
+        <h3 class="section-title">All Compliance Records</h3>
+        <span class="count-badge">{{ all.length }} record(s)</span>
+      </div>
+      @if (loading) {
+        <div class="center"><div class="spinner"></div></div>
+      }
+      @if (!loading && all.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Entity</th>
+                <th>Type</th>
+                <th>Result</th>
+                <th>Notes</th>
+                <th>Evaluated</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of all; track r) {
+                <tr>
+                  <td class="id-cell">#{{ r.complianceId }}</td>
+                  <td>{{ r.entityType }} #{{ r.entityId }}</td>
+                  <td>{{ r.entityType }}</td>
+                  <td><app-status-badge [status]="r.result"></app-status-badge></td>
+                  <td>{{ r.notes || '—' }}</td>
+                  <td class="date-cell">{{ r.evaluatedAt | date: 'dd MMM y, h:mm a' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @if (!loading && !all.length) {
+        <div class="empty-state">
+          <p>No compliance records found</p>
+        </div>
+      }
     </div>
   </div>
-</div>
+}
 
-<div class="tab-content" *ngIf="activeTab === 'violations'">
-  <div class="card">
-    <div class="toolbar">
-      <h3 class="section-title">Compliance Violations</h3>
-      <span class="count-badge violations">{{ violations.length }} violation(s)</span>
-    </div>
-    <div class="table-wrap" *ngIf="violations.length">
-      <table class="data-table">
-        <thead>
-          <tr><th>ID</th><th>Entity</th><th>Type</th><th>Result</th><th>Notes</th><th>Evaluated</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of violations">
-            <td class="id-cell">#{{ r.complianceId }}</td>
-            <td>{{ r.entityType }} #{{ r.entityId }}</td>
-            <td>{{ r.entityType }}</td>
-            <td><app-status-badge [status]="r.result"></app-status-badge></td>
-            <td>{{ r.notes || '—' }}</td>
-            <td class="date-cell">{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="empty-state" *ngIf="!violations.length">
-      <p>No violations found</p>
+@if (activeTab === 'violations') {
+  <div class="tab-content">
+    <div class="card">
+      <div class="toolbar">
+        <h3 class="section-title">Compliance Violations</h3>
+        <span class="count-badge violations">{{ violations.length }} violation(s)</span>
+      </div>
+      @if (violations.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Entity</th>
+                <th>Type</th>
+                <th>Result</th>
+                <th>Notes</th>
+                <th>Evaluated</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of violations; track r) {
+                <tr>
+                  <td class="id-cell">#{{ r.complianceId }}</td>
+                  <td>{{ r.entityType }} #{{ r.entityId }}</td>
+                  <td>{{ r.entityType }}</td>
+                  <td><app-status-badge [status]="r.result"></app-status-badge></td>
+                  <td>{{ r.notes || '—' }}</td>
+                  <td class="date-cell">{{ r.evaluatedAt | date: 'dd MMM y, h:mm a' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @if (!violations.length) {
+        <div class="empty-state">
+          <p>No violations found</p>
+        </div>
+      }
     </div>
   </div>
-</div>
+}
 
-<div class="tab-content" *ngIf="activeTab === 'flagged'">
-  <div class="card">
-    <div class="toolbar">
-      <h3 class="section-title">Flagged Items</h3>
-      <span class="count-badge flagged">{{ flagged.length }} flagged</span>
-    </div>
-    <div class="table-wrap" *ngIf="flagged.length">
-      <table class="data-table">
-        <thead>
-          <tr><th>ID</th><th>Entity</th><th>Type</th><th>Result</th><th>Notes</th><th>Evaluated</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of flagged">
-            <td class="id-cell">#{{ r.complianceId }}</td>
-            <td>{{ r.entityType }} #{{ r.entityId }}</td>
-            <td>{{ r.entityType }}</td>
-            <td><app-status-badge [status]="r.result"></app-status-badge></td>
-            <td>{{ r.notes || '—' }}</td>
-            <td class="date-cell">{{ r.evaluatedAt | date:'dd MMM y, h:mm a' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="empty-state" *ngIf="!flagged.length">
-      <p>No flagged items found</p>
+@if (activeTab === 'flagged') {
+  <div class="tab-content">
+    <div class="card">
+      <div class="toolbar">
+        <h3 class="section-title">Flagged Items</h3>
+        <span class="count-badge flagged">{{ flagged.length }} flagged</span>
+      </div>
+      @if (flagged.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Entity</th>
+                <th>Type</th>
+                <th>Result</th>
+                <th>Notes</th>
+                <th>Evaluated</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of flagged; track r) {
+                <tr>
+                  <td class="id-cell">#{{ r.complianceId }}</td>
+                  <td>{{ r.entityType }} #{{ r.entityId }}</td>
+                  <td>{{ r.entityType }}</td>
+                  <td><app-status-badge [status]="r.result"></app-status-badge></td>
+                  <td>{{ r.notes || '—' }}</td>
+                  <td class="date-cell">{{ r.evaluatedAt | date: 'dd MMM y, h:mm a' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @if (!flagged.length) {
+        <div class="empty-state">
+          <p>No flagged items found</p>
+        </div>
+      }
     </div>
   </div>
-</div>
+}

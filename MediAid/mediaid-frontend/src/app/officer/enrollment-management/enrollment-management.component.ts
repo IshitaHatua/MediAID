@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin, of } from 'rxjs';
@@ -16,9 +16,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 @Component({
   selector: 'app-enrollment-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatDialogModule, StatusBadgeComponent],
+  imports: [FormsModule, MatDialogModule, StatusBadgeComponent],
   templateUrl: './enrollment-management.component.html',
-  styleUrl: './enrollment-management.component.css'
+  styleUrl: './enrollment-management.component.css',
 })
 export class EnrollmentManagementComponent implements OnInit {
   enrollments: any[] = [];
@@ -29,8 +29,11 @@ export class EnrollmentManagementComponent implements OnInit {
   private citizensById: Record<number, any> = {};
   private schemesById: Record<number, any> = {};
 
-  eligibilityDialog: { open: boolean; schemeName: string; text: string } =
-    { open: false, schemeName: '', text: '' };
+  eligibilityDialog: { open: boolean; schemeName: string; text: string } = {
+    open: false,
+    schemeName: '',
+    text: '',
+  };
 
   constructor(
     private enrollSvc: EnrollmentService,
@@ -39,7 +42,7 @@ export class EnrollmentManagementComponent implements OnInit {
     private refresh: RefreshService,
     private toastr: ToastrService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -47,23 +50,27 @@ export class EnrollmentManagementComponent implements OnInit {
     forkJoin({
       enrollments: this.enrollSvc.getAll().pipe(catchError(() => of(empty))),
       schemes: this.schemeSvc.getAll().pipe(catchError(() => of(empty))),
-      citizens: this.citizenSvc.getAll().pipe(catchError(() => of(empty)))
+      citizens: this.citizenSvc.getAll().pipe(catchError(() => of(empty))),
     }).subscribe({
       next: ({ enrollments, schemes, citizens }) => {
         this.loading = false;
         this.enrollments = enrollments.data ?? [];
-        for (const s of (schemes.data ?? [])) this.schemesById[s.schemeId] = s;
-        for (const c of (citizens.data ?? [])) this.citizensById[c.citizenId] = c;
+        for (const s of schemes.data ?? []) this.schemesById[s.schemeId] = s;
+        for (const c of citizens.data ?? []) this.citizensById[c.citizenId] = c;
         this.applyFilter();
         this.cdr.markForCheck();
       },
-      error: () => { this.loading = false; this.toastr.error('Could not load enrollments.'); this.cdr.markForCheck(); }
+      error: () => {
+        this.loading = false;
+        this.toastr.error('Could not load enrollments.');
+        this.cdr.markForCheck();
+      },
     });
   }
 
   applyFilter() {
     this.filtered = this.filterStatus
-      ? this.enrollments.filter(e => e.status === this.filterStatus)
+      ? this.enrollments.filter((e) => e.status === this.filterStatus)
       : this.enrollments;
   }
 
@@ -102,7 +109,7 @@ export class EnrollmentManagementComponent implements OnInit {
     this.eligibilityDialog = {
       open: true,
       schemeName: this.schemeName(schemeId),
-      text
+      text,
     };
   }
 
@@ -114,20 +121,23 @@ export class EnrollmentManagementComponent implements OnInit {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: `${status === 'APPROVED' ? 'Approve' : 'Reject'} Enrollment`,
-        message: `Are you sure you want to ${status.toLowerCase()} enrollment #${e.enrollmentId}?`
-      }
+        message: `Are you sure you want to ${status.toLowerCase()} enrollment #${e.enrollmentId}?`,
+      },
     });
-    ref.afterClosed().subscribe(confirmed => {
+    ref.afterClosed().subscribe((confirmed) => {
       if (!confirmed) return;
       this.enrollSvc.updateStatus(e.enrollmentId, status).subscribe({
-        next: r => {
+        next: (r) => {
           if (r.data) e.status = r.data.status;
           this.applyFilter();
           this.refresh.notify('enrollments');
           this.toastr.success(`Enrollment ${status.toLowerCase()}.`);
           this.cdr.markForCheck();
         },
-        error: () => { this.toastr.error(`Could not ${status.toLowerCase()} enrollment.`); this.cdr.markForCheck(); }
+        error: () => {
+          this.toastr.error(`Could not ${status.toLowerCase()} enrollment.`);
+          this.cdr.markForCheck();
+        },
       });
     });
   }

@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation, inject, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -9,28 +9,36 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-register',
   standalone: true,
   encapsulation: ViewEncapsulation.None,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  styleUrl: './register.component.css',
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);
   form = this.fb.group({
-    name:     ['', Validators.required],
-    email:    ['', [Validators.required, Validators.email]],
+    name: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    role:     ['CITIZEN']
+    role: ['CITIZEN'],
   });
   loading = false;
   showPw = false;
 
-  constructor(private auth: AuthService, private router: Router, private toastr: ToastrService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private toastr: ToastrService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   submit() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.loading = true;
     this.auth.register(this.form.value as any).subscribe({
-      next: res => {
+      next: (res) => {
         this.loading = false;
         if (res.status === 'SUCCESS') {
           this.toastr.success('Account created! Please sign in.', 'Registration Successful');
@@ -40,7 +48,10 @@ export class RegisterComponent {
         }
         this.cdr.markForCheck();
       },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      error: () => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
     });
   }
 }

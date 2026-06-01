@@ -4,173 +4,236 @@
 </div>
 
 <div class="tab-bar">
-  <button class="tab-btn" [class.active]="activeTab === 'audits'" (click)="activeTab = 'audits'">All Audits</button>
-  <button class="tab-btn" [class.active]="activeTab === 'logs'" (click)="activeTab = 'logs'">Audit Logs</button>
+  <button class="tab-btn" [class.active]="activeTab === 'audits'" (click)="activeTab = 'audits'">
+    All Audits
+  </button>
+  <button class="tab-btn" [class.active]="activeTab === 'logs'" (click)="activeTab = 'logs'">
+    Audit Logs
+  </button>
 </div>
 
-<div class="tab-content" *ngIf="activeTab === 'audits'">
-  <div class="card">
-
-    <div class="toolbar">
-      <div class="filters">
-        <div class="form-group">
-          <label>Status</label>
-          <select class="form-input" [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()">
-            <option value="">All</option>
-            <option value="PLANNED">Planned</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="ESCALATED">Escalated</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Scope</label>
-          <select class="form-input" [(ngModel)]="filterScope" (ngModelChange)="applyFilter()">
-            <option value="">All</option>
-            <option value="CLAIM">Claim</option>
-            <option value="POLICY">Policy</option>
-            <option value="DISBURSEMENT">Disbursement</option>
-          </select>
-        </div>
-      </div>
-      <button class="btn btn-primary" (click)="toggleAuditForm()">+ New Audit</button>
-    </div>
-
-    <form *ngIf="showCreateForm" [formGroup]="auditForm" (ngSubmit)="createAudit()" class="audit-form">
-
-      <div class="form-group">
-        <label>Scope</label>
-        <select class="form-input" formControlName="scope" (change)="onAuditScopeChange()">
-          <option value="CLAIM">Claim</option>
-          <option value="POLICY">Policy</option>
-          <option value="DISBURSEMENT">Disbursement</option>
-        </select>
-      </div>
-
-      <div class="audit-entity-section">
-        <div class="ae-label">Select a record</div>
-
-        <div class="center" *ngIf="auditEntitiesLoading">
-          <div class="spinner"></div>
-        </div>
-
-        <div class="entity-list" *ngIf="!auditEntitiesLoading && auditEntities.length">
-          <div class="entity-row"
-               *ngFor="let e of auditEntities"
-               [class.selected]="auditSelectedEntity?.id === e.id"
-               (click)="auditSelectedEntity = e">
-            <span class="radio-icon">{{ auditSelectedEntity?.id === e.id ? '&#9679;' : '&#9675;' }}</span>
-            <span class="entity-label">{{ e.label }}</span>
-            <app-status-badge [status]="e.status"></app-status-badge>
+@if (activeTab === 'audits') {
+  <div class="tab-content">
+    <div class="card">
+      <div class="toolbar">
+        <div class="filters">
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-input" [(ngModel)]="filterStatus" (ngModelChange)="applyFilter()">
+              <option value="">All</option>
+              <option value="PLANNED">Planned</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="ESCALATED">Escalated</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Scope</label>
+            <select class="form-input" [(ngModel)]="filterScope" (ngModelChange)="applyFilter()">
+              <option value="">All</option>
+              <option value="CLAIM">Claim</option>
+              <option value="POLICY">Policy</option>
+              <option value="DISBURSEMENT">Disbursement</option>
+            </select>
           </div>
         </div>
-
-        <div class="entity-load-error" *ngIf="auditEntitiesError && !auditEntitiesLoading">
-          <span>&#9888; Could not load records. Check your connection and try again.</span>
-          <button type="button" class="btn btn-outline btn-sm" (click)="onAuditScopeChange()">&#8635; Retry</button>
+        <button class="btn btn-primary" (click)="toggleAuditForm()">+ New Audit</button>
+      </div>
+      @if (showCreateForm) {
+        <form [formGroup]="auditForm" (ngSubmit)="createAudit()" class="audit-form">
+          <div class="form-group">
+            <label>Scope</label>
+            <select class="form-input" formControlName="scope" (change)="onAuditScopeChange()">
+              <option value="CLAIM">Claim</option>
+              <option value="POLICY">Policy</option>
+              <option value="DISBURSEMENT">Disbursement</option>
+            </select>
+          </div>
+          <div class="audit-entity-section">
+            <div class="ae-label">Select a record</div>
+            @if (auditEntitiesLoading) {
+              <div class="center">
+                <div class="spinner"></div>
+              </div>
+            }
+            @if (!auditEntitiesLoading && auditEntities.length) {
+              <div class="entity-list">
+                @for (e of auditEntities; track e) {
+                  <div
+                    class="entity-row"
+                    [class.selected]="auditSelectedEntity?.id === e.id"
+                    (click)="auditSelectedEntity = e"
+                  >
+                    <span class="radio-icon">{{
+                      auditSelectedEntity?.id === e.id ? '&#9679;' : '&#9675;'
+                    }}</span>
+                    <span class="entity-label">{{ e.label }}</span>
+                    <app-status-badge [status]="e.status"></app-status-badge>
+                  </div>
+                }
+              </div>
+            }
+            @if (auditEntitiesError && !auditEntitiesLoading) {
+              <div class="entity-load-error">
+                <span>&#9888; Could not load records. Check your connection and try again.</span>
+                <button type="button" class="btn btn-outline btn-sm" (click)="onAuditScopeChange()">
+                  &#8635; Retry
+                </button>
+              </div>
+            }
+            @if (!auditEntitiesLoading && !auditEntitiesError && !auditEntities.length) {
+              <p class="ae-empty">No records found for this scope.</p>
+            }
+          </div>
+          <div class="form-group findings-field">
+            <label>Findings (optional)</label>
+            <textarea class="form-input" formControlName="findings" rows="2"></textarea>
+          </div>
+          <div class="form-btns">
+            <button class="btn btn-primary" type="submit">Create Audit</button>
+            <button class="btn btn-secondary" type="button" (click)="toggleAuditForm()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      }
+      @if (loading) {
+        <div class="center"><div class="spinner"></div></div>
+      }
+      @if (auditAccessDenied && !loading) {
+        <div class="access-denied-banner">
+          <span class="adb-icon">&#128274;</span>
+          <div>
+            <strong>Access Restricted</strong>
+            <p>
+              Your role does not have permission to view the audit list from this service. Contact
+              your administrator if you believe this is an error.
+            </p>
+          </div>
         </div>
-
-        <p class="ae-empty" *ngIf="!auditEntitiesLoading && !auditEntitiesError && !auditEntities.length">
-          No records found for this scope.
-        </p>
-      </div>
-
-      <div class="form-group findings-field">
-        <label>Findings (optional)</label>
-        <textarea class="form-input" formControlName="findings" rows="2"></textarea>
-      </div>
-
-      <div class="form-btns">
-        <button class="btn btn-primary" type="submit">Create Audit</button>
-        <button class="btn btn-secondary" type="button" (click)="toggleAuditForm()">Cancel</button>
-      </div>
-    </form>
-
-    <div class="center" *ngIf="loading"><div class="spinner"></div></div>
-
-    <div class="access-denied-banner" *ngIf="auditAccessDenied && !loading">
-      <span class="adb-icon">&#128274;</span>
-      <div>
-        <strong>Access Restricted</strong>
-        <p>Your role does not have permission to view the audit list from this service. Contact your administrator if you believe this is an error.</p>
-      </div>
-    </div>
-
-    <div class="audit-list" *ngIf="!loading && !auditAccessDenied && filtered.length">
-      <div class="audit-panel" *ngFor="let a of filtered">
-        <div class="panel-header" (click)="a._expanded = !a._expanded">
-          <div class="panel-title">
-            <span class="audit-id">#{{ a.auditId }}</span>
-            <span class="scope-tag">{{ a.scope }}</span>
-          </div>
-          <div class="panel-desc">
-            <app-status-badge [status]="a.status"></app-status-badge>
-            <button type="button" class="btn btn-outline btn-sm">{{ a._expanded ? 'Hide' : 'View' }}</button>
-          </div>
-        </div>
-
-        <div class="audit-detail" *ngIf="a._expanded">
-          <div class="info-grid">
-            <div class="info-item"><span class="label">Officer ID</span><span class="value">{{ a.officerId }}</span></div>
-            <div class="info-item"><span class="label">Entity ID</span><span class="value">{{ a.scopeEntityId }}</span></div>
-            <div class="info-item"><span class="label">Created</span><span class="value date">{{ a.createdAt | date:'dd MMM y' }}</span></div>
-            <div class="info-item full"><span class="label">Findings</span><span class="value">{{ a.findings || '—' }}</span></div>
-          </div>
-          <div class="audit-actions">
-            <div class="form-group status-field">
-              <label>Update Status</label>
-              <select class="form-input" [(ngModel)]="a._newStatus" [ngModelOptions]="{standalone: true}">
-                <option value="PLANNED">Planned</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="ESCALATED">Escalated</option>
-              </select>
+      }
+      @if (!loading && !auditAccessDenied && filtered.length) {
+        <div class="audit-list">
+          @for (a of filtered; track a) {
+            <div class="audit-panel">
+              <div class="panel-header" (click)="a._expanded = !a._expanded">
+                <div class="panel-title">
+                  <span class="audit-id">#{{ a.auditId }}</span>
+                  <span class="scope-tag">{{ a.scope }}</span>
+                </div>
+                <div class="panel-desc">
+                  <app-status-badge [status]="a.status"></app-status-badge>
+                  <button type="button" class="btn btn-outline btn-sm">
+                    {{ a._expanded ? 'Hide' : 'View' }}
+                  </button>
+                </div>
+              </div>
+              @if (a._expanded) {
+                <div class="audit-detail">
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <span class="label">Officer ID</span
+                      ><span class="value">{{ a.officerId }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Entity ID</span
+                      ><span class="value">{{ a.scopeEntityId }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Created</span
+                      ><span class="value date">{{ a.createdAt | date: 'dd MMM y' }}</span>
+                    </div>
+                    <div class="info-item full">
+                      <span class="label">Findings</span
+                      ><span class="value">{{ a.findings || '—' }}</span>
+                    </div>
+                  </div>
+                  <div class="audit-actions">
+                    <div class="form-group status-field">
+                      <label>Update Status</label>
+                      <select
+                        class="form-input"
+                        [(ngModel)]="a._newStatus"
+                        [ngModelOptions]="{ standalone: true }"
+                      >
+                        <option value="PLANNED">Planned</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="ESCALATED">Escalated</option>
+                      </select>
+                    </div>
+                    <button class="btn btn-primary" (click)="updateAudit(a)">
+                      &#10003; Update
+                    </button>
+                    <button class="btn btn-outline" (click)="triggerCompliance(a)">
+                      &#9878; Trigger Compliance
+                    </button>
+                  </div>
+                </div>
+              }
             </div>
-            <button class="btn btn-primary" (click)="updateAudit(a)">&#10003; Update</button>
-            <button class="btn btn-outline" (click)="triggerCompliance(a)">&#9878; Trigger Compliance</button>
+          }
+        </div>
+      }
+      @if (!loading && !auditAccessDenied && !filtered.length) {
+        <div class="empty-state">
+          <p>No audits found</p>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+@if (activeTab === 'logs') {
+  <div class="tab-content">
+    <div class="card">
+      <h3 class="section-title">Audit Management Logs</h3>
+      @if (logsLoading) {
+        <div class="center"><div class="spinner"></div></div>
+      }
+      @if (logAccessDenied && !logsLoading) {
+        <div class="access-denied-banner">
+          <span class="adb-icon">&#128274;</span>
+          <div>
+            <strong>Access Restricted</strong>
+            <p>
+              Your role does not have permission to view audit logs. Contact your administrator if
+              you believe this is an error.
+            </p>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="empty-state" *ngIf="!loading && !auditAccessDenied && !filtered.length">
-      <p>No audits found</p>
-    </div>
-
-  </div>
-</div>
-
-<div class="tab-content" *ngIf="activeTab === 'logs'">
-  <div class="card">
-    <h3 class="section-title">Audit Management Logs</h3>
-    <div class="center" *ngIf="logsLoading"><div class="spinner"></div></div>
-
-    <div class="access-denied-banner" *ngIf="logAccessDenied && !logsLoading">
-      <span class="adb-icon">&#128274;</span>
-      <div>
-        <strong>Access Restricted</strong>
-        <p>Your role does not have permission to view audit logs. Contact your administrator if you believe this is an error.</p>
-      </div>
-    </div>
-
-    <div class="table-wrap" *ngIf="!logsLoading && !logAccessDenied && logs.length">
-      <table class="data-table">
-        <thead>
-          <tr><th>ID</th><th>User</th><th>Action</th><th>Resource</th><th>Time</th></tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let l of logs">
-            <td class="id-cell">#{{ l.logId }}</td>
-            <td>{{ l.userId }}</td>
-            <td>{{ l.action }}</td>
-            <td>{{ l.resource }}</td>
-            <td class="date-cell">{{ l.timestamp | date:'medium' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="empty-state" *ngIf="!logsLoading && !logAccessDenied && !logs.length">
-      <p>No logs found</p>
+      }
+      @if (!logsLoading && !logAccessDenied && logs.length) {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Resource</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of logs; track l) {
+                <tr>
+                  <td class="id-cell">#{{ l.logId }}</td>
+                  <td>{{ l.userId }}</td>
+                  <td>{{ l.action }}</td>
+                  <td>{{ l.resource }}</td>
+                  <td class="date-cell">{{ l.timestamp | date: 'medium' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @if (!logsLoading && !logAccessDenied && !logs.length) {
+        <div class="empty-state">
+          <p>No logs found</p>
+        </div>
+      }
     </div>
   </div>
-</div>
+}

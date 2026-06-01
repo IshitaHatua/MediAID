@@ -5,43 +5,57 @@
   <div class="toolbar">
     <div class="form-group">
       <label>Filter by User ID</label>
-      <input class="form-input" [(ngModel)]="userIdFilter" placeholder="Enter user ID">
+      <input class="form-input" [(ngModel)]="userIdFilter" placeholder="Enter user ID" />
     </div>
     <div class="form-group">
       <label>Filter by Action</label>
-      <input class="form-input" [(ngModel)]="actionFilter" placeholder="e.g. LOGIN, REGISTER">
+      <input class="form-input" [(ngModel)]="actionFilter" placeholder="e.g. LOGIN, REGISTER" />
     </div>
     <button type="button" class="btn btn-primary" (click)="applyFilter()">Filter</button>
     <button type="button" class="btn btn-secondary" (click)="clear()">Clear</button>
-    <button type="button" class="btn btn-outline" (click)="exportCSV(basicLogs, 'identity-audit-logs.csv')">&#8595; Export CSV</button>
+    <button
+      type="button"
+      class="btn btn-outline"
+      (click)="exportCSV(basicLogs, 'identity-audit-logs.csv')"
+    >
+      &#8595; Export CSV
+    </button>
   </div>
 
-  <div class="center" *ngIf="basicLoading"><div class="spinner"></div></div>
+  @if (basicLoading) {
+    <div class="center"><div class="spinner"></div></div>
+  }
 
-  <div class="table-wrap" *ngIf="!basicLoading && basicLogs.length">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>User ID</th>
-          <th>Action</th>
-          <th>Resource</th>
-          <th>Details</th>
-          <th>Timestamp</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let l of basicLogs">
-          <td>{{ l.auditId }}</td>
-          <td>{{ l.userId }}</td>
-          <td>{{ l.action }}</td>
-          <td>{{ l.resource }}</td>
-          <td>{{ l.details }}</td>
-          <td>{{ l.timestamp | date:'medium' }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  @if (!basicLoading && basicLogs.length) {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Action</th>
+            <th>Resource</th>
+            <th>Details</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (l of basicLogs; track l) {
+            <tr>
+              <td>{{ l.auditId }}</td>
+              <td>{{ l.userId }}</td>
+              <td>{{ l.action }}</td>
+              <td>{{ l.resource }}</td>
+              <td>{{ l.details }}</td>
+              <td>{{ l.timestamp | date: 'medium' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 
-  <p *ngIf="!basicLoading && !basicLogs.length" class="empty">No audit logs found.</p>
+  @if (!basicLoading && !basicLogs.length) {
+    <p class="empty">No audit logs found.</p>
+  }
 </div>

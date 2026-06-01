@@ -1,41 +1,48 @@
+<div class="page-header">
+  <div>
+    <h2 class="page-title">My Disbursements</h2>
+    <p class="page-sub">Healthcare aid disbursements approved for your claims</p>
+  </div>
+</div>
 
-    <div class="page-header">
-      <div>
-        <h2 class="page-title">My Disbursements</h2>
-        <p class="page-sub">Healthcare aid disbursements approved for your claims</p>
-      </div>
-    </div>
+@if (loading) {
+  <div class="center">
+    <div class="spinner"></div>
+  </div>
+}
 
-    <div class="center" *ngIf="loading">
-      <div class="spinner"></div>
-    </div>
-
-    <div class="card" *ngIf="!loading && disbursements.length">
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead>
+@if (!loading && disbursements.length) {
+  <div class="card">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Disbursement ID</th>
+            <th>Claim ID</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of disbursements; track d) {
             <tr>
-              <th>Disbursement ID</th>
-              <th>Claim ID</th>
-              <th>Amount</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let d of disbursements">
               <td>#{{ d.disbursementId }}</td>
               <td>#{{ d.claimId }}</td>
-              <td>₹{{ d.amount | number:'1.0-2' }}</td>
-              <td>{{ d.date | date:'dd MMM y' }}</td>
+              <td>₹{{ d.amount | number: '1.0-2' }}</td>
+              <td>{{ d.date | date: 'dd MMM y' }}</td>
               <td><app-status-badge [status]="d.status"></app-status-badge></td>
             </tr>
-          </tbody>
-        </table>
-      </div>
+          }
+        </tbody>
+      </table>
     </div>
+  </div>
+}
 
-    <div class="empty-state" *ngIf="!loading && !disbursements.length">
-      <h3>No disbursements yet</h3>
-      <p>Disbursements will appear here once your claims are approved and processed.</p>
-    </div>
+@if (!loading && !disbursements.length) {
+  <div class="empty-state">
+    <h3>No disbursements yet</h3>
+    <p>Disbursements will appear here once your claims are approved and processed.</p>
+  </div>
+}

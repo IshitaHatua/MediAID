@@ -8,13 +8,15 @@
   </div>
 
   <div class="summary-grid">
-    <div class="summary-card" *ngFor="let card of summaryCards">
-      <div class="card-icon-wrap">{{ card.icon }}</div>
-      <div class="card-content">
-        <div class="card-value">{{ card.value }}</div>
-        <div class="card-label">{{ card.label }}</div>
+    @for (card of summaryCards; track card) {
+      <div class="summary-card">
+        <div class="card-icon-wrap">{{ card.icon }}</div>
+        <div class="card-content">
+          <div class="card-value">{{ card.value }}</div>
+          <div class="card-label">{{ card.label }}</div>
+        </div>
       </div>
-    </div>
+    }
   </div>
 
   <div class="quick-actions-card">

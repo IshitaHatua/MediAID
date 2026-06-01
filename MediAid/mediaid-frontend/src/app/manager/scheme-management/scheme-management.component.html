@@ -1,92 +1,153 @@
+<h2 class="page-title">Scheme Management</h2>
+<div class="card">
+  <div class="toolbar">
+    <input
+      class="form-input search-input"
+      placeholder="Search schemes..."
+      [(ngModel)]="search"
+      (input)="applyFilter()"
+    />
+    <button class="btn btn-primary" (click)="showForm = !showForm; resetForm()">
+      + Create Scheme
+    </button>
+  </div>
 
-    <h2 class="page-title">Scheme Management</h2>
-    <div class="card">
-      <div class="toolbar">
-        <input class="form-input search-input" placeholder="Search schemes..." [(ngModel)]="search" (input)="applyFilter()">
-        <button class="btn btn-primary" (click)="showForm=!showForm; resetForm()">+ Create Scheme</button>
-      </div>
+  @if (showForm) {
+    <div class="inline-form scheme-form-panel">
+      <h3>{{ editMode ? 'Edit' : 'New' }} Scheme</h3>
+      <form [formGroup]="schemeForm" (ngSubmit)="submit()" class="scheme-form">
+        <div class="two-col">
+          <div class="form-group">
+            <label>Name</label>
+            <input class="form-input" formControlName="name" />
+            @if (schemeForm.get('name')?.touched && schemeForm.get('name')?.invalid) {
+              <div class="field-error">Required</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Max Coverage (₹)</label>
+            <input class="form-input" formControlName="maxCoverageAmount" type="number" />
+            @if (
+              schemeForm.get('maxCoverageAmount')?.touched &&
+              schemeForm.get('maxCoverageAmount')?.invalid
+            ) {
+              <div class="field-error">Required</div>
+            }
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea
+            class="form-input"
+            formControlName="description"
+            rows="2"
+            maxlength="1000"
+          ></textarea>
+          @if (schemeForm.get('description')?.touched && schemeForm.get('description')?.invalid) {
+            <div class="field-error">Required</div>
+          }
+        </div>
+        <div class="form-group full-width">
+          <label>Eligibility Criteria</label>
+          <textarea
+            class="form-input"
+            formControlName="eligibilityCriteria"
+            rows="2"
+            maxlength="500"
+          ></textarea>
+          @if (
+            schemeForm.get('eligibilityCriteria')?.touched &&
+            schemeForm.get('eligibilityCriteria')?.invalid
+          ) {
+            <div class="field-error">Required</div>
+          }
+        </div>
+        <div class="form-group full-width">
+          <label>Benefits</label>
+          <textarea
+            class="form-input"
+            formControlName="benefits"
+            rows="2"
+            maxlength="500"
+          ></textarea>
+          @if (schemeForm.get('benefits')?.touched && schemeForm.get('benefits')?.invalid) {
+            <div class="field-error">Required</div>
+          }
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>Validity (Years)</label>
+            <input class="form-input" formControlName="validityYears" type="number" min="1" />
+            @if (
+              schemeForm.get('validityYears')?.touched && schemeForm.get('validityYears')?.invalid
+            ) {
+              <div class="field-error">Must be 1 or more</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-input" formControlName="status">
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+            </select>
+            @if (schemeForm.get('status')?.touched && schemeForm.get('status')?.invalid) {
+              <div class="field-error">Required</div>
+            }
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" type="button" (click)="showForm = false">Cancel</button>
+          <button class="btn btn-primary" type="submit">
+            {{ editMode ? 'Update' : 'Create' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
 
-      <div *ngIf="showForm" class="inline-form scheme-form-panel">
-        <h3>{{ editMode ? 'Edit' : 'New' }} Scheme</h3>
-        <form [formGroup]="schemeForm" (ngSubmit)="submit()" class="scheme-form">
-          <div class="two-col">
-            <div class="form-group">
-              <label>Name</label>
-              <input class="form-input" formControlName="name">
-              <div class="field-error" *ngIf="schemeForm.get('name')?.touched && schemeForm.get('name')?.invalid">Required</div>
-            </div>
-            <div class="form-group">
-              <label>Max Coverage (₹)</label>
-              <input class="form-input" formControlName="maxCoverageAmount" type="number">
-              <div class="field-error" *ngIf="schemeForm.get('maxCoverageAmount')?.touched && schemeForm.get('maxCoverageAmount')?.invalid">Required</div>
-            </div>
-          </div>
-          <div class="form-group full-width">
-            <label>Description</label>
-            <textarea class="form-input" formControlName="description" rows="2" maxlength="1000"></textarea>
-            <div class="field-error" *ngIf="schemeForm.get('description')?.touched && schemeForm.get('description')?.invalid">Required</div>
-          </div>
-          <div class="form-group full-width">
-            <label>Eligibility Criteria</label>
-            <textarea class="form-input" formControlName="eligibilityCriteria" rows="2" maxlength="500"></textarea>
-            <div class="field-error" *ngIf="schemeForm.get('eligibilityCriteria')?.touched && schemeForm.get('eligibilityCriteria')?.invalid">Required</div>
-          </div>
-          <div class="form-group full-width">
-            <label>Benefits</label>
-            <textarea class="form-input" formControlName="benefits" rows="2" maxlength="500"></textarea>
-            <div class="field-error" *ngIf="schemeForm.get('benefits')?.touched && schemeForm.get('benefits')?.invalid">Required</div>
-          </div>
-          <div class="two-col">
-            <div class="form-group">
-              <label>Validity (Years)</label>
-              <input class="form-input" formControlName="validityYears" type="number" min="1">
-              <div class="field-error" *ngIf="schemeForm.get('validityYears')?.touched && schemeForm.get('validityYears')?.invalid">Must be 1 or more</div>
-            </div>
-            <div class="form-group">
-              <label>Status</label>
-              <select class="form-input" formControlName="status">
-                <option value="ACTIVE">Active</option>
-                <option value="INACTIVE">Inactive</option>
-              </select>
-              <div class="field-error" *ngIf="schemeForm.get('status')?.touched && schemeForm.get('status')?.invalid">Required</div>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-secondary" type="button" (click)="showForm=false">Cancel</button>
-            <button class="btn btn-primary" type="submit">{{ editMode ? 'Update' : 'Create' }}</button>
-          </div>
-        </form>
-      </div>
+  @if (loading) {
+    <div class="center"><div class="spinner"></div></div>
+  }
 
-      <div class="center" *ngIf="loading"><div class="spinner"></div></div>
-
-      <div class="table-wrap" *ngIf="!loading && filtered.length">
-        <table class="data-table">
-          <thead>
+  @if (!loading && filtered.length) {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Max Coverage</th>
+            <th>Validity</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of filtered; track s) {
             <tr>
-              <th>Name</th>
-              <th>Max Coverage</th>
-              <th>Validity</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let s of filtered">
               <td>{{ s.name }}</td>
-              <td>₹{{ s.maxCoverageAmount | number:'1.0-0' }}</td>
+              <td>₹{{ s.maxCoverageAmount | number: '1.0-0' }}</td>
               <td>{{ s.validityYears }} yr(s)</td>
               <td><app-status-badge [status]="s.status"></app-status-badge></td>
               <td>
-                <button class="btn btn-outline btn-sm" (click)="toggleStatus(s)" [title]="s.status === 'ACTIVE' ? 'Deactivate' : 'Activate'">
+                <button
+                  class="btn btn-outline btn-sm"
+                  (click)="toggleStatus(s)"
+                  [title]="s.status === 'ACTIVE' ? 'Deactivate' : 'Activate'"
+                >
                   {{ s.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
                 </button>
-                <button class="btn btn-danger btn-sm" (click)="deleteScheme(s)" title="Delete">✕ Delete</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteScheme(s)" title="Delete">
+                  ✕ Delete
+                </button>
               </td>
             </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p *ngIf="!loading && !filtered.length" class="empty">No schemes found.</p>
+          }
+        </tbody>
+      </table>
     </div>
+  }
+
+  @if (!loading && !filtered.length) {
+    <p class="empty">No schemes found.</p>
+  }
+</div>

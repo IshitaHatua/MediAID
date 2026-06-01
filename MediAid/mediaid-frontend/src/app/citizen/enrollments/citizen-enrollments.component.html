@@ -1,43 +1,57 @@
+<h2 class="page-title">My Enrollments</h2>
 
-    <h2 class="page-title">My Enrollments</h2>
-
-    <div class="no-profile-banner" *ngIf="!profileLoading && !hasProfile">
-      <div>
-        <strong>Profile Required</strong>
-        <p>You need to create your citizen profile before you can enroll in schemes.</p>
-      </div>
-      <a class="btn btn-primary" routerLink="/citizen/profile">Create Profile</a>
+@if (!profileLoading && !hasProfile) {
+  <div class="no-profile-banner">
+    <div>
+      <strong>Profile Required</strong>
+      <p>You need to create your citizen profile before you can enroll in schemes.</p>
     </div>
+    <a class="btn btn-primary" routerLink="/citizen/profile">Create Profile</a>
+  </div>
+}
 
-    <div class="pending-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'PENDING'">
-      <div>
-        <strong>Profile Pending Approval</strong>
-        <p>Your citizen profile is awaiting officer verification. You can enroll in schemes once your profile is approved.</p>
-      </div>
+@if (!profileLoading && hasProfile && citizenStatus === 'PENDING') {
+  <div class="pending-banner">
+    <div>
+      <strong>Profile Pending Approval</strong>
+      <p>
+        Your citizen profile is awaiting officer verification. You can enroll in schemes once your
+        profile is approved.
+      </p>
     </div>
+  </div>
+}
 
-    <div class="rejected-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'REJECTED'">
-      <div>
-        <strong>Profile Rejected</strong>
-        <p>Your citizen profile was rejected. Please update your profile and contact support.</p>
-      </div>
-      <a class="btn btn-danger" routerLink="/citizen/profile">Update Profile</a>
+@if (!profileLoading && hasProfile && citizenStatus === 'REJECTED') {
+  <div class="rejected-banner">
+    <div>
+      <strong>Profile Rejected</strong>
+      <p>Your citizen profile was rejected. Please update your profile and contact support.</p>
     </div>
+    <a class="btn btn-danger" routerLink="/citizen/profile">Update Profile</a>
+  </div>
+}
 
-    <div class="rejected-banner" *ngIf="!profileLoading && hasProfile && citizenStatus === 'SUSPENDED'">
-      <div>
-        <strong>Profile Suspended</strong>
-        <p>Your citizen profile has been suspended. Please contact support for assistance.</p>
-      </div>
+@if (!profileLoading && hasProfile && citizenStatus === 'SUSPENDED') {
+  <div class="rejected-banner">
+    <div>
+      <strong>Profile Suspended</strong>
+      <p>Your citizen profile has been suspended. Please contact support for assistance.</p>
     </div>
+  </div>
+}
 
-    <div class="card" *ngIf="!profileLoading && hasProfile && citizenStatus === 'VERIFIED'">
-      <div class="toolbar">
-        <span class="text-muted">{{ enrollments.length }} enrollment(s)</span>
-        <button class="btn btn-primary" (click)="openEnrollDialog()">+ Enroll in Scheme</button>
-      </div>
-      <div class="center" *ngIf="loading"><div class="spinner"></div></div>
-      <div class="table-wrap" *ngIf="!loading && enrollments.length">
+@if (!profileLoading && hasProfile && citizenStatus === 'VERIFIED') {
+  <div class="card">
+    <div class="toolbar">
+      <span class="text-muted">{{ enrollments.length }} enrollment(s)</span>
+      <button class="btn btn-primary" (click)="openEnrollDialog()">+ Enroll in Scheme</button>
+    </div>
+    @if (loading) {
+      <div class="center"><div class="spinner"></div></div>
+    }
+    @if (!loading && enrollments.length) {
+      <div class="table-wrap">
         <table class="data-table">
           <thead>
             <tr>
@@ -49,59 +63,98 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let e of enrollments">
-              <td>{{ e.enrollmentId }}</td>
-              <td>{{ schemeName(e.schemeId) }}</td>
-              <td>{{ e.enrollmentDate | date:'mediumDate' }}</td>
-              <td>{{ e.expiryDate | date:'mediumDate' }}</td>
-              <td><app-status-badge [status]="e.status"></app-status-badge></td>
-            </tr>
+            @for (e of enrollments; track e) {
+              <tr>
+                <td>{{ e.enrollmentId }}</td>
+                <td>{{ schemeName(e.schemeId) }}</td>
+                <td>{{ e.enrollmentDate | date: 'mediumDate' }}</td>
+                <td>{{ e.expiryDate | date: 'mediumDate' }}</td>
+                <td><app-status-badge [status]="e.status"></app-status-badge></td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
-      <p *ngIf="!loading && !enrollments.length" class="empty">No enrollments yet.</p>
-    </div>
-    <div class="center" *ngIf="profileLoading"><div class="spinner"></div></div>
+    }
+    @if (!loading && !enrollments.length) {
+      <p class="empty">No enrollments yet.</p>
+    }
+  </div>
+}
+@if (profileLoading) {
+  <div class="center"><div class="spinner"></div></div>
+}
 
-    <div class="dialog-overlay" *ngIf="showDialog">
-      <div class="card dialog-card">
-        <button class="btn btn-secondary btn-sm dialog-close-btn" type="button" aria-label="Close" (click)="showDialog=false">✕</button>
-        <h3>Enroll in a Scheme</h3>
-        <form [formGroup]="enrollForm" (ngSubmit)="submitEnroll()">
-          <div class="form-group">
-            <label>Select Scheme</label>
-            <select class="form-input" formControlName="schemeId">
-              <option [ngValue]="null" disabled *ngIf="schemesLoading">Loading schemes...</option>
-              <option [ngValue]="null" disabled *ngIf="!schemesLoading && schemes.length === 0">No active schemes available</option>
-              <option *ngFor="let s of schemes" [ngValue]="s.schemeId">{{ s.name }}</option>
-            </select>
-            <div class="field-error" *ngIf="enrollForm.get('schemeId')?.touched && enrollForm.get('schemeId')?.invalid">Please select a scheme</div>
-          </div>
-
-          <div class="scheme-details" *ngIf="selectedScheme as s">
+@if (showDialog) {
+  <div class="dialog-overlay">
+    <div class="card dialog-card">
+      <button
+        class="btn btn-secondary btn-sm dialog-close-btn"
+        type="button"
+        aria-label="Close"
+        (click)="showDialog = false"
+      >
+        ✕
+      </button>
+      <h3>Enroll in a Scheme</h3>
+      <form [formGroup]="enrollForm" (ngSubmit)="submitEnroll()">
+        <div class="form-group">
+          <label>Select Scheme</label>
+          <select class="form-input" formControlName="schemeId">
+            @if (schemesLoading) {
+              <option [ngValue]="null" disabled>Loading schemes...</option>
+            }
+            @if (!schemesLoading && schemes.length === 0) {
+              <option [ngValue]="null" disabled>No active schemes available</option>
+            }
+            @for (s of schemes; track s) {
+              <option [ngValue]="s.schemeId">{{ s.name }}</option>
+            }
+          </select>
+          @if (enrollForm.get('schemeId')?.touched && enrollForm.get('schemeId')?.invalid) {
+            <div class="field-error">Please select a scheme</div>
+          }
+        </div>
+        @if (selectedScheme; as s) {
+          <div class="scheme-details">
             <div class="scheme-details-header">About this scheme</div>
             <div class="scheme-pills">
-              <span class="pill pill-coverage">Max coverage: ₹{{ s.maxCoverageAmount | number:'1.0-0' }}</span>
-              <span class="pill pill-validity">Valid for {{ s.validityYears }} year{{ s.validityYears === 1 ? '' : 's' }}</span>
+              <span class="pill pill-coverage"
+                >Max coverage: ₹{{ s.maxCoverageAmount | number: '1.0-0' }}</span
+              >
+              <span class="pill pill-validity"
+                >Valid for {{ s.validityYears }} year{{ s.validityYears === 1 ? '' : 's' }}</span
+              >
             </div>
-            <div class="scheme-section" *ngIf="s.description">
-              <div class="scheme-section-label">Description</div>
-              <p>{{ s.description }}</p>
-            </div>
-            <div class="scheme-section" *ngIf="s.benefits">
-              <div class="scheme-section-label">Benefits</div>
-              <p>{{ s.benefits }}</p>
-            </div>
-            <div class="scheme-section" *ngIf="s.eligibilityCriteria">
-              <div class="scheme-section-label">Eligibility</div>
-              <p>{{ s.eligibilityCriteria }}</p>
-            </div>
+            @if (s.description) {
+              <div class="scheme-section">
+                <div class="scheme-section-label">Description</div>
+                <p>{{ s.description }}</p>
+              </div>
+            }
+            @if (s.benefits) {
+              <div class="scheme-section">
+                <div class="scheme-section-label">Benefits</div>
+                <p>{{ s.benefits }}</p>
+              </div>
+            }
+            @if (s.eligibilityCriteria) {
+              <div class="scheme-section">
+                <div class="scheme-section-label">Eligibility</div>
+                <p>{{ s.eligibilityCriteria }}</p>
+              </div>
+            }
           </div>
-
-          <div class="dialog-actions">
-            <button class="btn btn-secondary" type="button" (click)="showDialog=false">Cancel</button>
-            <button class="btn btn-primary" type="submit" [disabled]="schemes.length === 0">Enroll</button>
-          </div>
-        </form>
-      </div>
+        }
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" type="button" (click)="showDialog = false">
+            Cancel
+          </button>
+          <button class="btn btn-primary" type="submit" [disabled]="schemes.length === 0">
+            Enroll
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
+}

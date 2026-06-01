@@ -3,58 +3,107 @@
   <div class="toolbar">
     <div class="form-group search-field">
       <label>Search users</label>
-      <input class="form-input" [(ngModel)]="search" (input)="applyFilter()" placeholder="Name or email">
+      <input
+        class="form-input"
+        [(ngModel)]="search"
+        (input)="applyFilter()"
+        placeholder="Name or email"
+      />
     </div>
     <span>{{ users.length }} user(s)</span>
   </div>
 
-  <div class="center" *ngIf="loading"><div class="spinner"></div></div>
+  @if (loading) {
+    <div class="center"><div class="spinner"></div></div>
+  }
 
-  <div class="table-wrap" *ngIf="!loading">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let u of filteredUsers" [class.editing-row]="editingUser?.userId === u.userId">
-          <td>{{ u.userId }}</td>
-          <td>
-            <span *ngIf="editingUser?.userId !== u.userId">{{ u.name }}</span>
-            <input *ngIf="editingUser?.userId === u.userId" [(ngModel)]="editingUser.name" class="form-input inline-input">
-          </td>
-          <td>{{ u.email }}</td>
-          <td>
-            <span *ngIf="editingUser?.userId !== u.userId" class="role-chip {{ (u.role || '').toLowerCase() }}">{{ u.role }}</span>
-            <select *ngIf="editingUser?.userId === u.userId" [(ngModel)]="editingUser.role" class="form-input inline-input">
-              <option value="CITIZEN">Citizen</option>
-              <option value="OFFICER">Officer</option>
-              <option value="MANAGER">Manager</option>
-              <option value="ADMIN">Admin</option>
-              <option value="COMPLIANCE">Compliance</option>
-              <option value="AUDITOR">Auditor</option>
-            </select>
-          </td>
-          <td class="actions-cell">
-            <ng-container *ngIf="editingUser?.userId !== u.userId">
-              <button type="button" class="btn btn-sm btn-outline" (click)="startEdit(u)" title="Edit">&#9998; Edit</button>
-              <button type="button" class="btn btn-sm btn-danger" (click)="deleteUser(u)" title="Delete">&#10005; Delete</button>
-            </ng-container>
-            <ng-container *ngIf="editingUser?.userId === u.userId">
-              <button type="button" class="btn btn-sm btn-primary" (click)="saveEdit(u)" title="Save">&#10003; Save</button>
-              <button type="button" class="btn btn-sm btn-secondary" (click)="editingUser=null" title="Cancel">&#10005; Cancel</button>
-            </ng-container>
-          </td>
-        </tr>
-        <tr *ngIf="filteredUsers.length === 0">
-          <td colspan="5" class="empty">No users found.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  @if (!loading) {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of filteredUsers; track u) {
+            <tr [class.editing-row]="editingUser?.userId === u.userId">
+              <td>{{ u.userId }}</td>
+              <td>
+                @if (editingUser?.userId !== u.userId) {
+                  <span>{{ u.name }}</span>
+                }
+                @if (editingUser?.userId === u.userId) {
+                  <input [(ngModel)]="editingUser.name" class="form-input inline-input" />
+                }
+              </td>
+              <td>{{ u.email }}</td>
+              <td>
+                @if (editingUser?.userId !== u.userId) {
+                  <span class="role-chip {{ (u.role || '').toLowerCase() }}">{{ u.role }}</span>
+                }
+                @if (editingUser?.userId === u.userId) {
+                  <select [(ngModel)]="editingUser.role" class="form-input inline-input">
+                    <option value="CITIZEN">Citizen</option>
+                    <option value="OFFICER">Officer</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="COMPLIANCE">Compliance</option>
+                    <option value="AUDITOR">Auditor</option>
+                  </select>
+                }
+              </td>
+              <td class="actions-cell">
+                @if (editingUser?.userId !== u.userId) {
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline"
+                    (click)="startEdit(u)"
+                    title="Edit"
+                  >
+                    &#9998; Edit
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    (click)="deleteUser(u)"
+                    title="Delete"
+                  >
+                    &#10005; Delete
+                  </button>
+                }
+                @if (editingUser?.userId === u.userId) {
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    (click)="saveEdit(u)"
+                    title="Save"
+                  >
+                    &#10003; Save
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-secondary"
+                    (click)="editingUser = null"
+                    title="Cancel"
+                  >
+                    &#10005; Cancel
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+          @if (filteredUsers.length === 0) {
+            <tr>
+              <td colspan="5" class="empty">No users found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </div>
