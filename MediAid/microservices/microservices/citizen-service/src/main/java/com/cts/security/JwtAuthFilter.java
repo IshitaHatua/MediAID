@@ -14,12 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Authentication filter for downstream services.
- * Authentication is centralised at the API Gateway, which validates the JWT and
- * injects the resolved user identity as trusted headers before forwarding the request.
- * This filter simply reads those headers and populates the SecurityContext.
- */
+
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -41,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
-                // Invalid header format — leave SecurityContext unauthenticated
+            	
             }
         }
 

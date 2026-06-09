@@ -10,7 +10,7 @@ import jakarta.validation.ConstraintValidatorContext;
 public class ValidDateValidator implements ConstraintValidator<ValidDate, String> {
 
     private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
@@ -20,7 +20,13 @@ public class ValidDateValidator implements ConstraintValidator<ValidDate, String
         }
 
         try {
-            LocalDate.parse(value, FORMATTER);
+            LocalDate date = LocalDate.parse(value, FORMATTER);
+
+            // date must not be in the future
+            if (date.isAfter(LocalDate.now())) {
+                return false;
+            }
+
             return true;
         } catch (DateTimeParseException e) {
             return false;

@@ -30,9 +30,10 @@ const NAV_MAP: Record<string, NavItem[]> = {
     { label: 'Schemes', icon: 'local_offer', route: '/manager/schemes' },
   ],
   ADMIN: [
-    { label: 'Dashboard', icon: 'dashboard', route: '/admin/dashboard' },
+    { label: 'Dashboard',       icon: 'dashboard',       route: '/admin/dashboard' },
     { label: 'User Management', icon: 'manage_accounts', route: '/admin/users' },
-    { label: 'Audit Logs', icon: 'manage_search', route: '/admin/audit-logs' },
+    { label: 'Citizens',        icon: 'people',          route: '/admin/citizens' },
+    { label: 'Audit Logs',      icon: 'manage_search',   route: '/admin/audit-logs' },
   ],
   COMPLIANCE: [
     { label: 'Dashboard', icon: 'dashboard', route: '/compliance/dashboard' },

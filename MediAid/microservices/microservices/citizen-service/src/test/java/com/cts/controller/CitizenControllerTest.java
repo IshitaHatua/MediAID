@@ -45,7 +45,7 @@ class CitizenControllerTest {
     void setUp() {
         requestDTO = new CitizenRequestDTO();
         requestDTO.setName("Jane Doe");
-        requestDTO.setDob("15-06-1995");
+        requestDTO.setDob("1995-06-15");
         requestDTO.setGender("Female");
         requestDTO.setAddress("456 Elm Street");
         requestDTO.setContactInfo("9123456789");

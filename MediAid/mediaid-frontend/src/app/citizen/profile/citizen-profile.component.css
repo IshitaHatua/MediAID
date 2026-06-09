@@ -1,5 +1,6 @@
 
     .profile-card { padding: 1.75rem; max-width: 43.75rem; }
+    .doc-delete-btn { margin-left: 0.5rem; }
     .cancel-edit-btn { margin-top: 0.5rem; }
     .center { display: flex; justify-content: center; padding: 2rem; }
     .profile-header { display: flex; align-items: center; gap: 1.125rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e0e0e0; }

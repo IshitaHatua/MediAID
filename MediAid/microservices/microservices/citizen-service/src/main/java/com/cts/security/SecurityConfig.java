@@ -26,10 +26,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Download endpoint: no role restriction — accessible to any
-                        // authenticated caller; gateway enforces JWT before routing here.
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
-                                "/api/documents/*/download")
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter,

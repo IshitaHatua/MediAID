@@ -1,0 +1,84 @@
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Citizen Management</h2>
+    <p class="page-sub">View all citizens and suspend accounts when necessary</p>
+  </div>
+</div>
+
+<div class="card">
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <input
+      class="form-input search-field"
+      [(ngModel)]="search"
+      (input)="applyFilter()"
+      placeholder="Search by name or ID"
+    />
+
+    <select class="form-input status-filter" [(ngModel)]="selectedStatus" (change)="applyFilter()">
+      <option value="">All Statuses</option>
+      <option value="PENDING">Pending</option>
+      <option value="VERIFIED">Verified</option>
+      <option value="REJECTED">Rejected</option>
+      <option value="SUSPENDED">Suspended</option>
+    </select>
+
+    <div class="toolbar-right">
+      @if (!loading) {
+        <span>{{ filteredCitizens.length }} citizen(s)</span>
+      }
+      <button class="btn btn-outline btn-sm" (click)="loadCitizens()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="center"><div class="spinner"></div></div>
+  }
+
+  <!-- Table -->
+  @if (!loading) {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of filteredCitizens; track c.citizenId) {
+            <tr>
+              <td>{{ c.citizenId }}</td>
+              <td>{{ c.name }}</td>
+              <td>
+                <app-status-badge [status]="c.status"></app-status-badge>
+              </td>
+              <td class="actions-cell">
+                @if (c.status !== 'SUSPENDED') {
+                  <button
+                    class="btn btn-danger btn-sm"
+                    (click)="suspendCitizen(c)"
+                    title="Suspend this citizen"
+                  >
+                    🚫 Suspend
+                  </button>
+                }
+                @if (c.status === 'SUSPENDED') {
+                  <span class="suspended-label">Account Suspended</span>
+                }
+              </td>
+            </tr>
+          }
+          @if (filteredCitizens.length === 0) {
+            <tr>
+              <td colspan="4" class="empty">No citizens found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

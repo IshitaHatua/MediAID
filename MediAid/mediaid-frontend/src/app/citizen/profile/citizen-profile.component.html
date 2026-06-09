@@ -75,7 +75,8 @@
         <button
           type="button"
           class="btn btn-primary"
-          [disabled]="uploading"
+          [disabled]="uploading || isSuspended"
+          [title]="isSuspended ? 'Account suspended — uploads disabled' : ''"
           (click)="triggerFilePicker()"
         >
           @if (!uploading) {
@@ -135,7 +136,7 @@
                     ↓
                   </button>
                   <button
-                    class="btn btn-danger btn-sm"
+                    class="btn btn-danger btn-sm doc-delete-btn"
                     (click)="deleteDoc(d)"
                     title="Delete / Replace"
                   >

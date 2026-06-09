@@ -50,6 +50,7 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', loadComponent: () => import('./dashboard/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
       { path: 'users', loadComponent: () => import('./admin/user-management/user-management.component').then(m => m.UserManagementComponent) },
+      { path: 'citizens', loadComponent: () => import('./admin/citizen-management/citizen-management.component').then(m => m.AdminCitizenManagementComponent) },
       { path: 'audit-logs', loadComponent: () => import('./admin/audit-logs/audit-logs.component').then(m => m.AuditLogsComponent) },
     ]
   },

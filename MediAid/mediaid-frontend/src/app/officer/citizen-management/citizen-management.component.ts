@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -25,6 +25,7 @@ export class CitizenManagementComponent implements OnInit {
     private citizenSvc: CitizenService,
     private refresh: RefreshService,
     private toastr: ToastrService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -39,12 +40,14 @@ export class CitizenManagementComponent implements OnInit {
       next: (r) => {
         this.pendingLoading = false;
         if (r.data) this.pendingCitizens = r.data.filter((c: any) => c.status === 'PENDING');
+        this.cdr.markForCheck();
       },
       error: () => {
         this.pendingLoading = false;
         this.toastr.error(
           'Could not load pending citizens. Restart the citizen-service and click Refresh.',
         );
+        this.cdr.markForCheck();
       },
     });
   }
@@ -57,14 +60,17 @@ export class CitizenManagementComponent implements OnInit {
     this.expandedCitizen = citizenId;
     if (this.citizenDocs[citizenId]) return;
     this.docsLoading[citizenId] = true;
+    this.cdr.markForCheck();
     this.citizenSvc.getDocuments(citizenId).subscribe({
       next: (r) => {
         this.docsLoading[citizenId] = false;
         this.citizenDocs[citizenId] = r.data ?? [];
+        this.cdr.markForCheck();
       },
       error: () => {
         this.docsLoading[citizenId] = false;
         this.citizenDocs[citizenId] = [];
+        this.cdr.markForCheck();
       },
     });
   }
@@ -135,23 +141,13 @@ export class CitizenManagementComponent implements OnInit {
         if (this.expandedCitizen === c.citizenId) this.expandedCitizen = null;
         this.refresh.notify('citizens');
         this.toastr.success(`Citizen ${status.toLowerCase()}.`);
+        this.cdr.markForCheck();
       },
-      error: () => this.toastr.error(`Could not ${status.toLowerCase()} citizen.`),
+      error: () => {
+        this.toastr.error(`Could not ${status.toLowerCase()} citizen.`);
+        this.cdr.markForCheck();
+      },
     });
   }
 
-  verifyDoc(citizenId: number, documentId: number, status: string) {
-    this.citizenSvc.verifyDocument(documentId, status).subscribe({
-      next: () => {
-        const docs = this.citizenDocs[citizenId];
-        if (docs) {
-          const target = docs.find((d) => d.documentId === documentId);
-          if (target) target.verificationStatus = status.toUpperCase();
-          this.citizenDocs[citizenId] = [...docs];
-        }
-        this.toastr.success(`Document ${status.toLowerCase()}.`);
-      },
-      error: () => this.toastr.error(`Could not ${status.toLowerCase()} document.`),
-    });
-  }
 }

@@ -3,8 +3,6 @@ package com.cts.service.serviceImpl;
 import com.cts.client.AuditServiceClient;
 import com.cts.dto.request.CitizenDocumentRequestDTO;
 import com.cts.dto.response.CitizenDocumentResponseDTO;
-import com.cts.enums.DocumentVerificationStatus;
-import com.cts.exception.BadRequestException;
 import com.cts.exception.ResourceNotFoundException;
 import com.cts.mapper.CitizenDocumentMapper;
 import com.cts.model.Citizen;
@@ -92,27 +90,6 @@ public class CitizenDocumentServiceImpl implements CitizenDocumentService {
     }
 
     @Override
-    public CitizenDocumentResponseDTO verifyDocuments(long documentId, String status)
-            throws BadRequestException, ResourceNotFoundException {
-
-        CitizenDocument doc = docRepo.findById(documentId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Document not found with id " + documentId));
-
-        try {
-            DocumentVerificationStatus verificationStatus =
-                    DocumentVerificationStatus.valueOf(status.toUpperCase());
-            doc.setVerificationStatus(verificationStatus);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid status value. Must be: PENDING, VERIFIED, or REJECTED");
-        }
-
-        CitizenDocument verified = docRepo.save(doc);
-        auditServiceClient.log(currentUserUtil.getUserId(), "VERIFY", "CitizenDocument");
-        return citizenDocumentMapper.toDto(verified);
-    }
-
-    @Override
     public void deleteDocument(long documentId) throws ResourceNotFoundException {
         CitizenDocument doc = docRepo.findById(documentId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -123,8 +100,12 @@ public class CitizenDocumentServiceImpl implements CitizenDocumentService {
 
         if (fileUri != null && !fileUri.isBlank()) {
             try {
-                Path filePath = Paths.get(uploadDir).resolve(fileUri).normalize();
-                Files.deleteIfExists(filePath);
+                Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+                Path filePath   = uploadPath.resolve(fileUri).normalize();
+
+                if (filePath.startsWith(uploadPath)) {
+                    Files.deleteIfExists(filePath);
+                }
             } catch (IOException ignored) {
                 // file removal best-effort; DB row is already gone
             }

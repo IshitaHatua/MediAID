@@ -14,7 +14,7 @@ import jakarta.validation.Payload;
 @Retention(RUNTIME)
 public @interface ValidDate {
 
-    String message() default "Invalid date format. Expected dd-MM-yyyy";
+    String message() default "Invalid date format. Expected yyyy-MM-dd";
 
     Class<?>[] groups() default {};
 

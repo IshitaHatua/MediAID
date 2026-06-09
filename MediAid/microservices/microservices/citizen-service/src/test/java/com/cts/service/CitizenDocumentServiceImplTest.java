@@ -58,13 +58,13 @@ class CitizenDocumentServiceImplTest {
         document.setDocumentId(10L);
         document.setDocType("Aadhaar");
         document.setFileUri("uploads/uuid_aadhaar.pdf");
-        document.setUploadedDate("15-01-2024");
+        document.setUploadedDate("2024-01-15");
         document.setVerificationStatus(DocumentVerificationStatus.PENDING);
         document.setCitizen(citizen);
 
         requestDTO = new CitizenDocumentRequestDTO();
         requestDTO.setDocType("Aadhaar");
-        requestDTO.setUploadedDate("15-01-2024");
+        requestDTO.setUploadedDate("2024-01-15");
         requestDTO.setFile(new MockMultipartFile("file", "aadhaar.pdf", "application/pdf", new byte[]{1, 2, 3}));
 
         responseDTO = new CitizenDocumentResponseDTO();
@@ -144,60 +144,4 @@ class CitizenDocumentServiceImplTest {
                 .isInstanceOf(BadRequestException.class);
     }
 
-    // --- verifyDocuments ---
-
-    @Test
-    void verifyDocuments_verified_success() {
-        when(docRepo.findById(10L)).thenReturn(Optional.of(document));
-        when(docRepo.save(any())).thenReturn(document);
-        when(citizenDocumentMapper.toDto(document)).thenReturn(responseDTO);
-        when(currentUserUtil.getUserId()).thenReturn(2L);
-
-        documentService.verifyDocuments(10L, "VERIFIED");
-
-        assertThat(document.getVerificationStatus()).isEqualTo(DocumentVerificationStatus.VERIFIED);
-        verify(auditServiceClient).log(2L, "VERIFY", "CitizenDocument");
-    }
-
-    @Test
-    void verifyDocuments_rejected_success() {
-        when(docRepo.findById(10L)).thenReturn(Optional.of(document));
-        when(docRepo.save(any())).thenReturn(document);
-        when(citizenDocumentMapper.toDto(document)).thenReturn(responseDTO);
-        when(currentUserUtil.getUserId()).thenReturn(2L);
-
-        documentService.verifyDocuments(10L, "REJECTED");
-
-        assertThat(document.getVerificationStatus()).isEqualTo(DocumentVerificationStatus.REJECTED);
-    }
-
-    @Test
-    void verifyDocuments_invalidStatus_throwsBadRequest() {
-        when(docRepo.findById(10L)).thenReturn(Optional.of(document));
-
-        assertThatThrownBy(() -> documentService.verifyDocuments(10L, "INVALID_STATUS"))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("Invalid status value. Must be: PENDING, VERIFIED, or REJECTED");
-    }
-
-    @Test
-    void verifyDocuments_documentNotFound_throwsException() {
-        when(docRepo.findById(99L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> documentService.verifyDocuments(99L, "VERIFIED"))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("99");
-    }
-
-    @Test
-    void verifyDocuments_lowercaseStatus_success() {
-        when(docRepo.findById(10L)).thenReturn(Optional.of(document));
-        when(docRepo.save(any())).thenReturn(document);
-        when(citizenDocumentMapper.toDto(document)).thenReturn(responseDTO);
-        when(currentUserUtil.getUserId()).thenReturn(2L);
-
-        documentService.verifyDocuments(10L, "verified");
-
-        assertThat(document.getVerificationStatus()).isEqualTo(DocumentVerificationStatus.VERIFIED);
-    }
 }

@@ -1,5 +1,6 @@
 
     .search-input { flex: 1; max-width: 18.75rem; }
+    .scheme-delete-btn { margin-left: 0.5rem; }
     .scheme-form-panel { margin-bottom: 1.25rem; }
     .scheme-form-panel h3 { margin: 0 0 1rem; color: #2f62e8; font-size: 1.1rem; }
     .scheme-form { display: flex; flex-direction: column; gap: 0.75rem; }

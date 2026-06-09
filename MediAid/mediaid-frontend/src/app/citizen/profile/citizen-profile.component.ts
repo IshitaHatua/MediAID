@@ -70,9 +70,9 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
       error: () => { this.loading = false; this.cdr.markForCheck(); }
     });
 
-    interval(20_000).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      if (this.citizen && !this.uploading) this.loadDocs(true);
-    });
+    // interval(20_000).pipe(takeUntil(this.destroy$)).subscribe(() => {
+    //   if (this.citizen && !this.uploading) this.loadDocs(true);
+    // });
 
     this.refresh.events$.pipe(takeUntil(this.destroy$)).subscribe(topic => {
       if (topic === 'citizens' && this.citizen) this.loadDocs(true);
@@ -92,13 +92,7 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
   startEdit() {
     this.editing = true;
     const patch: any = { ...this.citizen };
-    if (patch.dob && typeof patch.dob === 'string') {
-      const parts = patch.dob.split('-');
-      if (parts.length === 3) {
-        const [a, b, c] = parts;
-        patch.dob = a.length === 2 ? `${c}-${b}-${a}` : `${a}-${b}-${c}`;
-      }
-    }
+    // dob is already yyyy-MM-dd — no transformation needed
     this.form.patchValue(patch);
   }
 
@@ -107,10 +101,7 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
     this.saving = true;
     const userId = Number(this.auth.getUserId());
     const raw = this.form.value as any;
-    if (raw.dob && raw.dob.includes('-') && raw.dob.indexOf('-') === 4) {
-      const [y, m, d] = raw.dob.split('-');
-      raw.dob = `${d}-${m}-${y}`;
-    }
+    // dob stays as yyyy-MM-dd — backend accepts it directly
     const isUpdate = !!this.citizen;
     const obs = this.citizen
       ? this.citizenSvc.updateCitizen(userId, raw)
@@ -137,8 +128,16 @@ export class CitizenProfileComponent implements OnInit, OnDestroy {
     });
   }
 
+  get isSuspended(): boolean {
+    return this.citizen?.status === 'SUSPENDED';
+  }
+
   triggerFilePicker() {
     if (this.uploading) return;
+    if (this.isSuspended) {
+      this.toastr.error('Your account is suspended. You cannot upload documents.');
+      return;
+    }
     if (this.hasDocument) {
       this.toastr.warning('Only one document is allowed. Delete the existing one to upload a new file.');
       return;

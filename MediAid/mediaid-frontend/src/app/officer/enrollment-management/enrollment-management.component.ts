@@ -87,10 +87,9 @@ export class EnrollmentManagementComponent implements OnInit {
   }
 
   private parseDob(s: string): Date | null {
-    const m1 = /^(\d{2})-(\d{2})-(\d{4})$/.exec(s);
-    if (m1) return new Date(+m1[3], +m1[2] - 1, +m1[1]);
-    const m2 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
-    if (m2) return new Date(+m2[1], +m2[2] - 1, +m2[3]);
+    // backend now always returns yyyy-MM-dd
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+    if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
     const fallback = new Date(s);
     return isNaN(fallback.getTime()) ? null : fallback;
   }

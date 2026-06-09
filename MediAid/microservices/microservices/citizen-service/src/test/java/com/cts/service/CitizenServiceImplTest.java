@@ -51,7 +51,7 @@ class CitizenServiceImplTest {
         citizen = new Citizen();
         citizen.setCitizenId(1L);
         citizen.setName("John Doe");
-        citizen.setDob("01-01-1990");
+        citizen.setDob("1990-01-01");
         citizen.setGender("Male");
         citizen.setAddress("123 Main St");
         citizen.setContactInfo("9876543210");
@@ -59,7 +59,7 @@ class CitizenServiceImplTest {
 
         requestDTO = new CitizenRequestDTO();
         requestDTO.setName("John Doe");
-        requestDTO.setDob("01-01-1990");
+        requestDTO.setDob("1990-01-01");
         requestDTO.setGender("Male");
         requestDTO.setAddress("123 Main St");
         requestDTO.setContactInfo("9876543210");

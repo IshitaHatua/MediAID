@@ -24,6 +24,7 @@ public class CitizenController {
         this.citizenService = citizenService;
     }
 
+    // OFFICER / MANAGER / ADMIN can view all citizens
     @PreAuthorize("hasAnyRole('OFFICER','MANAGER','ADMIN')")
     @GetMapping
     public ResponseEntity<APIResponse<List<CitizenResponseDTO>>> getAllCitizens() {
@@ -36,6 +37,8 @@ public class CitizenController {
         return ResponseEntity.ok(response);
     }
 
+    // Only CITIZEN role can register themselves
+    @PreAuthorize("hasRole('CITIZEN')")
     @PostMapping
     public ResponseEntity<APIResponse<CitizenResponseDTO>> createCitizen(@Valid @RequestBody CitizenRequestDTO dto) {
         CitizenResponseDTO responseDTO = citizenService.createCitizen(dto);
@@ -49,6 +52,8 @@ public class CitizenController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // Citizen can view their own profile; Officers/Admin can view any
+    @PreAuthorize("hasAnyRole('CITIZEN','OFFICER','ADMIN','MANAGER')")
     @GetMapping("/{citizenId}")
     public ResponseEntity<APIResponse<CitizenResponseDTO>> findCitizenById(@PathVariable long citizenId) {
 
@@ -63,6 +68,8 @@ public class CitizenController {
         return ResponseEntity.ok(response);
     }
 
+    // Only CITIZEN role can update — service enforces ownership
+    @PreAuthorize("hasRole('CITIZEN')")
     @PutMapping("/{citizenId}")
     public ResponseEntity<APIResponse<CitizenResponseDTO>> updateCitizen(@PathVariable long citizenId,
                                  @Valid @RequestBody CitizenRequestDTO dto){

@@ -17,19 +17,16 @@ public class CurrentUserUtil {
     }
 
     public Long getUserId() {
-        // Try X-User-Id header first (Spring Cloud Gateway)
         String userIdHeader = request.getHeader("X-User-Id");
         if (userIdHeader != null) {
             return Long.parseLong(userIdHeader);
         }
 
-        // Read from Security Context (set by JwtAuthFilter)  
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof Long) {
             return (Long) authentication.getPrincipal();
         }
 
-        // Fall back to JWT token directly
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);

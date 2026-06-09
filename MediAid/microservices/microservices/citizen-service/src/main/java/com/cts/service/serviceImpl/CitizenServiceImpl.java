@@ -111,9 +111,7 @@ public class CitizenServiceImpl implements CitizenService {
         citizen.setStatus(status);
         Citizen updated = citizenRepository.save(citizen);
 
-        // Cascade the same decision to every document the citizen has uploaded.
-        // The per-document Verify/Reject buttons were removed from the officer UI,
-        // so the citizen-level decision is the single source of truth for documents too.
+        
         DocumentVerificationStatus docStatus = (status == CitizenStatus.VERIFIED)
                 ? DocumentVerificationStatus.VERIFIED
                 : DocumentVerificationStatus.REJECTED;
